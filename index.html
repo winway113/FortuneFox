@@ -1,0 +1,198 @@
+html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FortuneFox Casino</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Верхняя панель */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #252525;
+            border-bottom: 2px solid #f39c12;
+        }
+
+        .balance-section {
+            display: flex;
+            align-items: center;
+            background: #333;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .balance-section .plus {
+            color: #2ecc71;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .casino-name {
+            font-weight: bold;
+            color: #f39c12;
+            font-size: 1.2em;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #555;
+            border: 2px solid #f39c12;
+            cursor: pointer;
+        }
+
+        /* Кнопка "три полоски" */
+        .menu-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #f39c12;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            z-index: 100;
+        }
+
+        .menu-btn div {
+            width: 30px;
+            height: 4px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        /* Игровое поле */
+        .main-content {
+            padding: 20px;
+            text-align: center;
+            height: 80vh;
+            overflow-y: auto;
+        }
+
+        .game-card {
+            background: #2c3e50;
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #f39c12;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        /* Боковое меню */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 250px;
+            height: 100%;
+            background: #252525;
+            transition: 0.3s;
+            z-index: 200;
+            padding-top: 50px;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            border-bottom: 1px solid #333;
+            font-size: 1.1em;
+        }
+
+        /* Окна игр (скрыты по умолчанию) */
+        .game-window {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="balance-section" onclick="openWallet()"><span id="balance">0.00</span> ₽ <span class="plus">+</span>
+        </div>
+        <div class="casino-name">FortuneFox</div>
+        <img id="avatar" class="user-avatar" onclick="toggleAuthMenu()" src="https://via.placeholder.com/35">
+    </div>
+
+    <div class="main-content" id="lobby">
+        <div class="game-card" onclick="openGame('slots')">🎰 Слоты</div>
+        <div class="game-card" onclick="openGame('mines')">💣 Мины</div>
+        <div class="game-card" onclick="openGame('dice')">🎲 DICE</div>
+        <div class="game-card" onclick="openGame('cases')">📦 Кейсы</div>
+    </div>
+
+    <!-- Меню три полоски -->
+    <div class="menu-btn" onclick="toggleMenu()">
+        <div></div><div></div><div></div>
+    </div>
+
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-item" onclick="showLobby()">🎮 Игры</div>
+        <div class="menu-item" onclick="showSection('bonus')">🎁 Бонусы</div>
+        <div class="menu-item" onclick="showSection('ref')">👥 Рефералы</div>
+        <div class="menu-item" onclick="window.location.href='https://t.me/твой_саппорт'">🎧 Поддержка</div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Авторизация через ТГ
+        document.getElementById('avatar').src = tg.initDataUnsafe.user.photo_url || "https://ui-avatars.com/api/?name=" + tg.initDataUnsafe.user.first_name;
+        
+        function toggleMenu() {
+            document.getElementById('sideMenu').classList.toggle('active');
+        }
+
+        function showLobby() {
+            toggleMenu();
+            // Логика возврата на главный экран
+        }
+
+        function openGame(game) {
+            alert("Запуск игры: " + game + ". Скоро здесь будет механика!");
+        }
+
+        function showSection(name) {
+            toggleMenu();
+            alert("Открываем раздел: " + name);
+        }
+
+        function openWallet() {
+            alert("Пополнение/Вывод");
+        }
+    </script>
+</body>
+</html>
