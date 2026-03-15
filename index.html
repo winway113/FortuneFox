@@ -13,34 +13,36 @@ html
         .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1e1e1e; border-bottom: 1px solid #f39c12; }
         .balance-amount { color: #2ecc71; font-weight: bold; }
         
+        /* SCREENS */
+        .game-screen { display: none; flex-direction: column; align-items: center; padding: 15px; height: 100vh; background: #121212; box-sizing: border-box; overflow-y: auto; padding-bottom: 100px; }
+
         /* LOBBY */
-        .lobby { padding: 20px; display: flex; flex-direction: column; gap: 15px; height: 90vh; overflow-y: auto; }
+        .lobby { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
         .game-card { background: #1e1e1e; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #f39c12; font-size: 20px; font-weight: bold; cursor: pointer; }
 
-        /* SCREENS */
-        .game-screen { display: none; flex-direction: column; align-items: center; padding: 15px; height: 100vh; background: #121212; box-sizing: border-box; }
+        /* BONUS PAGE */
+        .bonus-section { width: 100%; max-width: 400px; background: #1e1e1e; border-radius: 20px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; box-sizing: border-box; }
+        .promo-box { display: flex; gap: 10px; margin-bottom: 30px; }
+        .promo-input { flex: 2; background: #121212; border: 1px solid #f39c12; border-radius: 10px; padding: 12px; color: white; outline: none; }
+        
+        /* WHEEL STYLE */
+        .wheel-container { position: relative; width: 260px; height: 260px; margin: 20px auto; border: 5px solid #f39c12; border-radius: 50%; overflow: hidden; transition: 5s cubic-bezier(0.1, 0, 0.1, 1); }
+        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #f39c12; z-index: 100; }
+        .wheel-canvas { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(#1e1e1e 0deg 30deg, #2b2b2b 30deg 60deg, #1e1e1e 60deg 90deg, #2b2b2b 90deg 120deg, #1e1e1e 120deg 150deg, #2b2b2b 150deg 180deg, #1e1e1e 180deg 210deg, #2b2b2b 210deg 240deg, #1e1e1e 240deg 270deg, #2b2b2b 270deg 300deg, #1e1e1e 300deg 330deg, #2b2b2b 330deg 360deg); position: relative; }
+        
+        /* TASKS */
+        .task-card { background: #121212; border: 1px solid #333; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .task-btn { background: #f39c12; color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 14px; }
 
-        /* MINES */
-        .multiplier-badge { background: #f39c12; color: black; padding: 8px 20px; border-radius: 10px; font-weight: bold; font-size: 20px; margin-bottom: 15px; }
+        /* OLD STYLES (MINES, DICE, CASES) */
         .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px; }
-        .mine-cell { aspect-ratio: 1/1; background: #2b2b2b; border-radius: 10px; border: 2px solid #3d3d3d; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .mine-cell.open-gem { background: #2ecc71; border-color: #27ae60; }
+        .mine-cell { aspect-ratio: 1/1; background: #2b2b2b; border-radius: 10px; border: 2px solid #3d3d3d; display: flex; align-items: center; justify-content: center; font-size: 24px; }.mine-cell.open-gem { background: #2ecc71; border-color: #27ae60; }
         .mine-cell.open-bomb { background: #ff7675; border-color: #d63031; }
-
-        .mines-controls { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 10px; }
-        .input-row { display: flex; gap: 10px; width: 100%; }
-        .input-box { flex: 1; background: #1e1e1e; border: 1px solid #333; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; }
-        .input-box label { font-size: 11px; color: #777; margin-bottom: 4px; }
-        .input-box input { background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; outline: none; width: 100%; }
-
-        /* CASES FIX */
-        .roulette-wrapper { width: 100%; max-width: 400px; position: relative; margin: 20px 0; }
+        .roulette-wrapper { width: 100%; position: relative; margin: 20px 0; }
         .roulette-container { width: 100%; height: 120px; background: #1e1e1e; border-radius: 15px; overflow: hidden; border: 1px solid #f39c12; position: relative; }
-        .roulette-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #f39c12; z-index: 50; box-shadow: 0 0 10px #f39c12; }
+        .roulette-pointer { position: absolute; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #f39c12; z-index: 50; }
         .roulette-tape { display: flex; position: absolute; height: 100%; left: 0; }
-        .r-item { min-width: 100px; max-width: 100px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; font-weight: bold; flex-direction: column; box-sizing: border-box; }
-
-        /* BUTTONS */
+        .r-item { min-width: 100px; max-width: 100px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; font-weight: bold; flex-direction: column; }
         .btn-play { background: #f39c12; color: black; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; }
         .btn-cashout { background: #2ecc71; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; display: none; }
 
@@ -56,10 +58,11 @@ html
 
     <div class="header">
         <div style="background:#2b2b2b; padding:5px 12px; border-radius:10px;"><span class="balance-amount" id="balance">100.00</span> ₽</div>
-        <div style="color:#f39c12; font-weight:bold; letter-spacing:1px;">FORTUNEFOX</div>
+        <div style="color:#f39c12; font-weight:bold;">FORTUNEFOX</div>
         <img id="user-pic" style="width:34px; border-radius:50%; border:1px solid #f39c12;" src="https://ui-avatars.com/api/?name=U">
     </div>
 
+    <!-- LOBBY -->
     <div id="lobby" class="lobby">
         <div class="game-card" onclick="alert('Слоты в разработке')">🎰 СЛОТЫ</div>
         <div class="game-card" onclick="showGame('mines')">💣 МИНЫ</div>
@@ -67,41 +70,79 @@ html
         <div class="game-card" onclick="showGame('cases')">📦 КЕЙСЫ</div>
     </div>
 
+    <!-- BONUS SCREEN -->
+    <div id="bonus-game" class="game-screen">
+        <div class="bonus-section">
+            <h3 style="margin-top:0; color:#f39c12; text-align:center;">🎟 ПРОМОКОД</h3>
+            <div class="promo-box">
+                <input type="text" id="promo-input" class="promo-input" placeholder="Введите код...">
+                <button class="task-btn" onclick="usePromo()" style="flex:1">ОК</button>
+            </div>
+        </div>
+
+        <div class="bonus-section" style="text-align:center;">
+            <h3 style="color:#f39c12;">🎡 КОЛЕСО ФОРТУНЫ</h3>
+            <p style="font-size:12px; color:#777;">Раз в 24 часа</p>
+            <div class="wheel-pointer"></div>
+            <div id="wheel" class="wheel-container">
+                <div class="wheel-canvas" id="wheel-inner">
+                    <!-- Numbers will be here via JS -->
+                </div>
+            </div>
+            <button class="btn-play" id="wheel-btn" onclick="spinWheel()">КРУТИТЬ</button>
+        </div>
+
+        <div class="bonus-section">
+            <h3 style="color:#f39c12; text-align:center;">📋 ЗАДАНИЯ</h3>
+            <div id="tasks-list">
+                <div class="task-card">
+                    <span>Подписка на канал</span>
+                    <button class="task-btn" onclick="window.open('https://t.me/your_channel')">+5.00₽</button></div>
+                <!-- Другие задания появятся тут -->
+            </div>
+        </div>
+        <button onclick="exitToLobby()" style="background:none; border:none; color:#555; font-weight:bold;">ВЫЙТИ</button>
+    </div>
+
     <!-- MINES -->
     <div id="mines-game" class="game-screen">
         <div class="multiplier-badge" id="m-coeff">x0.00</div>
         <div class="mines-grid" id="m-grid"></div>
-        <div class="mines-controls">
-            <div class="input-row">
-                <div class="input-box"><label>Ставка</label><input type="number" id="m-bet" value="10"></div>
-                <div class="input-box"><label>Бомбы (2-24)</label><input type="number" id="m-bombs" value="3"></div>
+        <div style="width:100%; max-width:400px; display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1; background:#1e1e1e; padding:10px; border-radius:10px; border:1px solid #333;">
+                    <label style="font-size:11px; color:#777;">Ставка</label>
+                    <input type="number" id="m-bet" value="10" style="background:none; border:none; color:white; width:100%; font-weight:bold; outline:none;">
+                </div>
+                <div style="flex:1; background:#1e1e1e; padding:10px; border-radius:10px; border:1px solid #333;">
+                    <label style="font-size:11px; color:#777;">Бомбы</label>
+                    <input type="number" id="m-bombs" value="3" style="background:none; border:none; color:white; width:100%; font-weight:bold; outline:none;">
+                </div>
             </div>
             <button class="btn-play" id="m-start-btn" onclick="startMines()">ИГРАТЬ</button>
             <button class="btn-cashout" id="m-cash-btn" onclick="cashoutMines()">ЗАБРАТЬ</button>
-            <button onclick="exitToLobby()" style="background:none; border:none; color:#555; margin-top:10px; font-weight:bold;">ВЫЙТИ</button>
+            <button onclick="exitToLobby()" style="color:#555; background:none; border:none; margin-top:10px;">ВЫЙТИ</button>
         </div>
     </div>
 
     <!-- DICE -->
     <div id="dice-game" class="game-screen">
         <div style="font-size:50px; color:#f39c12; font-weight:bold; margin: 30px 0;" id="d-possible">20.00</div>
-        <div class="mines-controls">
-            <div class="input-row">
-                <div class="input-box"><label>Ставка</label><input type="number" id="d-bet" value="10" oninput="updDiceWin()"></div>
-                <div class="input-box"><label>Шанс %</label><input type="number" id="d-chance" value="50" oninput="updDiceWin()"></div>
+        <div style="width:100%; max-width:400px; display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1; background:#1e1e1e; padding:10px; border-radius:10px;"><input type="number" id="d-bet" value="10" oninput="updDiceWin()" style="background:none; border:none; color:white; width:100%; outline:none;"></div>
+                <div style="flex:1; background:#1e1e1e; padding:10px; border-radius:10px;"><input type="number" id="d-chance" value="50" oninput="updDiceWin()" style="background:none; border:none; color:white; width:100%; outline:none;"></div>
             </div>
-            <div class="input-row">
-                <button class="btn-play" onclick="playDice('less')">МЕНЬШЕ</button>
-                <button class="btn-play" onclick="playDice('more')">БОЛЬШЕ</button>
-            </div>
-            <div id="d-res-plate" style="margin-top:15px; text-align:center; padding:15px; border-radius:12px; display:none; font-weight:bold;"></div>
-            <button onclick="exitToLobby()" style="background:none; border:none; color:#555; margin-top:20px; font-weight:bold;">ВЫЙТИ В ЛОББИ</button>
+            <button class="btn-play" onclick="playDice('less')">МЕНЬШЕ</button>
+            <button class="btn-play" onclick="playDice('more')">БОЛЬШЕ</button>
+            <div id="d-res-plate" style="margin-top:10px; text-align:center; padding:15px; border-radius:12px; display:none; font-weight:bold;"></div>
+            <button onclick="exitToLobby()" style="color:#555; background:none; border:none; margin-top:20px;">ВЫЙТИ</button>
         </div>
     </div>
 
     <!-- CASES -->
     <div id="cases-game" class="game-screen">
-        <div id="cases-grid" class="cases-grid">
+        <div id="cases-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
             <div class="game-card" onclick="viewCase('c1')">📦 10 ₽</div>
             <div class="game-card" onclick="viewCase('c2')">📦 50 ₽</div>
             <div class="game-card" onclick="viewCase('c3')">📦 150 ₽</div>
@@ -117,15 +158,16 @@ html
                 <div class="roulette-container"><div class="roulette-tape" id="tape"></div></div>
             </div>
             <button class="btn-play" id="open-btn" onclick="startCase()">ОТКРЫТЬ КЕЙС</button>
-            <button id="case-back-btn" onclick="backToCases()" style="background:none; border:none; color:#555; margin-top:20px; font-weight:bold;">НАЗАД</button>
+            <button id="case-back-btn" onclick="backToCases()" style="background:none; border:none; color:#555; margin-top:20px;">НАЗАД</button>
         </div>
     </div>
 
+    <!-- MENU BUTTON -->
     <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
     <div class="side-menu" id="side-menu">
         <a href="#" class="menu-link" onclick="exitToLobby(); toggleMenu()">🎰 Игры</a>
-        <a href="#" class="menu-link">🎁 Бонусы</a>
-        <a href="#" class="menu-link">👥 Рефералы</a>
+        <a href="#" class="menu-link" onclick="showGame('bonus'); toggleMenu()">🎁 Бонусы</a>
+        <a href="#" class="menu-link" onclick="toggleMenu()">👥 Рефералы</a>
     </div>
 
     <script>
@@ -141,11 +183,60 @@ html
             document.querySelectorAll('.game-screen').forEach(s=>s.style.display='none');
             document.getElementById(g+'-game').style.display='flex'; 
             if(g==='mines') initMinesGrid();
+            if(g==='bonus') initWheel();
         }
 
         function exitToLobby() { 
             document.getElementById('lobby').style.display='flex'; 
             document.querySelectorAll('.game-screen').forEach(s=>s.style.display='none');
+        }
+
+        // --- BONUS LOGIC (PROMO & WHEEL) ---
+        function usePromo() {
+            let code = document.getElementById('promo-input').value;
+            if(!code) return;
+            // Тут должна быть проверка кода через БД бота
+            alert("Проверка промокода: " + code);
+        }
+
+        const wheelPrizes = [1, 5, 2, 10, 3, 25, 1, 5, 2, 10, 4, 15]; // Призы на колесе
+        function initWheel() {
+            const inner = document.getElementById('wheel-inner');
+            inner.innerHTML = '';
+            for(let i=0; i<12; i++) {
+                let div = document.createElement('div');
+                div.style.position = 'absolute';
+                div.style.width = '100%';
+                div.style.height = '100%';
+                div.style.textAlign = 'center';
+                div.style.paddingTop = '10px';
+                div.style.transform = `rotate(${i*30}deg)`;
+                div.innerHTML = `<span style="font-weight:bold; color:#f39c12;">${wheelPrizes[i]}₽</span>`;
+                inner.appendChild(div);
+            }
+            // Проверка таймера
+            let lastSpin = localStorage.getItem('lastSpin');
+            if(lastSpin && (Date.now() - lastSpin < 86400000)) {
+                document.getElementById('wheel-btn').disabled = true;
+                document.getElementById('wheel-btn').innerText = "ЗАВТРА";
+            }
+        }
+
+        function spinWheel() {
+            let wheel = document.getElementById('wheel');
+            let randomDeg = 1800 + Math.floor(Math.random() * 360);
+            wheel.style.transform = `rotate(${randomDeg}deg)`;
+            document.getElementById('wheel-btn').disabled = true;
+            
+            setTimeout(() => {
+                let actualDeg = randomDeg % 360;
+                let prizeIndex = Math.floor(((360 - actualDeg + 15) % 360) / 30);
+                let prize = wheelPrizes[prizeIndex];
+                balance += prize;
+                updateBal();
+                localStorage.setItem('lastSpin', Date.now());
+                alert("Ваш ежедневный бонус: " + prize + "₽!");
+            }, 5200);
         }
 
         // --- MINES LOGIC ---
@@ -163,8 +254,7 @@ html
             if(b > balance || n < 2 || n > 24) return;
             balance -= b; updateBal();
             mState = { active: true, bet: b, bombs: n, opened: 0, grid: Array(25).fill('gem') };
-            let count = 0;
-            while(count < n) {
+            let count = 0; while(count < n) {
                 let r = Math.floor(Math.random()*25);
                 if(mState.grid[r] === 'gem') { mState.grid[r] = 'bomb'; count++; }
             }
@@ -224,7 +314,7 @@ html
             }
         }
 
-        // --- CASES ---
+        // --- CASES LOGIC ---
         const caseDB = {
             'c1': {p: 10, items: [2, 5, 10, 20], w: [40, 30, 25, 5]},
             'c2': {p: 50, items: [10, 25, 50, 150], w: [40, 35, 20, 5]},
@@ -244,64 +334,31 @@ html
             document.getElementById('case-view').style.display='flex';
             resetTape();
         }
-
         function resetTape() {
-            let t = document.getElementById('tape');
-            t.style.transition = 'none';
-            t.style.transform = 'translateX(0px)';
-            t.innerHTML = '';
+            let t = document.getElementById('tape'); t.style.transition = 'none'; t.style.transform = 'translateX(0px)'; t.innerHTML = '';
             for(let i=0; i<85; i++) {
                 let pr = curCase.items[Math.floor(Math.random()*curCase.items.length)];
                 t.innerHTML += `<div class="r-item">${pr}<span>₽</span></div>`;
             }
         }
-
-        function backToCases() { 
-            if(isSpinning) return;
-            document.getElementById('cases-grid').style.display='grid'; 
-            document.getElementById('case-view').style.display='none'; 
-        }
-
+        function backToCases() { if(!isSpinning) { document.getElementById('cases-grid').style.display='grid'; document.getElementById('case-view').style.display='none'; } }
         function startCase() {
             if(balance < curCase.p || isSpinning) return;
-            
-            isSpinning = true;
-            document.getElementById('open-btn').disabled = true;
-            document.getElementById('case-back-btn').style.opacity = '0.5';
-
-            // Сбрасываем ленту перед новым крутком
-            let t = document.getElementById('tape');
-            t.style.transition = 'none';
-            t.style.transform = 'translateX(0px)';
-
-            // Небольшая задержка перед стартом для сброса
+            isSpinning = true; document.getElementById('open-btn').disabled = true;
+            let t = document.getElementById('tape'); t.style.transition = 'none'; t.style.transform = 'translateX(0px)';
             setTimeout(() => {
                 balance -= curCase.p; updateBal();
                 let win = getPr(curCase.items, curCase.w);
-                
-                // Индекс выигрышного предмета
-                let winIdx = 70; 
-                t.children[winIdx].innerHTML = win + "<span>₽</span>";
-                t.children[winIdx].style.color = "#f39c12";
-
-                // Расчет остановки точно по центру полоски (ширина айтема 100px)
-                let containerWidth = document.querySelector('.roulette-container').offsetWidth;
-                let stopPos = (winIdx * 100) - (containerWidth / 2) + 50;
-
+                let winIdx = 70; t.children[winIdx].innerHTML = win + "<span>₽</span>";
+                let stopPos = (winIdx * 100) - (document.querySelector('.roulette-container').offsetWidth / 2) + 50;
                 t.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
                 t.style.transform = `translateX(-${stopPos}px)`;
-
                 setTimeout(() => {
-                    balance += win; 
-                    updateBal();
-                    alert('Ваш приз: ' + win + '₽');
-                    isSpinning = false;
-                    document.getElementById('open-btn').disabled = false;
-                    document.getElementById('case-back-btn').style.opacity = '1';
+                    balance += win; updateBal(); alert('Приз: ' + win + '₽');
+                    isSpinning = false; document.getElementById('open-btn').disabled = false;
                 }, 7200);
             }, 50);
         }
-
         function getPr(p, w) {
             let s = w.reduce((a,b)=>a+b, 0); let r = Math.random()*s;
             for(let i=0; i<p.length; i++) { if(r<w[i]) return p[i]; r-=w[i]; }
