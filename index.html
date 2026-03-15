@@ -7,43 +7,42 @@ html
     <title>FortuneFox Casino</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { margin: 0; padding: 0; background-color: #f5f6fa; color: #2f3640; font-family: 'Segoe UI', sans-serif; user-select: none; overflow-x: hidden; }
-        .dark-body { background-color: #121212; color: white; }
+        body { margin: 0; padding: 0; background-color: #121212; color: white; font-family: 'Segoe UI', sans-serif; user-select: none; overflow-x: hidden; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #2f3640; color: white; position: sticky; top: 0; z-index: 100; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1e1e1e; color: white; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #f39c12; }
         .balance-amount { color: #2ecc71; font-weight: bold; }
 
         /* ЛОББИ */
         .lobby { padding: 20px; display: flex; flex-direction: column; gap: 15px; background: #121212; min-height: 100vh; }
-        .game-card { background: #1e1e1e; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #333; font-size: 20px; font-weight: bold; color: white; cursor: pointer; }
+        .game-card { background: #1e1e1e; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #f39c12; font-size: 20px; font-weight: bold; color: white; cursor: pointer; }
 
         /* ЭКРАНЫ ИГР */
-        .game-screen { display: none; flex-direction: column; align-items: center; padding: 15px; min-height: 100vh; background: #f5f6fa; }
+        .game-screen { display: none; flex-direction: column; align-items: center; padding: 15px; min-height: 100vh; background: #121212; }
 
-        /* DICE STYLE (WELVURA) */
-        .dice-card { background: white; width: 100%; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); box-sizing: border-box; }
+        /* DICE STYLE (ОБНОВЛЕННЫЙ ПОД ОСНОВУ) */
+        .dice-card { background: #1e1e1e; width: 100%; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); box-sizing: border-box; border: 1px solid #333; }
         .dice-inputs { display: flex; gap: 10px; margin-bottom: 20px; }
         .dice-input-box { flex: 1; text-align: center; }
-        .dice-input-box label { font-size: 12px; color: #7f8c8d; display: block; margin-bottom: 5px; }
-        .i-wrap { border: 2px solid #edeff2; border-radius: 12px; padding: 10px; }
-        .i-wrap input { border: none; width: 100%; text-align: center; font-size: 20px; font-weight: bold; outline: none; }
+        .dice-input-box label { font-size: 12px; color: #f39c12; display: block; margin-bottom: 5px; }
+        .i-wrap { border: 2px solid #333; border-radius: 12px; padding: 10px; background: #121212; }
+        .i-wrap input { border: none; width: 100%; text-align: center; font-size: 20px; font-weight: bold; outline: none; background: transparent; color: white; }
         
-        .possible-win { font-size: 60px; font-weight: bold; text-align: center; margin: 10px 0; color: #2f3640; }
-        .win-label { text-align: center; color: #bdc3c7; font-size: 14px; margin-bottom: 20px; }
+        .possible-win { font-size: 60px; font-weight: bold; text-align: center; margin: 10px 0; color: #f39c12; }
+        .win-label { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 20px; }
         
-        .range-txt { display: flex; justify-content: space-between; font-size: 12px; color: #bdc3c7; width: 100%; margin-bottom: 5px; padding: 0 10px; box-sizing: border-box; }
+        .range-txt { display: flex; justify-content: space-between; font-size: 12px; color: #7f8c8d; width: 100%; margin-bottom: 5px; padding: 0 10px; box-sizing: border-box; }
         .dice-btns { display: flex; gap: 10px; width: 100%; }
-        .dice-btns button { flex: 1; padding: 15px; border: none; border-radius: 12px; background: #edeff2; font-weight: bold; color: #7f8c8d; font-size: 16px; }
+        .dice-btns button { flex: 1; padding: 15px; border: none; border-radius: 12px; background: #f39c12; font-weight: bold; color: white; font-size: 16px; }
 
         .dice-res-plate { width: 100%; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; font-weight: bold; color: white; display: none; }
         .plate-win { background: #2ecc71; display: block; }
         .plate-lose { background: #ff7675; display: block; }
 
-        /* КЕЙСЫ (CS:GO) */
-        .roulette-container { width: 100%; height: 120px; background: #1e1e1e; border-radius: 15px; position: relative; overflow: hidden; margin: 20px 0; border: 2px solid #333; }
+        /* КЕЙСЫ */
+        .roulette-container { width: 100%; height: 120px; background: #1e1e1e; border-radius: 15px; position: relative; overflow: hidden; margin: 20px 0; border: 2px solid #f39c12; }
         .roulette-center { position: absolute; left: 50%; top: 0; width: 3px; height: 100%; background: #f39c12; z-index: 10; transform: translateX(-50%); }
-        .roulette-tape { display: flex; position: absolute; left: 0; top: 0; height: 100%; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); }
-        .r-item { min-width:90px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; color: #2ecc71; font-weight: bold; font-size: 16px; flex-direction: column; }
+        .roulette-tape { display: flex; position: absolute; left: 0; top: 0; height: 100%; transition: transform 7s cubic-bezier(0.1, 0, 0.1, 1); }
+        .r-item { min-width:90px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; color: #2ecc71;font-weight: bold; font-size: 16px; flex-direction: column; }
         
         .cases-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; padding: 10px; box-sizing: border-box; }
 
@@ -55,7 +54,7 @@ html
         .menu-link { padding: 15px 25px; display: block; color: white; text-decoration: none; border-bottom: 1px solid #333; }
     </style>
 </head>
-<body class="dark-body">
+<body>
 
     <div class="header">
         <div style="background:#2b2b2b; padding:5px 12px; border-radius:10px;"><span class="balance-amount" id="balance">100.00</span> ₽</div>
@@ -65,9 +64,9 @@ html
 
     <!-- ЛОББИ -->
     <div id="lobby" class="lobby">
-        <div class="game-card" style="border-color:#f39c12" onclick="showGame('mines')">💣 МИНЫ</div>
-        <div class="game-card" style="border-color:#f39c12" onclick="showGame('dice')">🎲 DICE</div>
-        <div class="game-card" style="border-color:#f39c12" onclick="showGame('cases')">📦 КЕЙСЫ</div>
+        <div class="game-card" onclick="showGame('mines')">💣 МИНЫ</div>
+        <div class="game-card" onclick="showGame('dice')">🎲 DICE</div>
+        <div class="game-card" onclick="showGame('cases')">📦 КЕЙСЫ</div>
     </div>
 
     <!-- DICE SCREEN -->
@@ -86,11 +85,11 @@ html
             </div>
             <div id="d-res-plate" class="dice-res-plate">Выиграли 20.00</div>
         </div>
-        <button onclick="exitToLobby()" style="margin-top:20px; background:none; border:none; color:#7f8c8d; font-weight:bold;">ВЫЙТИ</button>
+        <button onclick="exitToLobby()" style="margin-top:20px; background:none; border:none; color:#7f8c8d; font-weight:bold;">ВЫЙТИ В ЛОББИ</button>
     </div>
 
     <!-- CASES SCREEN -->
-    <div id="cases-game" class="game-screen" style="background:#121212;">
+    <div id="cases-game" class="game-screen">
         <div id="cases-grid" class="cases-grid">
             <div class="game-card" onclick="viewCase('novice')">📦 10 ₽</div>
             <div class="game-card" onclick="viewCase('standard')">📦 25 ₽</div>
@@ -103,51 +102,53 @@ html
                 <div class="roulette-tape" id="tape"></div>
             </div>
             <button class="game-card" id="open-btn" style="width:90%; background:#f39c12; border:none;" onclick="startCase()">ОТКРЫТЬ</button>
-            <button onclick="backToCases()" style="margin-top:20px; color:#555; background:none; border:none;">Назад</button></div>
+            <button onclick="backToCases()" style="margin-top:20px; color:#7f8c8d; background:none; border:none; font-weight:bold;">НАЗАД К КЕЙСАМ</button>
+        </div>
     </div>
 
     <!-- МЕНЮ -->
     <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
     <div class="side-menu" id="side-menu">
         <a href="#" class="menu-link" onclick="exitToLobby(); toggleMenu()">🎮 Игры</a>
-        <a href="https://t.me/твой_саппорт" class="menu-link">🎧 Поддержка</a>
+        <a href="#" class="menu-link">👤 Профиль (Скоро)</a>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
+        tg.expand();
         let balance = 100.00;
 
         function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
+        
         function showGame(g) { 
             document.getElementById('lobby').style.display='none'; 
-            document.getElementById(g+'-game').style.display='flex'; 
+            document.querySelectorAll('.game-screen').forEach(s=>s.style.display='none');
+            if(document.getElementById(g+'-game')) document.getElementById(g+'-game').style.display='flex'; 
             if(g==='dice') updDiceWin();
-            if(g==='cases') backToCases();
-            document.body.className = (g==='dice') ? '' : 'dark-body';
         }
+
         function exitToLobby() { 
             document.getElementById('lobby').style.display='flex'; 
             document.querySelectorAll('.game-screen').forEach(s=>s.style.display='none');
-            document.body.className = 'dark-body';
         }
 
-        // --- DICE WELVURA ---
+        // --- DICE LOGIC ---
         function updDiceWin() {
             let b = parseFloat(document.getElementById('d-bet').value) || 0;
             let c = parseFloat(document.getElementById('d-chance').value) || 1;
-            if(c > 95) c = 95;
+            if(c > 95) { c = 95; document.getElementById('d-chance').value = 95; }
             let win = (b * (95 / c)).toFixed(2);
             document.getElementById('d-possible').innerText = win;
             let thr = Math.floor(c * 10000);
-            document.getElementById('txt-less').innerText = `0 - ${thr-1}`;
-            document.getElementById('txt-more').innerText = `${1000000-thr} - 999999`;
+            document.getElementById('txt-less').innerText = "0 - " + (thr-1);
+            document.getElementById('txt-more').innerText = (1000000-thr) + " - 999999";
         }
 
         function playDice(type) {
             let b = parseFloat(document.getElementById('d-bet').value);
             let c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance) return;
+            if(b > balance || b <= 0) return;
             balance -= b; updateBal();
             
             let roll = Math.floor(Math.random() * 1000000);
@@ -158,23 +159,23 @@ html
             if(win) {
                 let prize = b * (95 / c);
                 balance += prize; updateBal();
-                plate.innerText = `Выиграли ${prize.toFixed(2)} (${roll})`;
+                plate.innerText = "Выиграли " + prize.toFixed(2) + " (" + roll + ")";
                 plate.className = 'dice-res-plate plate-win';
                 tg.HapticFeedback.notificationOccurred('success');
             } else {
-                plate.innerText = `Проиграли ${b.toFixed(2)} (${roll})`;
+                plate.innerText = "Проиграли " + b.toFixed(2) + " (" + roll + ")";
                 plate.className = 'dice-res-plate plate-lose';
                 tg.HapticFeedback.notificationOccurred('error');
             }
         }
 
-        // --- КЕЙСЫ CS:GO ---
+        // --- CASES LOGIC ---
         let currentCase = null;
         const caseDB = {
-            'novice': { price: 10, prizes: [1, 2, 5, 8, 10, 12, 15, 20, 30, 50], weights: [30, 25, 15, 10, 8, 5, 3, 2, 1.5, 0.5] },
-            'standard': { price: 25, prizes: [5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200], weights: [25, 20, 15, 10, 10, 8, 5, 3, 2, 1, 0.7, 0.3] },
-            'gold': { price: 100, prizes: [20, 40, 60, 80, 100, 150, 200, 300, 500, 800, 1000, 2500], weights: [25, 20, 15, 10, 10, 8, 5, 3, 2, 1, 0.8, 0.2] },
-            'fox': { price: 5000, prizes: [1000, 2000, 3000, 4000, 5000, 6000, 7500, 10000, 15000, 25000, 50000], weights: [30, 20, 15, 10, 10, 6, 4, 3, 1, 0.8, 0.2] }
+            'novice': { price: 10, prizes: [1, 2, 5, 10, 20, 50], weights: [30, 25, 20, 15, 8, 2] },
+            'standard': { price: 25, prizes: [5, 10, 25, 50, 100], weights: [30, 25, 20, 15, 10] },
+            'gold': { price: 100, prizes: [20, 50, 100, 200, 500, 1000], weights: [30, 25, 20, 15, 8, 2] },
+            'fox': { price: 5000, prizes: [1000, 5000, 10000, 25000], weights: [50, 30, 15, 5] }
         };
 
         function viewCase(id) {
@@ -183,18 +184,25 @@ html
             document.getElementById('case-view').style.display='flex';
             buildTape();
         }
+
         function backToCases() {
             document.getElementById('cases-grid').style.display='grid';
             document.getElementById('case-view').style.display='none';
         }
-        function buildTape() {let tape = document.getElementById('tape');
-            tape.style.transition = 'none'; tape.style.transform = 'translateX(0px)';
+
+        function buildTape() {
+            let tape = document.getElementById('tape');
+            tape.style.transition = 'none'; 
+            tape.style.transform = 'translateX(0px)';
             tape.innerHTML = '';
             for(let i=0; i<80; i++) {
                 let p = currentCase.prizes[Math.floor(Math.random()*currentCase.prizes.length)];
-                tape.innerHTML += `<div class="r-item">${p}<span>₽</span></div>`;
+                let item = document.createElement('div');item.className = 'r-item';
+                item.innerHTML = p + "<span>₽</span>";
+                tape.appendChild(item);
             }
         }
+
         function startCase() {
             if(balance < currentCase.price) return;
             balance -= currentCase.price; updateBal();
@@ -203,18 +211,23 @@ html
             let win = getPrize(currentCase.prizes, currentCase.weights);
             let tape = document.getElementById('tape');
             let winIdx = 65; 
-            tape.children[winIdx].innerHTML = `${win}<span>₽</span>`;
+            tape.children[winIdx].innerHTML = win + "<span>₽</span>";
+            tape.children[winIdx].style.color = "#f39c12";
             
-            let stopPos = (winIdx * 90) - (document.querySelector('.roulette-container').offsetWidth / 2) + 45;
-            tape.style.transition = 'transform 4s cubic-bezier(0.1, 0, 0.1, 1)';
-            tape.style.transform = `translateX(-${stopPos}px)`;
+            let containerWidth = document.querySelector('.roulette-container').offsetWidth;
+            let stopPos = (winIdx * 90) - (containerWidth / 2) + 45;
+            
+            tape.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
+            tape.style.transform = "translateX(-" + stopPos + "px)";
 
             setTimeout(() => {
                 balance += win; updateBal();
                 document.getElementById('open-btn').disabled = false;
                 tg.HapticFeedback.notificationOccurred('success');
-            }, 4200);
+                alert("Выпало: " + win + " ₽");
+            }, 7200);
         }
+
         function getPrize(p, w) {
             let total = w.reduce((a,b)=>a+b, 0);
             let r = Math.random()*total;
