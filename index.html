@@ -20,7 +20,7 @@ html
         /* SCREENS */
         .game-screen { display: none; flex-direction: column; align-items: center; padding: 15px; height: 100vh; background: #121212; box-sizing: border-box; }
 
-        /* MINES IMPROVED */
+        /* MINES */
         .multiplier-badge { background: #f39c12; color: black; padding: 8px 20px; border-radius: 10px; font-weight: bold; font-size: 20px; margin-bottom: 15px; }
         .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px; }
         .mine-cell { aspect-ratio: 1/1; background: #2b2b2b; border-radius: 10px; border: 2px solid #3d3d3d; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 24px; }
@@ -33,12 +33,12 @@ html
         .input-box label { font-size: 11px; color: #777; margin-bottom: 4px; }
         .input-box input { background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; outline: none; width: 100%; }
 
-        /* CASES WITH ARROW */
+        /* CASES FIX */
         .roulette-wrapper { width: 100%; max-width: 400px; position: relative; margin: 20px 0; }
-        .roulette-container { width: 100%; height: 100px; background: #1e1e1e; border-radius: 15px; overflow: hidden; border: 1px solid #f39c12; position: relative; }
-        .roulette-pointer { position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 4px; height: 110px; background: #f39c12; z-index: 50; box-shadow: 0 0 10px #f39c12; }
-        .roulette-tape { display: flex; position: absolute; height: 100%; transition: transform 7s cubic-bezier(0.1, 0, 0.1, 1); }
-        .r-item { min-width: 90px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; font-weight: bold; flex-direction: column; }
+        .roulette-container { width: 100%; height: 120px; background: #1e1e1e; border-radius: 15px; overflow: hidden; border: 1px solid #f39c12; position: relative; }
+        .roulette-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #f39c12; z-index: 50; box-shadow: 0 0 10px #f39c12; }
+        .roulette-tape { display: flex; position: absolute; height: 100%; left: 0; }
+        .r-item { min-width: 100px; max-width: 100px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; font-weight: bold; flex-direction: column; box-sizing: border-box; }
 
         /* BUTTONS */
         .btn-play { background: #f39c12; color: black; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; }
@@ -60,7 +60,6 @@ html
         <img id="user-pic" style="width:34px; border-radius:50%; border:1px solid #f39c12;" src="https://ui-avatars.com/api/?name=U">
     </div>
 
-    <!-- LOBBY -->
     <div id="lobby" class="lobby">
         <div class="game-card" onclick="alert('Слоты в разработке')">🎰 СЛОТЫ</div>
         <div class="game-card" onclick="showGame('mines')">💣 МИНЫ</div>
@@ -102,7 +101,7 @@ html
 
     <!-- CASES -->
     <div id="cases-game" class="game-screen">
-        <div id="cases-grid" class="cases-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+        <div id="cases-grid" class="cases-grid">
             <div class="game-card" onclick="viewCase('c1')">📦 10 ₽</div>
             <div class="game-card" onclick="viewCase('c2')">📦 50 ₽</div>
             <div class="game-card" onclick="viewCase('c3')">📦 150 ₽</div>
@@ -118,16 +117,15 @@ html
                 <div class="roulette-container"><div class="roulette-tape" id="tape"></div></div>
             </div>
             <button class="btn-play" id="open-btn" onclick="startCase()">ОТКРЫТЬ КЕЙС</button>
-            <button onclick="backToCases()" style="background:none; border:none; color:#555; margin-top:20px; font-weight:bold;">НАЗАД</button>
+            <button id="case-back-btn" onclick="backToCases()" style="background:none; border:none; color:#555; margin-top:20px; font-weight:bold;">НАЗАД</button>
         </div>
     </div>
 
-    <!-- SIDE MENU -->
     <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
     <div class="side-menu" id="side-menu">
         <a href="#" class="menu-link" onclick="exitToLobby(); toggleMenu()">🎰 Игры</a>
-        <a href="#" class="menu-link" onclick="toggleMenu()">🎁 Бонусы</a>
-        <a href="#" class="menu-link" onclick="toggleMenu()">👥 Реферальная система</a>
+        <a href="#" class="menu-link">🎁 Бонусы</a>
+        <a href="#" class="menu-link">👥 Рефералы</a>
     </div>
 
     <script>
@@ -155,10 +153,8 @@ html
         function initMinesGrid() {
             const grid = document.getElementById('m-grid'); grid.innerHTML = '';
             for(let i=0; i<25; i++) {
-                let cell = document.createElement('div');
-                cell.className = 'mine-cell';
-                cell.onclick = () => clickMines(i);
-                grid.appendChild(cell);
+                let cell = document.createElement('div'); cell.className = 'mine-cell';
+                cell.onclick = () => clickMines(i); grid.appendChild(cell);
             }
         }
         function startMines() {
@@ -189,7 +185,8 @@ html
             if(mState.grid[i] === 'bomb') {
                 cell.classList.add('open-bomb'); cell.innerText = '💣';
                 mState.active = false;
-                setTimeout(() => { alert('БОМБА!'); resetMines(); }, 500);} else {
+                setTimeout(() => { alert('БОМБА!'); resetMines(); }, 500);
+            } else {
                 cell.classList.add('open-gem'); cell.innerText = '💎';
                 mState.opened++;
                 document.getElementById('m-coeff').innerText = 'x' + getMult();
@@ -239,28 +236,72 @@ html
             'fox': {p: 5000, items: [2500, 5000, 15000, 50000], w: [60, 25, 10, 5]}
         };
         let curCase = null;
+        let isSpinning = false;
+
         function viewCase(id) {
             curCase = caseDB[id];
             document.getElementById('cases-grid').style.display='none';
             document.getElementById('case-view').style.display='flex';
-            let t = document.getElementById('tape'); t.style.transition = 'none'; t.style.transform = 'translateX(0px)'; t.innerHTML = '';
-            for(let i=0; i<80; i++) {
+            resetTape();
+        }
+
+        function resetTape() {
+            let t = document.getElementById('tape');
+            t.style.transition = 'none';
+            t.style.transform = 'translateX(0px)';
+            t.innerHTML = '';
+            for(let i=0; i<85; i++) {
                 let pr = curCase.items[Math.floor(Math.random()*curCase.items.length)];
                 t.innerHTML += `<div class="r-item">${pr}<span>₽</span></div>`;
             }
         }
-        function backToCases() { document.getElementById('cases-grid').style.display='grid'; document.getElementById('case-view').style.display='none'; }
-        function startCase() {
-            if(balance < curCase.p) return;
-            balance -= curCase.p; updateBal();
-            let win = getPr(curCase.items, curCase.w);
-            let t = document.getElementById('tape');
-            t.children[65].innerHTML = win + "<span>₽</span>";
-            let stop = (65 * 90) - (document.querySelector('.roulette-container').offsetWidth / 2) + 45;
-            t.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
-            t.style.transform = `translateX(-${stop}px)`;
-            setTimeout(() => { balance += win; updateBal(); alert('Приз: ' + win + '₽'); }, 7200);
+
+        function backToCases() { 
+            if(isSpinning) return;
+            document.getElementById('cases-grid').style.display='grid'; 
+            document.getElementById('case-view').style.display='none'; 
         }
+
+        function startCase() {
+            if(balance < curCase.p || isSpinning) return;
+            
+            isSpinning = true;
+            document.getElementById('open-btn').disabled = true;
+            document.getElementById('case-back-btn').style.opacity = '0.5';
+
+            // Сбрасываем ленту перед новым крутком
+            let t = document.getElementById('tape');
+            t.style.transition = 'none';
+            t.style.transform = 'translateX(0px)';
+
+            // Небольшая задержка перед стартом для сброса
+            setTimeout(() => {
+                balance -= curCase.p; updateBal();
+                let win = getPr(curCase.items, curCase.w);
+                
+                // Индекс выигрышного предмета
+                let winIdx = 70; 
+                t.children[winIdx].innerHTML = win + "<span>₽</span>";
+                t.children[winIdx].style.color = "#f39c12";
+
+                // Расчет остановки точно по центру полоски (ширина айтема 100px)
+                let containerWidth = document.querySelector('.roulette-container').offsetWidth;
+                let stopPos = (winIdx * 100) - (containerWidth / 2) + 50;
+
+                t.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
+                t.style.transform = `translateX(-${stopPos}px)`;
+
+                setTimeout(() => {
+                    balance += win; 
+                    updateBal();
+                    alert('Ваш приз: ' + win + '₽');
+                    isSpinning = false;
+                    document.getElementById('open-btn').disabled = false;
+                    document.getElementById('case-back-btn').style.opacity = '1';
+                }, 7200);
+            }, 50);
+        }
+
         function getPr(p, w) {
             let s = w.reduce((a,b)=>a+b, 0); let r = Math.random()*s;
             for(let i=0; i<p.length; i++) { if(r<w[i]) return p[i]; r-=w[i]; }
