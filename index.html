@@ -10,29 +10,38 @@ html
         body { margin: 0; padding: 0; background-color: #121212; color: white; font-family: 'Segoe UI', sans-serif; user-select: none; overflow: hidden; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1e1e1e; border-bottom: 1px solid #f39c12; }
         .balance-amount { color: #2ecc71; font-weight: bold; }
-        .game-screen { display: none; flex-direction: column; align-items: center; padding: 15px; height: 100vh; background: #121212; box-sizing: border-box; overflow-y: auto; }
+        .game-screen { display: none; flex-direction: column; align-items: center; padding: 15px; height: 100vh; background: #121212; box-sizing: border-box; overflow-y: auto; padding-bottom: 100px; }
         .lobby { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
         .game-card { background: #1e1e1e; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #f39c12; font-size: 20px; font-weight: bold; cursor: pointer; }
 
-        /* WHEEL */
-        .wheel-wrapper { position: relative; width: 280px; height: 280px; margin: 30px auto; }
-        .wheel-pointer-red { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 40px solid #ff4757; z-index: 100; }
-        .wheel-container { width: 100%; height: 100%; border: 8px solid #f39c12; border-radius: 50%; position: relative; overflow: hidden; transition: 5s cubic-bezier(0.1, 0, 0.1, 1); background: #1e1e1e; }
-        .wheel-section { position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%; display: flex; align-items: center; justify-content: center; }
-        .wheel-text { transform: rotate(45deg); font-weight: bold; font-size: 16px; color: #f39c12; position: absolute; right: 20px; bottom: 20px; }
-
-        /* DICE BUTTONS */
+        /* DICE BUTTONS SIDE BY SIDE */
         .dice-controls { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
-        .btn-play { background: #f39c12; color: black; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; }
+        .btn-row { display: flex; gap: 10px; width: 100%; }
+        .btn-play { flex: 1; background: #f39c12; color: black; border: none; padding: 18px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* CASES FIX */
+        /* CASES MATH FIXED (120px) */
         .roulette-container { width: 100%; height: 130px; background: #1e1e1e; border-radius: 15px; overflow: hidden; border: 2px solid #f39c12; position: relative; margin: 20px 0; }
         .roulette-pointer { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 4px; height: 100%; background: #f39c12; z-index: 50; box-shadow: 0 0 10px #f39c12; }
         .roulette-tape { display: flex; position: absolute; height: 100%; left: 0; transition: transform 7s cubic-bezier(0.1, 0, 0.1, 1); }
-        .r-item { min-width: 120px; width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; font-weight: bold; flex-direction: column; box-sizing: border-box; font-size: 18px; }
+        .r-item { min-width: 120px; width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; font-weight: bold; flex-direction: column; box-sizing: border-box; }
 
+        /* WHEEL */
+        .wheel-wrapper { position: relative; width: 260px; height: 260px; margin: 20px auto; }
+        .wheel-pointer-red { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 40px solid #ff4757; z-index: 100; }
+        .wheel-container { width: 100%; height: 100%; border: 6px solid #f39c12; border-radius: 50%; position: relative; overflow: hidden; transition: 5s cubic-bezier(0.1, 0, 0.1, 1); background: #1e1e1e; }
+        .wheel-section { position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%; display: flex; align-items: center; justify-content: center; }
+        .wheel-text { transform: rotate(45deg); font-weight: bold; font-size: 14px; color: #f39c12; position: absolute; right: 15px; bottom: 15px; }
+
+        /* MINES */
         .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px; }
         .mine-cell { aspect-ratio: 1/1; background: #2b2b2b; border-radius: 10px; border: 2px solid #3d3d3d; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .mine-cell.open-gem { background: #2ecc71; }
+        .mine-cell.open-bomb { background: #ff7675; }
+
+        .input-box { flex: 1; background: #1e1e1e; padding: 10px; border-radius: 12px; border: 1px solid #333; }
+        .input-box label { display: block; font-size: 11px; color: #777; margin-bottom: 5px; text-align: center; }
+        .input-box input { background: transparent; border: none; color: white; width: 100%; text-align: center; font-weight: bold; font-size: 16px; outline: none; }
+
         .menu-btn { position: fixed; bottom: 20px; left: 20px; background: #f39c12; width: 55px; height: 55px; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; z-index: 1000; }
         .menu-btn span { width: 30px; height: 3px; background: white; border-radius: 2px; }
         .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e1e1e; z-index: 2000; transition: 0.3s; padding-top: 60px; border-right: 2px solid #f39c12; }
@@ -48,41 +57,10 @@ html
     </div>
 
     <div id="lobby" class="lobby">
+        <div class="game-card" onclick="alert('Слоты в разработке')">🎰 СЛОТЫ</div>
         <div class="game-card" onclick="showGame('mines')">💣 МИНЫ</div>
         <div class="game-card" onclick="showGame('dice')">🎲 DICE</div>
         <div class="game-card" onclick="showGame('cases')">📦 КЕЙСЫ</div>
-    </div>
-
-    <!-- CASES -->
-    <div id="cases-game" class="game-screen">
-        <div id="cases-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
-            <div class="game-card" onclick="viewCase('c1')">📦 10 ₽</div>
-            <div class="game-card" onclick="viewCase('c2')">📦 50 ₽</div>
-            <div class="game-card" onclick="viewCase('fox')">🦊 5000 ₽</div>
-        </div>
-        <div id="case-view" style="display:none; width:100%; flex-direction:column; align-items:center;">
-            <div class="roulette-container">
-                <div class="roulette-pointer"></div>
-                <div class="roulette-tape" id="tape"></div>
-            </div>
-            <button class="btn-play" id="open-btn" onclick="startCase()">ОТКРЫТЬ КЕЙС</button>
-            <button id="case-back-btn" onclick="backToCases()" style="background:none; border:none; color:#555; margin-top:20px; font-weight:bold;">НАЗАД</button>
-        </div>
-    </div>
-
-    <!-- DICE -->
-    <div id="dice-game" class="game-screen">
-        <div style="font-size:70px; color:#f39c12; font-weight:bold; margin: 40px 0;" id="d-possible">20.00</div>
-        <div class="dice-controls">
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <div style="flex:1; background:#1e1e1e; padding:15px; border-radius:12px;"><input type="number" id="d-bet" value="10" oninput="updDiceWin()" style="background:none; border:none; color:white; width:100%; text-align:center; font-size:18px; outline:none;"></div>
-                <div style="flex:1; background:#1e1e1e; padding:15px; border-radius:12px;"><input type="number" id="d-chance" value="50" oninput="updDiceWin()" style="background:none; border:none; color:white; width:100%; text-align:center; font-size:18px; outline:none;"></div>
-            </div>
-            <button class="btn-play" onclick="playDice('less')">МЕНЬШЕ</button>
-            <button class="btn-play" onclick="playDice('more')">БОЛЬШЕ</button>
-            <div id="d-res-plate" style="margin-top:10px; text-align:center; padding:15px; border-radius:12px; display:none; font-weight:bold;"></div>
-            <button onclick="exitToLobby()" style="color:#555; background:none; border:none; margin-top:15px;">ВЫЙТИ</button>
-        </div>
     </div>
 
     <!-- MINES -->
@@ -90,21 +68,80 @@ html
         <div id="m-coeff" style="background:#f39c12; color:black; padding:8px 20px; border-radius:10px; font-weight:bold; font-size:20px; margin-bottom:15px;">x0.00</div>
         <div class="mines-grid" id="m-grid"></div>
         <div class="dice-controls">
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="m-bet" value="10" style="flex:1; background:#1e1e1e; border:none; color:white; padding:15px; border-radius:12px; text-align:center;">
-                <input type="number" id="m-bombs" value="3" style="flex:1; background:#1e1e1e; border:none; color:white; padding:15px; border-radius:12px; text-align:center;">
+            <div class="btn-row">
+                <div class="input-box"><label>СТАВКА</label><input type="number" id="m-bet" value="10"></div>
+                <div class="input-box"><label>БОМБЫ</label><input type="number" id="m-bombs" value="3"></div>
             </div>
             <button class="btn-play" id="m-start-btn" onclick="startMines()">ИГРАТЬ</button>
             <button class="btn-play" id="m-cash-btn" style="display:none; background:#2ecc71; color:white;" onclick="cashoutMines()">ЗАБРАТЬ</button>
-            <button onclick="exitToLobby()" style="color:#555; background:none; border:none; margin-top:10px;">ВЫЙТИ</button>
+            <button onclick="exitToLobby()" style="background:none; border:none; color:#555; font-weight:bold; margin-top:10px;">ВЫЙТИ</button>
         </div>
     </div>
 
-    <!-- SIDE MENU -->
+    <!-- DICE -->
+    <div id="dice-game" class="game-screen">
+        <div style="font-size:70px; color:#f39c12; font-weight:bold; margin: 30px 0;" id="d-possible">20.00</div>
+        <div class="dice-controls">
+            <div class="btn-row">
+                <div class="input-box"><label>СТАВКА</label><input type="number" id="d-bet" value="10" oninput="updDiceWin()"></div>
+                <div class="input-box"><label>ШАНС %</label><input type="number" id="d-chance" value="50" oninput="updDiceWin()"></div>
+            </div>
+            <div class="btn-row">
+                <button class="btn-play" onclick="playDice('less')">МЕНЬШЕ</button>
+                <button class="btn-play" onclick="playDice('more')">БОЛЬШЕ</button>
+            </div>
+            <div id="d-res-plate" style="margin-top:10px; text-align:center; padding:15px; border-radius:12px; display:none; font-weight:bold;"></div>
+            <button onclick="exitToLobby()" style="background:none; border:none; color:#555; font-weight:bold; margin-top:15px;">ВЫЙТИ</button>
+        </div>
+    </div>
+
+    <!-- CASES -->
+    <div id="cases-game" class="game-screen">
+        <div id="cases-grid" class="lobby" style="width:100%; padding:0;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div class="game-card" onclick="viewCase('c1')">📦 10 ₽</div>
+                <div class="game-card" onclick="viewCase('c2')">📦 50 ₽</div>
+                <div class="game-card" onclick="viewCase('c3')">📦 150 ₽</div>
+                <div class="game-card" onclick="viewCase('c4')">📦 250 ₽</div>
+                <div class="game-card" onclick="viewCase('c5')">📦 500 ₽</div>
+                <div class="game-card" onclick="viewCase('c6')">📦 1000 ₽</div>
+                <div class="game-card" onclick="viewCase('c7')">📦 2000 ₽</div>
+                <div class="game-card" onclick="viewCase('fox')">🦊 5000 ₽</div>
+            </div>
+            <button onclick="exitToLobby()" style="background:none; border:none; color:#555; font-weight:bold;">НАЗАД</button>
+        </div>
+        <div id="case-view" style="display:none; width:100%; flex-direction:column; align-items:center;">
+            <div class="roulette-container"><div class="roulette-pointer"></div><div class="roulette-tape" id="tape"></div></div>
+            <button class="btn-play" id="open-btn" onclick="startCase()">ОТКРЫТЬ КЕЙС</button>
+            <button onclick="backToCases()" style="background:none; border:none; color:#555; font-weight:bold; margin-top:15px;">НАЗАД</button>
+        </div>
+    </div>
+
+    <!-- BONUS SCREEN -->
+    <div id="bonus-game" class="game-screen" style="display:none;">
+        <div class="input-box" style="width:100%; margin-bottom:20px;">
+            <label>ПРОМОКОД</label>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="promo-input" style="flex:2; text-align:left; padding-left:10px;" placeholder="Введите код...">
+                <button onclick="alert('Проверка...')" style="background:#f39c12; border:none; padding:5px 15px; border-radius:8px; font-weight:bold;">ОК</button>
+            </div>
+        </div>
+        <div style="text-align:center; width:100%;">
+            <h3 style="color:#f39c12; margin:0;">КОЛЕСО ФОРТУНЫ</h3>
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer-red"></div>
+                <div id="wheel" class="wheel-container"></div>
+            </div>
+            <button class="btn-play" id="wheel-btn" onclick="spinWheel()">КРУТИТЬ</button>
+        </div>
+        <button onclick="exitToLobby()" style="background:none; border:none; color:#555; font-weight:bold; margin-top:20px;">ВЫЙТИ</button>
+    </div>
+
     <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
     <div class="side-menu" id="side-menu">
         <a href="#" class="menu-link" onclick="exitToLobby(); toggleMenu()">🎮 Игры</a>
         <a href="#" class="menu-link" onclick="showGame('bonus'); toggleMenu()">🎁 Бонусы</a>
+        <a href="#" class="menu-link" onclick="alert('Рефералы скоро'); toggleMenu()">👥 Рефералы</a>
     </div>
 
     <script>
@@ -119,84 +156,45 @@ html
             document.querySelectorAll('.game-screen').forEach(s=>s.style.display='none');
             document.getElementById(g+'-game').style.display='flex'; 
             if(g==='mines') initMinesGrid();
+            if(g==='bonus') initWheel();
         }
         function exitToLobby() { 
             document.getElementById('lobby').style.display='flex'; 
             document.querySelectorAll('.game-screen').forEach(s=>s.style.display='none');
         }
 
-        // --- CASES MATH FIX ---
-        const caseDB = {
-            'c1': {p: 10, items: [2, 5, 10, 20], w: [40, 30, 25, 5]},
-            'c2': {p: 50, items: [10, 25, 50, 150], w: [40, 35, 20, 5]},
-            'fox': {p: 5000, items: [2500, 5000, 15000, 50000], w: [60, 25, 10, 5]}
-        };
-        let curCase = null, isSpinning = false;
-
-        function viewCase(id) {
-            curCase = caseDB[id];
-            document.getElementById('cases-grid').style.display='none';
-            document.getElementById('case-view').style.display='flex';
-            resetTape();
-        }
-        function resetTape() {
-            let t = document.getElementById('tape');
-            t.style.transition = 'none';
-            t.style.transform = 'translateX(0px)';
-            t.innerHTML = '';
-            for(let i=0; i<85; i++) {
-                let pr = curCase.items[Math.floor(Math.random()*curCase.items.length)];
-                t.innerHTML += `<div class="r-item">${pr}<span>₽</span></div>`;
+        const wheelPrizes = [1, 5, 10, 2, 25, 3, 15, 1, 20, 5, 2, 10];
+        function initWheel() {const wheel = document.getElementById('wheel'); wheel.innerHTML = '';
+            for(let i=0; i<12; i++) {
+                let section = document.createElement('div'); section.className = 'wheel-section';
+                section.style.transform = `rotate(${i * 30}deg)`;
+                section.style.backgroundColor = i % 2 === 0 ? '#1e1e1e' : '#2b2b2b';
+                section.innerHTML = `<div class="wheel-text">${wheelPrizes[i]}₽</div>`;
+                wheel.appendChild(section);
             }
         }
-        function startCase() {
-            if(balance < curCase.p || isSpinning) return;
-            isSpinning = true;
-            document.getElementById('open-btn').disabled = true;
-            let t = document.getElementById('tape');
-            t.style.transition = 'none';
-            t.style.transform = 'translateX(0px)';
-
+        function spinWheel() {
+            let wheel = document.getElementById('wheel');
+            let deg = 1800 + Math.floor(Math.random() * 360);
+            wheel.style.transform = `rotate(${deg}deg)`;
+            document.getElementById('wheel-btn').disabled = true;
             setTimeout(() => {
-                balance -= curCase.p; updateBal();
-                let s = curCase.w.reduce((a,b)=>a+b, 0), r = Math.random()*s, win = curCase.items[0];
-                for(let i=0; i<curCase.items.length; i++){ if(r < curCase.w[i]){ win = curCase.items[i]; break; } r -= curCase.w[i]; }
-                
-                let winIdx = 70;
-                t.children[winIdx].innerHTML = `${win}<span>₽</span>`;
-                t.children[winIdx].style.color = "#f39c12";
-
-                let itemWidth = 120; // Новая фиксированная ширина
-                let containerWidth = document.querySelector('.roulette-container').offsetWidth;
-                let stopPos = (winIdx * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
-
-                t.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
-                t.style.transform = `translateX(-${stopPos}px)`;
-
-                setTimeout(() => {
-                    balance += win; updateBal(); alert('Приз: ' + win + '₽');
-                    isSpinning = false; document.getElementById('open-btn').disabled = false;
-                }, 7200);
-            }, 50);
+                let p = wheelPrizes[Math.floor(((360 - (deg % 360)) % 360) / 30)];
+                balance += p; updateBal(); alert("Бонус: " + p + "₽!");
+            }, 5200);
         }
 
-        // --- DICE ---
-        function updDiceWin() {
-            let b = parseFloat(document.getElementById('d-bet').value) || 0;
-            let c = parseFloat(document.getElementById('d-chance').value) || 1;
-            document.getElementById('d-possible').innerText = (b * (95/c)).toFixed(2);
-        }
+        function updDiceWin() { let b = parseFloat(document.getElementById('d-bet').value) || 0; let c = parseFloat(document.getElementById('d-chance').value) || 1; document.getElementById('d-possible').innerText = (b * (95/c)).toFixed(2); }
         function playDice(t) {
-            let b = parseFloat(document.getElementById('d-bet').value), c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance) return; balance -= b; updateBal();
-            let r = Math.floor(Math.random()*1000000), win = (t==='less')?(r < c*10000):(r >= (1000000-c*10000));
+            let b = parseFloat(document.getElementById('d-bet').value); let c = parseFloat(document.getElementById('d-chance').value);
+            if(b > balance) return; balance -= b;
+            let r = Math.floor(Math.random()*1000000); let win = (t==='less')?(r < c*10000):(r >= (1000000-c*10000));
             let p = document.getElementById('d-res-plate'); p.style.display = 'block';
-            if(win){ let w = b*(95/c); balance += w; p.innerText = "ВЫИГРЫШ: "+w.toFixed(2); p.style.background="#2ecc71"; }
-            else { p.innerText = "ПРОИГРЫШ"; p.style.background="#ff7675"; }
+            if(win){ let w = b*(95/c); balance += w; p.innerText = "ВЫИГРЫШ: "+w.toFixed(2)+" ("+r+")"; p.style.background="#2ecc71"; }
+            else { p.innerText = "ПРОИГРЫШ ("+r+")"; p.style.background="#ff7675"; }
             updateBal();
         }
 
-        // --- MINES ---
         let mState = { active: false, bet: 0, bombs: 0, opened: 0, grid: [] };
         function initMinesGrid() {
             const grid = document.getElementById('m-grid'); grid.innerHTML = '';
@@ -222,7 +220,24 @@ html
         function cashoutMines() { let win = mState.bet*getMult(); balance+=win; updateBal(); resetMines(); }
         function resetMines() { mState.active=false; document.getElementById('m-start-btn').style.display='block'; document.getElementById('m-cash-btn').style.display='none'; }
 
-        function backToCases() { if(!isSpinning) { document.getElementById('cases-grid').style.display='grid'; document.getElementById('case-view').style.display='none'; } }
+        const caseDB = { 'c1': {p: 10, items: [2, 5, 10, 20], w: [40, 30, 25, 5]}, 'c2': {p: 50, items: [10, 25, 50, 150], w: [40, 35, 20, 5]}, 'c3': {p: 150, items: [50, 100, 200,500], w: [40, 35, 20, 5]}, 'c4': {p: 250, items: [100, 250, 500, 1000], w: [45, 30, 20, 5]}, 'c5': {p: 500, items: [200, 500, 1000, 2500], w: [45, 30, 20, 5]}, 'c6': {p: 1000, items: [500, 1000, 2500, 5000], w: [50, 30, 15, 5]}, 'c7': {p: 2000, items: [1000, 2000, 5000, 10000], w: [50, 30, 15, 5]}, 'fox': {p: 5000, items: [2500, 5000, 15000, 50000], w: [60, 25, 10, 5]} };
+        let curCase = null, isSpinning = false;
+        function viewCase(id) { curCase = caseDB[id]; document.getElementById('cases-grid').style.display='none'; document.getElementById('case-view').style.display='flex'; resetTape(); }
+        function resetTape() { let t = document.getElementById('tape'); t.style.transition = 'none'; t.style.transform = 'translateX(0px)'; t.innerHTML = ''; for(let i=0; i<85; i++) { t.innerHTML += `<div class="r-item">${curCase.items[Math.floor(Math.random()*curCase.items.length)]}<span>₽</span></div>`; } }
+        function startCase() {
+            if(balance < curCase.p || isSpinning) return; isSpinning = true;
+            document.getElementById('open-btn').disabled = true;
+            let t = document.getElementById('tape');
+            balance -= curCase.p; updateBal();
+            let s = curCase.w.reduce((a,b)=>a+b, 0), r = Math.random()*s, win = curCase.items[0];
+            for(let i=0; i<curCase.items.length; i++){ if(r < curCase.w[i]){ win = curCase.items[i]; break; } r -= curCase.w[i]; }
+            let winIdx = 70; t.children[winIdx].innerHTML = `${win}<span>₽</span>`;
+            let stopPos = (winIdx * 120) - (document.querySelector('.roulette-container').offsetWidth / 2) + 60;
+            t.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
+            t.style.transform = `translateX(-${stopPos}px)`;
+            setTimeout(() => { balance += win; updateBal(); alert('Приз: ' + win + '₽'); isSpinning = false; document.getElementById('open-btn').disabled = false; }, 7200);
+        }
+        function backToCases() { if(!isSpinning) { document.getElementById('cases-grid').style.display='flex'; document.getElementById('case-view').style.display='none'; } }
         updateBal();
     </script>
 </body>
