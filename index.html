@@ -10,188 +10,250 @@ html
         body {
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a;
+            background-color: #121212;
             color: white;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
         }
 
-        /* Верхняя панель */
+        /* Шапка */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
-            background: #252525;
+            padding: 15px;
+            background: #1e1e1e;
             border-bottom: 2px solid #f39c12;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .balance-section {
+        .balance-container {
             display: flex;
             align-items: center;
-            background: #333;
-            padding: 5px 12px;
-            border-radius: 20px;
-            cursor: pointer;
+            background: #2b2b2b;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1px solid #333;
         }
 
-        .balance-section .plus {
+        .balance-amount {
             color: #2ecc71;
-            margin-left: 8px;
             font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .plus-btn {
+            background: #2ecc71;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
         }
 
         .casino-name {
-            font-weight: bold;
+            font-size: 18px;
+            font-weight: 800;
             color: #f39c12;
-            font-size: 1.2em;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .user-avatar {
-            width: 35px;
-            height: 35px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: #555;
             border: 2px solid #f39c12;
-            cursor: pointer;
         }
 
-        /* Кнопка "три полоски" */
-        .menu-btn {
+        /* Меню игры */
+        .lobby {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 100px;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #333;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .game-card:active {
+            transform: scale(0.95);
+        }
+
+        /* Кнопка Меню (Три полоски) */
+        .menu-trigger {
             position: fixed;
-            bottom: 20px;
+            bottom: 25px;
             left: 20px;
             background: #f39c12;
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             gap: 5px;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
             z-index: 100;
         }
 
-        .menu-btn div {
+        .menu-trigger span {
             width: 30px;
-            height: 4px;
+            height: 3px;
             background: white;
             border-radius: 2px;
         }
 
-        /* Игровое поле */
-        .main-content {
-            padding: 20px;
-            text-align: center;
-            height: 80vh;
-            overflow-y: auto;
-        }
-
-        .game-card {
-            background: #2c3e50;
-            margin: 15px 0;
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 5px solid #f39c12;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-
         /* Боковое меню */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 250px;
-            height: 100%;
-            background: #252525;
-            transition: 0.3s;
-            z-index: 200;
-            padding-top: 50px;
-        }
-
-        .side-menu.active {
-            left: 0;
-        }
-
-        .menu-item {
-            padding: 15px 25px;
-            border-bottom: 1px solid #333;
-            font-size: 1.1em;
-        }
-
-        /* Окна игр (скрыты по умолчанию) */
-        .game-window {
+        .side-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #1a1a1a;
-            z-index: 50;
+            background: rgba(0,0,0,0.7);
+            z-index: 150;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;height: 100%;
+            background: #1e1e1e;
+            z-index: 200;
+            transition: 0.3s;
+            padding-top: 20px;
+        }
+
+        .side-menu.open {
+            left: 0;
+        }
+
+        .menu-link {
+            padding: 15px 25px;
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            border-bottom: 1px solid #2b2b2b;
+        }
+
+        /* Модалка профиля */
+        .modal-auth {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #252525;
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 300;
+            text-align: center;
+            border: 1px solid #f39c12;
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="balance-section" onclick="openWallet()"><span id="balance">0.00</span> ₽ <span class="plus">+</span>
+        <div class="balance-container" onclick="alert('Пополнение в разработке')">
+            <span class="balance-amount" id="user-bal">0.00</span>
+            <span style="color:white; margin-right:5px">₽</span>
+            <div class="plus-btn">+</div>
         </div>
         <div class="casino-name">FortuneFox</div>
-        <img id="avatar" class="user-avatar" onclick="toggleAuthMenu()" src="https://via.placeholder.com/35">
+        <div class="profile-section" onclick="toggleAuth()">
+            <img id="user-pic" class="user-avatar" src="https://ui-avatars.com/api/?name=U">
+        </div>
     </div>
 
-    <div class="main-content" id="lobby">
-        <div class="game-card" onclick="openGame('slots')">🎰 Слоты</div>
-        <div class="game-card" onclick="openGame('mines')">💣 Мины</div>
-        <div class="game-card" onclick="openGame('dice')">🎲 DICE</div>
-        <div class="game-card" onclick="openGame('cases')">📦 Кейсы</div>
+    <div class="lobby">
+        <div class="game-card" onclick="alert('Скоро добавим Слоты!')">🎰 СЛОТЫ</div>
+        <div class="game-card" onclick="alert('Механика Мин будет в следующем обновлении!')">💣 МИНЫ</div>
+        <div class="game-card" onclick="alert('Механика DICE будет в следующем обновлении!')">🎲 DICE</div>
+        <div class="game-card" onclick="alert('Механика Кейсов будет в следующем обновлении!')">📦 КЕЙСЫ</div>
     </div>
 
-    <!-- Меню три полоски -->
-    <div class="menu-btn" onclick="toggleMenu()">
-        <div></div><div></div><div></div>
+    <!-- Кнопка три полоски -->
+    <div class="menu-trigger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
     </div>
 
-    <div class="side-menu" id="sideMenu">
-        <div class="menu-item" onclick="showLobby()">🎮 Игры</div>
-        <div class="menu-item" onclick="showSection('bonus')">🎁 Бонусы</div>
-        <div class="menu-item" onclick="showSection('ref')">👥 Рефералы</div>
-        <div class="menu-item" onclick="window.location.href='https://t.me/твой_саппорт'">🎧 Поддержка</div>
+    <!-- Наложение для закрытия меню -->
+    <div class="side-overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- Само меню -->
+    <div class="side-menu" id="menu">
+        <div style="text-align:center; padding: 20px; color: #f39c12; font-weight: bold; border-bottom: 1px solid #333;">МЕНЮ</div>
+        <a href="#" class="menu-link" onclick="toggleMenu()">🎮 Игры</a>
+        <a href="#" class="menu-link" onclick="alert('Задания появятся тут')">🎁 Бонусы</a>
+        <a href="#" class="menu-link" onclick="alert('Рефералка скоро')">👥 Рефералы</a>
+        <a href="https://t.me/твой_логин" class="menu-link" style="color: #3498db;">🎧 Поддержка</a>
+    </div>
+
+    <!-- Окно Выхода -->
+    <div class="modal-auth" id="auth-modal">
+        <p>Вы вошли как <br><b id="user-name">Игрок</b></p>
+        <button onclick="tg.close()" style="background:#e74c3c; color:white; border:none; padding:10px 20px; border-radius:10px;">Выйти из приложения</button>
+        <br><br>
+        <button onclick="toggleAuth()" style="background:none; color:#aaa; border:none;">Закрыть</button>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); // Развернуть на весь экран
 
-        // Авторизация через ТГ
-        document.getElementById('avatar').src = tg.initDataUnsafe.user.photo_url || "https://ui-avatars.com/api/?name=" + tg.initDataUnsafe.user.first_name;
-        
+        // Данные из Телеграм
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            document.getElementById('user-name').innerText = user.first_name;
+            if (user.photo_url) {
+                document.getElementById('user-pic').src = user.photo_url;
+            }
+        }
+
         function toggleMenu() {
-            document.getElementById('sideMenu').classList.toggle('active');
+            const menu = document.getElementById('menu');
+            const overlay = document.getElementById('overlay');
+            if (menu.classList.contains('open')) {
+                menu.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                menu.classList.add('open');
+                overlay.style.display = 'block';
+            }
         }
 
-        function showLobby() {
-            toggleMenu();
-            // Логика возврата на главный экран
-        }
-
-        function openGame(game) {
-            alert("Запуск игры: " + game + ". Скоро здесь будет механика!");
-        }
-
-        function showSection(name) {
-            toggleMenu();
-            alert("Открываем раздел: " + name);
-        }
-
-        function openWallet() {
-            alert("Пополнение/Вывод");
+        function toggleAuth() {
+            const modal = document.getElementById('auth-modal');
+            modal.style.display = (modal.style.display === 'block') ? 'none' : 'block';
         }
     </script>
 </body>
