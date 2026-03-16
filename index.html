@@ -20,15 +20,13 @@ html
         .screen { display: none; flex-direction: column; gap: 15px; width: 100%; }
         .active-screen { display: flex; }
 
-        /* Модальное окно */
         .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: #1e1e1e; border: 1px solid #f39c12; border-radius: 15px; width: 100%; max-width: 320px; padding: 25px; text-align: center; }
 
         .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
         .game-card { background: #1e1e1e; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #f39c12; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 80px; }
 
-        /* DICE элементы */
-        .dice-res-win { background: #2ecc71; color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; margin-top: 15px; font-size: 18px; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
+        .dice-res-win { background: #2ecc71; color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; margin-top: 15px; font-size: 18px; }
         .dice-res-lose { background: #ff7675; color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; margin-top: 15px; font-size: 18px; }
 
         .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 350px; margin: 0 auto; }
@@ -42,14 +40,14 @@ html
         .roulette-tape { display: flex; position: absolute; height: 100%; left: 0; }
         .r-item { min-width: 80px; width: 80px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #333; background: #252525; font-weight: bold; }
 
-        .btn { border: none; border-radius: 10px; padding: 15px; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; margin-bottom: 10px; }
+        .btn { border: none; border-radius: 10px; padding: 15px;font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; margin-bottom: 10px; }
         .btn-main { background: #f39c12; color: #000; }
         .btn-success { background: #2ecc71; color: #fff; }
         .btn-danger { background: #e74c3c; color: #fff; }
         .btn-back { background: transparent; color: #777; margin-top: 5px; }
 
         .promo-input { width: 100%; padding: 12px; background: #2b2b2b; border: 1px solid #444; border-radius: 8px; color: #fff; outline: none; }
-        .info-card { background: #1e1e1e; padding: 15px; border-radius: 12px; border-left: 4px solid #f39c12; width: 100%; }
+        .info-card { background: #1e1e1e; padding: 15px; border-radius: 12px; border-left: 4px solid #f39c12; width: 100%; margin-bottom: 10px; }
 
         .menu-btn { position: fixed; bottom: 20px; left: 20px; background: #f39c12; width: 50px; height: 50px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; z-index: 100; }
         .menu-btn span { width: 25px; height: 3px; background: #fff; border-radius: 2px; }
@@ -69,7 +67,6 @@ html
         <img id="user-pic" style="width:32px; height:32px; border-radius:50%; border: 1px solid #f39c12;" src="https://ui-avatars.com/api/?name=U">
     </div>
 
-    <!-- МОДАЛКА КОШЕЛЬКА -->
     <div class="modal-overlay" id="wallet-modal">
         <div class="modal-content">
             <h2 style="color:#f39c12; margin-bottom:20px;">КОШЕЛЕК</h2>
@@ -81,7 +78,6 @@ html
 
     <div class="main-container">
         
-        <!-- ГЛАВНАЯ -->
         <div id="lobby" class="screen active-screen">
             <div class="game-card" style="min-height: 120px; font-size: 20px;" onclick="alert('В разработке...')">🎰 СЛОТЫ</div>
             <div class="grid-2col">
@@ -91,7 +87,6 @@ html
             <div class="game-card" onclick="showScreen('cases-game')">📦 КЕЙСЫ</div>
         </div>
 
-        <!-- DICE -->
         <div id="dice-game" class="screen">
             <div id="d-possible" style="font-size:45px; color:#f39c12; text-align:center; font-weight:bold; margin:10px 0;">20.00</div>
             <div class="grid-2col">
@@ -102,13 +97,10 @@ html
                 <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
                 <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
             </div>
-            <!-- Поле результата -->
             <div id="d-res-plate" style="display:none;"></div>
-            
             <button class="btn btn-back" onclick="exitToLobby()">НАЗАД</button>
         </div>
 
-        <!-- МИНЫ -->
         <div id="mines-game" class="screen">
             <div id="m-coeff" style="text-align:center; font-size:24px; color:#f39c12; font-weight:bold;">x0.00</div>
             <div class="mines-grid" id="m-grid"></div>
@@ -121,12 +113,15 @@ html
             <button class="btn btn-back" onclick="exitToLobby()">НАЗАД</button>
         </div>
 
-        <!-- КЕЙСЫ -->
         <div id="cases-game" class="screen">
             <div id="cases-grid" class="grid-2col">
                 <div class="game-card" onclick="viewCase('c1')">📦 10 ₽</div>
                 <div class="game-card" onclick="viewCase('c2')">📦 50 ₽</div>
                 <div class="game-card" onclick="viewCase('c3')">📦 150 ₽</div>
+                <div class="game-card" onclick="viewCase('c4')">📦 250 ₽</div>
+                <div class="game-card" onclick="viewCase('c5')">📦 500 ₽</div>
+                <div class="game-card" onclick="viewCase('c6')">📦 1000 ₽</div>
+                <div class="game-card" onclick="viewCase('c7')">📦 2000 ₽</div>
                 <div class="game-card" onclick="viewCase('fox')" style="border-color:#f1c40f;">🦊 5000 ₽</div>
             </div>
             <div id="case-view" style="display:none; flex-direction:column; align-items:center;">
@@ -139,29 +134,28 @@ html
             </div>
         </div>
 
-        <!-- БОНУСЫ -->
         <div id="bonus-screen" class="screen">
             <div class="info-card">
-                <h4 style="margin:0 0 10px 0;">ПРОМОКОД</h4>
+                <h4>ПРОМОКОД</h4>
                 <input type="text" id="promo-code" class="promo-input" placeholder="Введите код">
                 <button class="btn btn-main" style="margin-top:10px;" onclick="alert('Код не найден')">АКТИВИРОВАТЬ</button>
             </div>
             <div class="info-card">
-                <h4 style="margin:0 0 5px 0;">ЕЖЕДНЕВНЫЙ БОНУС</h4>
+                <h4>ЕЖЕДНЕВНЫЙ БОНУС</h4>
+                <p style="font-size:12px; color:#aaa; margin-bottom:10px;">От 1 до 25 ₽ каждый день</p>
                 <button class="btn btn-main" id="daily-btn" onclick="getDailyBonus()">ПОЛУЧИТЬ</button>
             </div>
             <div class="info-card">
-                <h4 style="margin:0 0 10px 0;">ЗАДАНИЯ</h4>
+                <h4>ЗАДАНИЯ</h4>
                 <p style="font-size:12px; color:#555; text-align:center;">Заданий пока нет</p>
             </div>
             <button class="btn btn-back" onclick="exitToLobby()">НАЗАД</button>
         </div>
 
-        <!-- РЕФЕРАЛЫ -->
         <div id="ref-screen" class="screen">
             <div class="info-card">
-                <h4 style="margin:0 0 10px 0;">ВАША ССЫЛКА</h4>
-                <div id="ref-link" style="font-size:11px; background:#121212; padding:10px; border-radius:8px; border:1px dashed #f39c12; word-break:break-all;">https://t.me/FortuneFox_Bot?start=0</div>
+                <h4>ВАША ССЫЛКА</h4>
+                <div id="ref-link" style="font-size:11px; background:#121212; padding:10px; border-radius:8px; border:1px dashed #f39c12; word-break:break-all;"></div>
                 <button class="btn btn-main" style="margin-top:10px;" onclick="copyRef()">КОПИРОВАТЬ</button>
             </div>
             <button class="btn btn-back" onclick="exitToLobby()">НАЗАД</button>
@@ -171,7 +165,7 @@ html
 
     <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
     <div class="side-menu" id="side-menu">
-        <h2 style="color:#f39c12; margin-top:0;">FortuneFox</h2>
+        <h2 style="color:#f39c12;">FortuneFox</h2>
         <a href="#" class="menu-link" onclick="showScreen('lobby'); toggleMenu()">🎰 ИГРЫ</a>
         <a href="#" class="menu-link" onclick="showScreen('bonus-screen'); toggleMenu()">🎁 БОНУСЫ</a>
         <a href="#" class="menu-link" onclick="showScreen('ref-screen'); toggleMenu()">👥 РЕФЕРАЛЫ</a>
@@ -179,7 +173,7 @@ html
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
+        let tg= window.Telegram.WebApp;
         let balance = 100.00;
         tg.expand();
 
@@ -188,7 +182,6 @@ html
 
         function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
-        
         function openWallet() { document.getElementById('wallet-modal').style.display = 'flex'; }
         function closeWallet() { document.getElementById('wallet-modal').style.display = 'none'; }
         function walletAction(type) { closeWallet(); tg.sendData(JSON.stringify({action: type})); }
@@ -200,7 +193,6 @@ html
         }
         function exitToLobby() { showScreen('lobby'); }
 
-        // --- DICE ЛОГИКА ---
         function updDiceWin() {
             let b = parseFloat(document.getElementById('d-bet').value) || 0;
             let c = parseFloat(document.getElementById('d-chance').value) || 1;
@@ -212,38 +204,21 @@ html
             let c = parseFloat(document.getElementById('d-chance').value);
             if(b > balance || b <= 0) { alert("Недостаточно баланса!"); return; }
             balance -= b;
-            
-            // Число для проверки выигрыша (0-100)
             let r = Math.random() * 100;
             let win = (t === 'less') ? (r < c) : (r >= (100 - c));
-            
             let p = document.getElementById('d-res-plate');
             p.style.display = 'block';
-            
             if(win) {
                 let winAmt = b * (95/c);
                 balance += winAmt;
-                // Красивое зеленое окно при выигрыше
                 p.className = 'dice-res-win';
                 p.innerText = "Выиграли " + winAmt.toFixed(2);
             } else {
-                // Большое случайное число (билет) при проигрыше
                 let ticket = Math.floor(Math.random() * 900000) + 100000;
                 p.className = 'dice-res-lose';
                 p.innerText = "Проиграли " + ticket;
             }
             updateBal();
-        }
-
-        // --- ОСТАЛЬНЫЕ ИГРЫ ---
-        function getDailyBonus() {
-            let last = localStorage.getItem('lastBonus');
-            let now = new Date().getTime();
-            if(last && now - last < 86400000) { alert('Раз в 24 часа!'); return; }
-            let amt = (Math.random() * 24 + 1).toFixed(2);
-            balance += parseFloat(amt); updateBal();
-            localStorage.setItem('lastBonus', now);
-            alert("Зачислено " + amt + " ₽!");
         }
 
         let mState = { active: false, bet: 0, bombs: 0, opened: 0, grid: [] };
@@ -292,7 +267,16 @@ html
             document.getElementById('m-cash-btn').style.display = 'none';
         }
 
-        const caseDB = {'c1': {p: 10, items: [2, 5, 10, 20], w: [40, 30, 25, 5]}, 'c2': {p: 50, items: [10, 25, 50, 150], w: [40, 35, 20, 5]}, 'c3': {p: 150, items: [50, 100, 200, 500], w: [40, 35, 20, 5]}, 'fox': {p: 5000, items: [2500, 5000, 15000, 50000], w: [60, 25, 10, 5]}};
+        const caseDB = {
+            'c1': {p: 10, items: [2, 5, 10, 20], w: [40, 30, 25, 5]},
+            'c2': {p: 50, items: [10, 25, 50, 150], w: [40, 35, 20, 5]},
+            'c3': {p: 150, items: [50, 100, 200, 500], w: [40, 35, 20, 5]},
+            'c4': {p: 250, items: [100, 250, 500, 1000], w: [45, 30, 20, 5]},
+            'c5': {p: 500, items: [200, 500, 1000, 2500], w: [45, 30, 20, 5]},
+            'c6': {p: 1000, items: [500, 1000, 2500, 5000], w: [50, 30, 15, 5]},
+            'c7': {p: 2000, items: [1000, 2000, 5000, 10000], w: [50, 30, 15, 5]},
+            'fox': {p: 5000, items: [2500, 5000, 15000, 50000], w: [60, 25, 10, 5]}
+        };
         let curCase = null, isSpinning = false;
         function viewCase(id) { curCase = caseDB[id]; document.getElementById('cases-grid').style.display='none'; document.getElementById('case-view').style.display='flex'; resetTape(); }
         function resetTape() { let t = document.getElementById('tape'); t.style.transition = 'none'; t.style.transform = 'translateX(0px)'; t.innerHTML = ''; for(let i=0; i<85; i++) { let pr = curCase.items[Math.floor(Math.random()*curCase.items.length)]; t.innerHTML += `<div class="r-item"><b>${pr}</b></div>`; } }
@@ -308,8 +292,18 @@ html
         }
         function getPr(p, w) { let s = w.reduce((a,b)=>a+b,0); let r = Math.random()*s; for(let i=0; i<p.length; i++){ if(r<w[i]) return p[i]; r-=w[i]; } return p[p.length-1]; }
         function backToCases() { if(!isSpinning) { document.getElementById('cases-grid').style.display='grid'; document.getElementById('case-view').style.display='none'; } }
-        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-link').innerText); alert('Скопировано!'); }
+        
+        function getDailyBonus() {
+            let last = localStorage.getItem('lastBonus');
+            let now = new Date().getTime();
+            if(last && now - last < 86400000) { alert('Бонус доступен раз в 24 часа!'); return; }
+            let amt = (Math.random() * 24 + 1).toFixed(2);
+            balance += parseFloat(amt); updateBal();
+            localStorage.setItem('lastBonus', now);
+            alert("Зачислено " + amt + " ₽!");
+        }
 
+        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-link').innerText); alert('Скопировано!'); }
         updateBal();
     </script>
 </body>
