@@ -10,30 +10,30 @@ html
         body { margin: 0; padding: 0; background-color: #121212; color: white; font-family: 'Segoe UI', sans-serif; user-select: none; overflow: hidden; }
         
         /* HEADER */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1e1e1e; border-bottom: 1px solid #f39c12; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1e1e1e; border-bottom: 1px solid #f39c12; position: sticky; top: 0; z-index: 100; }
         .balance-amount { color: #2ecc71; font-weight: bold; }
         
-        /* LOBBY */
-        .lobby { padding: 20px; display: flex; flex-direction: column; gap: 15px; height: 90vh; overflow-y: auto; }
+        /* LOBBY & SCREENS */
+        .lobby, .game-screen, .extra-screen { padding: 20px; display: flex; flex-direction: column; gap: 15px; height: calc(100vh - 70px); overflow-y: auto; box-sizing: border-box; }
         .game-card { background: #1e1e1e; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #f39c12; font-size: 20px; font-weight: bold; cursor: pointer; }
 
-        /* SCREENS */
-        .game-screen { display: none; flex-direction: column; align-items: center; padding: 15px; height: 100vh; background: #121212; box-sizing: border-box; }
+        /* СКРЫТИЕ ЭКРАНОВ */
+        .game-screen, .extra-screen { display: none; }
 
         /* MINES */
-        .multiplier-badge { background: #f39c12; color: black; padding: 8px 20px; border-radius: 10px; font-weight: bold; font-size: 20px; margin-bottom: 15px; }
-        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 20px; }
+        .multiplier-badge { background: #f39c12; color: black; padding: 8px 20px; border-radius: 10px; font-weight: bold; font-size: 20px; margin-bottom: 15px; text-align: center;}
+        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 400px; margin: 0 auto 20px auto; }
         .mine-cell { aspect-ratio: 1/1; background: #2b2b2b; border-radius: 10px; border: 2px solid #3d3d3d; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 24px; }
         .mine-cell.open-gem { background: #2ecc71; border-color: #27ae60; }
         .mine-cell.open-bomb { background: #ff7675; border-color: #d63031; }
 
-        .mines-controls { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 10px; }
+        .mines-controls { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 10px; margin: 0 auto; }
         .input-row { display: flex; gap: 10px; width: 100%; }
         .input-box { flex: 1; background: #1e1e1e; border: 1px solid #333; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; }
         .input-box label { font-size: 11px; color: #777; margin-bottom: 4px; }
         .input-box input { background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; outline: none; width: 100%; }
 
-        /* CASES FIX */
+        /* CASES */
         .roulette-wrapper { width: 100%; max-width: 400px; position: relative; margin: 20px 0; }
         .roulette-container { width: 100%; height: 120px; background: #1e1e1e; border-radius: 15px; overflow: hidden; border: 1px solid #f39c12; position: relative; }
         .roulette-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #f39c12; z-index: 50; box-shadow: 0 0 10px #f39c12; }
@@ -43,31 +43,38 @@ html
         /* BUTTONS */
         .btn-play { background: #f39c12; color: black; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; }
         .btn-cashout { background: #2ecc71; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; display: none; }
+        .btn-secondary { background: #2b2b2b; color: white; border: 1px solid #444; padding: 15px; border-radius: 12px; font-size: 16px; width: 100%; margin-top: 10px; cursor: pointer;}
 
         /* MENU */
-        .menu-btn { position: fixed; bottom: 20px; left: 20px; background: #f39c12; width: 55px; height: 55px; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; z-index: 1000; }
+        .menu-btn { position: fixed; bottom: 20px; left: 20px; background: #f39c12; width: 55px; height: 55px; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .menu-btn span { width: 30px; height: 3px; background: white; border-radius: 2px; }
-        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e1e1e; z-index: 2000; transition: 0.3s; padding-top: 60px; border-right: 2px solid #f39c12; }
+        .side-menu { position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%; background: #1e1e1e; z-index: 2000; transition: 0.3s; padding-top: 60px; border-right: 2px solid #f39c12; }
         .side-menu.open { left: 0; }
-        .menu-link { padding: 20px 25px; display: block; color: white; text-decoration: none; border-bottom: 1px solid #333; font-weight: bold; }
+        .menu-link { padding: 20px 25px; display: block; color: white; text-decoration: none; border-bottom: 1px solid #333; font-weight: bold; font-size: 18px; }
+
+        /* BONUS & REF STYLES */
+        .info-block { background: #1e1e1e; padding: 20px; border-radius: 15px; border-left: 4px solid #f39c12; margin-bottom: 15px; }
+        .info-block h3 { margin-top: 0; color: #f39c12; }
+        .promo-input { width: 100%; padding: 15px; background: #2b2b2b; border: 1px solid #444; border-radius: 10px; color: white; font-size: 18px; box-sizing: border-box; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="background:#2b2b2b; padding:5px 12px; border-radius:10px;"><span class="balance-amount" id="balance">100.00</span> ₽</div>
+        <div style="background:#2b2b2b; padding:5px 12px; border-radius:10px;"><span class="balance-amount" id="balance">0.00</span> ₽</div>
         <div style="color:#f39c12; font-weight:bold; letter-spacing:1px;">FORTUNEFOX</div>
         <img id="user-pic" style="width:34px; border-radius:50%; border:1px solid #f39c12;" src="https://ui-avatars.com/api/?name=U">
     </div>
 
+    <!-- ГЛАВНОЕ ЛОББИ -->
     <div id="lobby" class="lobby">
         <div class="game-card" onclick="alert('Слоты в разработке')">🎰 СЛОТЫ</div>
-        <div class="game-card" onclick="showGame('mines')">💣 МИНЫ</div>
-        <div class="game-card" onclick="showGame('dice')">🎲 DICE</div>
-        <div class="game-card" onclick="showGame('cases')">📦 КЕЙСЫ</div>
+        <div class="game-card" onclick="showScreen('mines-game')">💣 МИНЫ</div>
+        <div class="game-card" onclick="showScreen('dice-game')">🎲 DICE</div>
+        <div class="game-card" onclick="showScreen('cases-game')">📦 КЕЙСЫ</div>
     </div>
 
-    <!-- MINES -->
+    <!-- МИНЫ -->
     <div id="mines-game" class="game-screen">
         <div class="multiplier-badge" id="m-coeff">x0.00</div>
         <div class="mines-grid" id="m-grid"></div>
@@ -78,77 +85,116 @@ html
             </div>
             <button class="btn-play" id="m-start-btn" onclick="startMines()">ИГРАТЬ</button>
             <button class="btn-cashout" id="m-cash-btn" onclick="cashoutMines()">ЗАБРАТЬ</button>
-            <button onclick="exitToLobby()" style="background:none; border:none; color:#555; margin-top:10px; font-weight:bold;">ВЫЙТИ</button>
+            <button class="btn-secondary" onclick="exitToLobby()">ВЫЙТИ В ЛОББИ</button>
         </div>
     </div>
 
     <!-- DICE -->
     <div id="dice-game" class="game-screen">
-        <div style="font-size:50px; color:#f39c12; font-weight:bold; margin: 30px 0;" id="d-possible">20.00</div>
+        <div style="font-size:50px; color:#f39c12; font-weight:bold; margin: 30px auto; text-align:center;" id="d-possible">20.00</div>
         <div class="mines-controls">
             <div class="input-row">
                 <div class="input-box"><label>Ставка</label><input type="number" id="d-bet" value="10" oninput="updDiceWin()"></div>
                 <div class="input-box"><label>Шанс %</label><input type="number" id="d-chance" value="50" oninput="updDiceWin()"></div>
             </div>
-            <div class="input-row">
+            <div class="input-row" style="margin-top:10px;">
                 <button class="btn-play" onclick="playDice('less')">МЕНЬШЕ</button>
-                <button class="btn-play" onclick="playDice('more')">БОЛЬШЕ</button>
+                <button class="btn-play" onclick="playDice('more')" style="background:#e67e22">БОЛЬШЕ</button>
             </div>
             <div id="d-res-plate" style="margin-top:15px; text-align:center; padding:15px; border-radius:12px; display:none; font-weight:bold;"></div>
-            <button onclick="exitToLobby()" style="background:none; border:none; color:#555; margin-top:20px; font-weight:bold;">ВЫЙТИ В ЛОББИ</button>
+            <button class="btn-secondary" onclick="exitToLobby()">ВЫЙТИ В ЛОББИ</button>
         </div>
     </div>
 
-    <!-- CASES -->
+    <!-- КЕЙСЫ -->
     <div id="cases-game" class="game-screen">
-        <div id="cases-grid" class="cases-grid">
+        <div id="cases-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="game-card" onclick="viewCase('c1')">📦 10 ₽</div>
             <div class="game-card" onclick="viewCase('c2')">📦 50 ₽</div>
             <div class="game-card" onclick="viewCase('c3')">📦 150 ₽</div>
             <div class="game-card" onclick="viewCase('c4')">📦 250 ₽</div>
-            <div class="game-card" onclick="viewCase('c5')">📦 500 ₽</div>
-            <div class="game-card" onclick="viewCase('c6')">📦 1000 ₽</div>
-            <div class="game-card" onclick="viewCase('c7')">📦 2000 ₽</div>
-            <div class="game-card" onclick="viewCase('fox')">🦊 5000 ₽</div>
+            <div class="game-card" onclick="viewCase('fox')" style="grid-column: span 2; border-color: #f1c40f;">🦊 FOX 5000 ₽</div>
         </div>
         <div id="case-view" style="display:none; width:100%; flex-direction:column; align-items:center;">
             <div class="roulette-wrapper">
                 <div class="roulette-pointer"></div>
                 <div class="roulette-container"><div class="roulette-tape" id="tape"></div></div>
             </div>
-            <button class="btn-play" id="open-btn" onclick="startCase()">ОТКРЫТЬ КЕЙС</button>
-            <button id="case-back-btn" onclick="backToCases()" style="background:none; border:none; color:#555; margin-top:20px; font-weight:bold;">НАЗАД</button>
+            <button class="btn-play" id="open-btn" onclick="startCase()">ОТКРЫТЬ</button>
+            <button class="btn-secondary" id="case-back-btn" onclick="backToCases()">НАЗАД</button>
+        </div>
+    </div>
+
+    <!-- БОНУСЫ -->
+    <div id="bonus-screen" class="extra-screen">
+        <div class="info-block">
+            <h3>Промокод</h3>
+            <input type="text" class="promo-input" id="promo-code" placeholder="Введите код...">
+            <button class="btn-play" onclick="activatePromo()">АКТИВИРОВАТЬ</button>
+        </div>
+        <div class="info-block">
+            <h3>Ежедневный бонус</h3>
+            <p>Получайте от 1 до 5 ₽ каждый день!</p>
+            <button class="btn-secondary" onclick="alert('Вы уже получили бонус сегодня')">ПОЛУЧИТЬ</button>
+        </div>
+    </div>
+
+    <!-- РЕФЕРАЛЫ -->
+    <div id="ref-screen" class="extra-screen">
+        <div class="info-block">
+            <h3>Ваша ссылка</h3>
+            <p id="ref-link" style="word-break: break-all; color: #f39c12; font-weight: bold;">Загрузка...</p>
+            <button class="btn-play" onclick="copyRef()">КОПИРОВАТЬ</button>
+        </div>
+        <div class="info-block">
+            <h3>Статистика</h3>
+            <p>Приглашено: <span id="ref-count">0</span> чел.</p>
+            <p>Заработано: <span id="ref-earned">0.00</span> ₽</p>
         </div>
     </div>
 
     <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    
     <div class="side-menu" id="side-menu">
         <a href="#" class="menu-link" onclick="exitToLobby(); toggleMenu()">🎰 Игры</a>
-        <a href="#" class="menu-link">🎁 Бонусы</a>
-        <a href="#" class="menu-link">👥 Рефералы</a>
+        <a href="#" class="menu-link" onclick="showScreen('bonus-screen'); toggleMenu()">🎁 Бонусы</a>
+        <a href="#" class="menu-link" onclick="showScreen('ref-screen'); toggleMenu()">👥 Рефералы</a>
+        <div style="padding: 25px; color: #555; font-size: 12px;">ID: <span id="user-id">0</span></div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        let balance = 100.00;
+        let balance = 0.00;
         tg.expand();
+
+        // Инициализация данных пользователя из Telegram
+        const userId = tg.initDataUnsafe?.user?.id || 0;
+        document.getElementById('user-id').innerText = userId;
+        document.getElementById('ref-link').innerText = "https://t.me/ТВОЙ_БОТ?start=" + userId;
+        if(tg.initDataUnsafe?.user?.photo_url) {
+            document.getElementById('user-pic').src = tg.initDataUnsafe.user.photo_url;
+        }
+
+        // ВАЖНО: Пока база данных не подключена через API, ставим стартовый баланс для теста
+        balance = 500.00; 
+        updateBal();
 
         function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
         
-        function showGame(g) { 
+        function showScreen(id) {
             document.getElementById('lobby').style.display='none'; 
-            document.querySelectorAll('.game-screen').forEach(s=>s.style.display='none');
-            document.getElementById(g+'-game').style.display='flex'; 
-            if(g==='mines') initMinesGrid();
+            document.querySelectorAll('.game-screen, .extra-screen').forEach(s=>s.style.display='none');
+            document.getElementById(id).style.display='flex'; 
+            if(id === 'mines-game') initMinesGrid();
         }
 
         function exitToLobby() { 
             document.getElementById('lobby').style.display='flex'; 
-            document.querySelectorAll('.game-screen').forEach(s=>s.style.display='none');
+            document.querySelectorAll('.game-screen, .extra-screen').forEach(s=>s.style.display='none');
         }
 
-        // --- MINES LOGIC ---
+        // --- МИНЫ ЛОГИКА ---
         let mState = { active: false, bet: 0, bombs: 0, opened: 0, grid: [] };
         function initMinesGrid() {
             const grid = document.getElementById('m-grid'); grid.innerHTML = '';
@@ -160,7 +206,9 @@ html
         function startMines() {
             let b = parseFloat(document.getElementById('m-bet').value);
             let n = parseInt(document.getElementById('m-bombs').value);
-            if(b > balance || n < 2 || n > 24) return;
+            if(isNaN(b) || b <= 0 || b > balance) { alert('Недостаточно средств!'); return; }
+            if(n < 2 || n > 24) { alert('Бомб должно быть от 2 до 24'); return; }
+            
             balance -= b; updateBal();
             mState = { active: true, bet: b, bombs: n, opened: 0, grid: Array(25).fill('gem') };
             let count = 0;
@@ -181,15 +229,17 @@ html
         function clickMines(i) {
             if(!mState.active) return;
             let cell = document.getElementById('m-grid').children[i];
-            if(cell.classList.contains('open-gem')) return;
+            if(cell.classList.contains('open-gem') || cell.classList.contains('open-bomb')) return;
+            
             if(mState.grid[i] === 'bomb') {
                 cell.classList.add('open-bomb'); cell.innerText = '💣';
                 mState.active = false;
-                setTimeout(() => { alert('БОМБА!'); resetMines(); }, 500);
+                setTimeout(() => { alert('БОМБА! Вы проиграли.'); resetMines(); }, 500);
             } else {
                 cell.classList.add('open-gem'); cell.innerText = '💎';
                 mState.opened++;
                 document.getElementById('m-coeff').innerText = 'x' + getMult();
+                if(mState.opened === (25 - mState.bombs)) cashoutMines();
             }
         }
         function cashoutMines() {
@@ -202,113 +252,81 @@ html
             document.getElementById('m-cash-btn').style.display = 'none';
         }
 
-        // --- DICE LOGIC ---
+        // --- DICE ЛОГИКА ---
         function updDiceWin() {
             let b = parseFloat(document.getElementById('d-bet').value) || 0;
             let c = parseFloat(document.getElementById('d-chance').value) || 1;
+            if(c > 95) c = 95; if(c < 1) c = 1;
             document.getElementById('d-possible').innerText = (b * (95/c)).toFixed(2);
         }
         function playDice(t) {
             let b = parseFloat(document.getElementById('d-bet').value);
             let c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance) return;
+            if(isNaN(b) || b <= 0 || b > balance) { alert('Недостаточно баланса!'); return; }
             balance -= b; updateBal();
-            let r = Math.floor(Math.random()*1000000);
-            let win = (t==='less') ? (r < c*10000) : (r >= (1000000 - c*10000));
+            let r = Math.floor(Math.random()*10000);
+            let target = c * 100;
+            let win = (t==='less') ? (r < target) : (r >= (10000 - target));
             let p = document.getElementById('d-res-plate'); p.style.display = 'block';
             if(win) {
                 let w = b * (95/c); balance += w; updateBal();
-                p.innerText = "ВЫИГРЫШ: " + w.toFixed(2); p.style.background = "#2ecc71";
+                p.innerText = "ВЫИГРЫШ: " + w.toFixed(2) + " ₽"; p.style.background = "#2ecc71";
             } else {
-                p.innerText = "ПРОИГРЫШ (" + r + ")"; p.style.background = "#ff7675";
+                p.innerText = "ПРОИГРЫШ: " + (r/100).toFixed(2); p.style.background = "#ff7675";
             }
         }
 
-        // --- CASES ---
+        // --- КЕЙСЫ ЛОГИКА ---
         const caseDB = {
             'c1': {p: 10, items: [2, 5, 10, 20], w: [40, 30, 25, 5]},
             'c2': {p: 50, items: [10, 25, 50, 150], w: [40, 35, 20, 5]},
             'c3': {p: 150, items: [50, 100, 200, 500], w: [40, 35, 20, 5]},
             'c4': {p: 250, items: [100, 250, 500, 1000], w: [45, 30, 20, 5]},
-            'c5': {p: 500, items: [200, 500, 1000, 2500], w: [45, 30, 20, 5]},
-            'c6': {p: 1000, items: [500, 1000, 2500, 5000], w: [50, 30, 15, 5]},
-            'c7': {p: 2000, items: [1000, 2000, 5000, 10000], w: [50, 30, 15, 5]},
             'fox': {p: 5000, items: [2500, 5000, 15000, 50000], w: [60, 25, 10, 5]}
         };
-        let curCase = null;
-        let isSpinning = false;
-
+        let curCase = null, isSpinning = false;
         function viewCase(id) {
             curCase = caseDB[id];
             document.getElementById('cases-grid').style.display='none';
             document.getElementById('case-view').style.display='flex';
             resetTape();
         }
-
         function resetTape() {
-            let t = document.getElementById('tape');
-            t.style.transition = 'none';
-            t.style.transform = 'translateX(0px)';
-            t.innerHTML = '';
+            let t = document.getElementById('tape'); t.style.transition = 'none'; t.style.transform = 'translateX(0px)'; t.innerHTML = '';
             for(let i=0; i<85; i++) {
                 let pr = curCase.items[Math.floor(Math.random()*curCase.items.length)];
                 t.innerHTML += `<div class="r-item">${pr}<span>₽</span></div>`;
             }
         }
-
-        function backToCases() { 
-            if(isSpinning) return;
-            document.getElementById('cases-grid').style.display='grid'; 
-            document.getElementById('case-view').style.display='none'; 
-        }
-
+        function backToCases() { if(!isSpinning) { document.getElementById('cases-grid').style.display='grid'; document.getElementById('case-view').style.display='none'; } }
         function startCase() {
             if(balance < curCase.p || isSpinning) return;
-            
-            isSpinning = true;
-            document.getElementById('open-btn').disabled = true;
-            document.getElementById('case-back-btn').style.opacity = '0.5';
-
-            // Сбрасываем ленту перед новым крутком
+            isSpinning = true; balance -= curCase.p; updateBal();
             let t = document.getElementById('tape');
-            t.style.transition = 'none';
-            t.style.transform = 'translateX(0px)';
-
-            // Небольшая задержка перед стартом для сброса
-            setTimeout(() => {
-                balance -= curCase.p; updateBal();
-                let win = getPr(curCase.items, curCase.w);
-                
-                // Индекс выигрышного предмета
-                let winIdx = 70; 
-                t.children[winIdx].innerHTML = win + "<span>₽</span>";
-                t.children[winIdx].style.color = "#f39c12";
-
-                // Расчет остановки точно по центру полоски (ширина айтема 100px)
-                let containerWidth = document.querySelector('.roulette-container').offsetWidth;
-                let stopPos = (winIdx * 100) - (containerWidth / 2) + 50;
-
-                t.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
-                t.style.transform = `translateX(-${stopPos}px)`;
-
-                setTimeout(() => {
-                    balance += win; 
-                    updateBal();
-                    alert('Ваш приз: ' + win + '₽');
-                    isSpinning = false;
-                    document.getElementById('open-btn').disabled = false;
-                    document.getElementById('case-back-btn').style.opacity = '1';
-                }, 7200);
-            }, 50);
+            let win = getPr(curCase.items, curCase.w);
+            let winIdx = 70; t.children[winIdx].innerHTML = win + "<span>₽</span>";
+            let containerWidth = document.querySelector('.roulette-container').offsetWidth;
+            let stopPos = (winIdx * 100) - (containerWidth / 2) + 50;
+            t.style.transition = 'transform 7s cubic-bezier(0.1, 0, 0.1, 1)';
+            t.style.transform = `translateX(-${stopPos}px)`;
+            setTimeout(() => { balance += win; updateBal(); alert('Выигрыш: ' + win + '₽'); isSpinning = false; }, 7200);
         }
-
         function getPr(p, w) {
             let s = w.reduce((a,b)=>a+b, 0); let r = Math.random()*s;
             for(let i=0; i<p.length; i++) { if(r<w[i]) return p[i]; r-=w[i]; }
             return p[p.length-1];
         }
 
-        updateBal();
+        // --- ВСПОМОГАТЕЛЬНОЕ ---
+        function activatePromo() {
+            const code = document.getElementById('promo-code').value;
+            if(code.length > 0) alert('Код ' + code + ' не найден или уже активирован');
+        }
+        function copyRef() {
+            const link = document.getElementById('ref-link').innerText;
+            navigator.clipboard.writeText(link);
+            alert('Ссылка скопирована!');
+        }
     </script>
 </body>
 </html>
