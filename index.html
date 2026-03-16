@@ -22,13 +22,11 @@ html
         .game-card { background: #1e1e1e; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #f39c12; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 80px; }
         .game-card:active { transform: scale(0.96); background: #252525; }
 
-        /* МИНЫ */
         .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 350px; margin: 0 auto; }
         .mine-cell { aspect-ratio: 1/1; background: #2b2b2b; border-radius: 8px; border: 2px solid #3d3d3d; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .mine-cell.open-gem { background: #2ecc71; border-color: #27ae60; }
         .mine-cell.open-bomb { background: #ff7675; border-color: #d63031; }
 
-        /* РУЛЕТКА */
         .roulette-wrapper { width: 100%; position: relative; margin: 10px 0; height: 100px; }
         .roulette-container { width: 100%; height: 100px; background: #1e1e1e; border-radius: 12px; overflow: hidden; border: 1px solid #f39c12; position: relative; }
         .roulette-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 100%; background: #f39c12; z-index: 10; box-shadow: 0 0 15px #f39c12; }
@@ -48,8 +46,6 @@ html
         .side-menu { position: fixed; top: 0; left: -100%; width: 75%; height: 100%; background: #1e1e1e; z-index: 1000; transition: 0.3s; border-right: 2px solid #f39c12; padding: 20px; }
         .side-menu.open { left: 0; }
         .menu-link { display: block; padding: 15px; color: #fff; text-decoration: none; font-weight: bold; border-bottom: 1px solid #333; font-size: 18px; }
-
-        .task-item { display: flex; justify-content: space-between; align-items: center; background: #2b2b2b; padding: 10px; border-radius: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -108,8 +104,7 @@ html
                 <div class="game-card" onclick="viewCase('c4')">📦 250 ₽</div>
                 <div class="game-card" onclick="viewCase('c5')">📦 500 ₽</div>
                 <div class="game-card" onclick="viewCase('c6')">📦 1000 ₽</div>
-                <div class="game-card" onclick="viewCase('c7')">📦 2000 ₽</div>
-                <div class="game-card" onclick="viewCase('fox')" style="border-color:#f1c40f;">🦊 5000 ₽</div>
+                <div class="game-card" onclick="viewCase('c7')">📦 2000 ₽</div><div class="game-card" onclick="viewCase('fox')" style="border-color:#f1c40f;">🦊 5000 ₽</div>
             </div>
             <div id="case-view" style="display:none; flex-direction:column; align-items:center;">
                 <div class="roulette-wrapper">
@@ -136,7 +131,6 @@ html
             <div class="info-card">
                 <h4 style="margin:0 0 10px 0;">ЗАДАНИЯ</h4>
                 <div id="tasks-container">
-                    <!-- Задания из админки будут появляться здесь -->
                     <p style="font-size:12px; color:#555; text-align:center;">Пока нет доступных заданий</p>
                 </div>
             </div>
@@ -177,7 +171,7 @@ html
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
         
         function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s=> s.classList.remove('active-screen'));
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.getElementById(id).classList.add('active-screen');
             if(id === 'mines-game') initMinesGrid();
         }
@@ -190,6 +184,39 @@ html
             document.getElementById('daily-btn').disabled = true;
             document.getElementById('daily-btn').innerText = "ПОЛУЧЕНО";
             alert("Бонус " + amt + " ₽ зачислен!");
+        }
+
+        // --- DICE ---
+        function updDiceWin() {
+            let b = parseFloat(document.getElementById('d-bet').value) || 0;
+            let c = parseFloat(document.getElementById('d-chance').value) || 1;
+            document.getElementById('d-possible').innerText = (b * (95/c)).toFixed(2);
+        }
+
+        function playDice(t) {
+            let b = parseFloat(document.getElementById('d-bet').value);
+            let c = parseFloat(document.getElementById('d-chance').value);
+            if(b > balance || isNaN(b) || b <= 0) { alert("Недостаточно баланса!"); return; }
+            
+            balance -= b; 
+            updateBal();
+            
+            let r = Math.floor(Math.random() * 1000001);
+            let target = c * 10000;
+            let win = (t === 'less') ? (r < target) : (r >= (1000000 - target));
+            
+            let p = document.getElementById('d-res-plate');
+            p.style.display = 'block';
+            p.style.background = win ? "#2ecc71" : "#ff7675";
+            
+            if(win) { 
+                let w = b * (95/c); 
+                balance += w; 
+                p.innerText = "ВЫИГРАЛИ: " + w.toFixed(2) + "₽ (БИЛЕТ: " + r + ")"; 
+            } else { 
+                p.innerText = "ПРОИГРАЛИ: " + r; 
+            }
+            updateBal();
         }
 
         // --- МИНЫ ---
@@ -239,28 +266,9 @@ html
             document.getElementById('m-cash-btn').style.display = 'none';
         }
 
-        // --- DICE ---
-        function updDiceWin() {
-            let b = parseFloat(document.getElementById('d-bet').value) || 0;
-            let c = parseFloat(document.getElementById('d-chance').value) || 1;
-            document.getElementById('d-possible').innerText = (b * (95/c)).toFixed(2);
-        }
-        function playDice(t) {
-            let b = parseFloat(document.getElementById('d-bet').value);
-            let c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance) return;
-            balance -= b; updateBal();
-            let r = Math.floor(Math.random()*10000);
-            let win = (t==='less') ? (r < c*100) : (r >= (10000 - c*100));
-            let p = document.getElementById('d-res-plate'); p.style.display = 'block';
-            p.style.background = win ? "#2ecc71" : "#ff7675";
-            if(win) { let w = b * (95/c); balance += w; p.innerText = "ПОБЕДА: " + w.toFixed(2); }
-            else { p.innerText = "ПРОИГРЫШ: " + (r/100).toFixed(2); }
-            updateBal();
-        }
-
         // --- КЕЙСЫ ---
-        const caseDB = {'c1': {p: 10, items: [2, 5, 10, 20], w: [40, 30, 25, 5]},
+        const caseDB = {
+            'c1': {p: 10, items: [2, 5, 10, 20], w: [40, 30, 25, 5]},
             'c2': {p: 50, items: [10, 25, 50, 150], w: [40, 35, 20, 5]},
             'c3': {p: 150, items: [50, 100, 200, 500], w: [40, 35, 20, 5]},
             'c4': {p: 250, items: [100, 250, 500, 1000], w: [45, 30, 20, 5]},
