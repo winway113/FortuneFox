@@ -95,7 +95,8 @@ html
             <div style="font-size: 80px; margin-bottom:10px;">🦊</div>
             <h1 style="color:var(--orange);">FortuneFox</h1>
             <p style="color: #666; margin-bottom: 40px;">Лучшее казино в Telegram</p>
-            <button class="btn btn-main" style="max-width:280px;" onclick="register()">ИГРАТЬ</button>
+            <!-- Изменение здесь: кнопка "ИГРАТЬ" теперь вызывает showLobbyAfterInit() -->
+            <button class="btn btn-main" style="max-width:280px;" onclick="showLobbyAfterInit()">ИГРАТЬ</button>
         </div>
 
         <!-- Лобби -->
@@ -148,7 +149,7 @@ html
 
         <!-- МИНЫ -->
         <div id="mines-game" class="screen">
-            <h2 id="m-coeff"style="text-align:center; color:var(--orange); font-size:32px;">x0.00</h2>
+            <h2 id="m-coeff" style="text-align:center; color:var(--orange); font-size:32px;">x0.00</h2>
             <div class="mines-grid" id="m-grid"></div>
             <div class="grid-2">
                 <div class="input-box"><label>Ставка</label><input type="number" id="m-bet" value="10"></div>
@@ -165,7 +166,7 @@ html
                 <div class="card" onclick="openCaseMenu('c1')">📦 Новичок<br>10 ₽</div>
                 <div class="card" onclick="openCaseMenu('c2')">📦 Обычный<br>50 ₽</div>
                 <div class="card" onclick="openCaseMenu('c3')">📦 Сталкер<br>100 ₽</div>
-                <div class="card" onclick="openCaseMenu('c4')">📦 Золотой<br>500 ₽</div>
+                <div class="card" onclick="openCaseMenu('c4')">📦 Золотой<br>500 ₽[17.03.2026 22:27] Сэм – ChatGPT нейросеть 🧠: </div>
                 <div class="card" onclick="openCaseMenu('c5')">📦 Элитный<br>1000 ₽</div>
                 <div class="card" onclick="openCaseMenu('fox')" style="border-color:var(--orange);">🦊 FOX<br>5000 ₽</div>
             </div>
@@ -225,20 +226,34 @@ html
             if (text.startsWith('BALANCE_UPDATE:')) {
                 balance = parseFloat(text.replace('BALANCE_UPDATE:', ''));
                 updateBal();
-                tg.showAlert('Баланс обновлен!');
-                // После обновления баланса, если мы были на экране регистрации, переходим в лобби
+                tg.showAlert('Баланс обновлен!'); // Оповещение об обновлении
+                
+                // Переход в лобби происходит после успешного получения баланса
+                // и только если мы находимся на экране регистрации.
+                // Это сделано, чтобы избежать повторного перехода при каждом обновлении баланса.
                 if (document.getElementById('reg-screen').classList.contains('active')) {
-                     showScreen('lobby');
-                     document.getElementById('fab').style.display = 'flex';
-                     document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+                    showScreen('lobby');
+                    document.getElementById('fab').style.display = 'flex';
+                    document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
                 }
+
+                // Разблокировка кнопок в случае успешного обновления баланса
+                document.ge
+[17.03.2026 22:27] Сэм – ChatGPT нейросеть 🧠: tElementById('spin-btn').disabled = false; // Для кейсов
+                document.getElementById('m-start').disabled = false; // Для мин
+                // Убедимся, что поля ввода DICE также разблокированы, если они были заблокированы
+                document.querySelectorAll('#dice-game .btn').forEach(btn => btn.disabled = false);
+                document.querySelectorAll('#dice-game input').forEach(input => input.disabled = false);
+
             } else if (text.startsWith('BALANCE_ERROR:')) {
-                tg.showAlert('Ошибка: ' + text.replace('BALANCE_ERROR:', ''));
-                // В случае ошибки с балансом, возможно, нужно разрешить кнопку "играть" снова
+                let errorMessage = text.replace('BALANCE_ERROR:', '');
+                tg.showAlert('Ошибка: ' + errorMessage);
+                // В случае ошибки с балансом, разблокируем соответствующие кнопки, 
+                // чтобы игрок мог попробовать снова или скорректировать ставку.
                 document.getElementById('spin-btn').disabled = false; // Для кейсов
                 document.getElementById('m-start').disabled = false; // Для мин
-                document.getElementById('d-bet').disabled = false; // Для Dice
-                document.getElementById('d-chance').disabled = false;
+                document.querySelectorAll('#dice-game .btn').forEach(btn => btn.disabled = false);
+                document.querySelectorAll('#dice-game input').forEach(input => input.disabled = false);
             }
             // TODO: Добавить обработку для промокодов и заданий
         });
@@ -251,11 +266,30 @@ html
 
         // === ГЛОБАЛЬНЫЕ ФУНКЦИИ ===
         
-        // Переименовал register в initApp для более точного названия
+        // Эта функция будет вызываться при загрузке WebApp
         function initApp() {
             // При загрузке WebApp запрашиваем актуальный баланс у бота
             sendToBot('get_balance'); 
             // Экран регистрации остается активным, пока не получим баланс
+            // Но мы покажем кнопку ИГРАТЬ, чтобы пользователь мог инициировать запрос
+            document.getElementById('reg-screen').classList.add('active'); // Убеждаемся, что экран регистрации активен
+        }
+
+        // Новая функция, которая вызывается по кнопке "ИГРАТЬ"
+        function showLobbyAfterInit() {
+            // Если баланс уже получен (не 0.00), сразу показываем лобби
+            if (balance > 0) { // Проверяем, что баланс не дефолтный 0.00
+                showScreen('lobby');
+                document.getElementById('fab').style.display = 'flex';
+                document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+            } else {
+                // Если баланс 0, это может означать, что еще не получен из бота
+                // или у пользователя действительно 0. В этом случае просто ждем ответа от бота.
+                // Бот сам переключит экран после получения баланса.
+                tg.showAlert("Загружаем ваш баланс...");
+                // Можно отключить кнопку, чтобы не было повторных нажатий
+                document.querySelector('#reg-screen .btn-main').disabled = true;
+            }
         }
 
         function showScreen(id) {
@@ -272,11 +306,11 @@ html
                 mData.active = false; // Убедимся, что игра неактивна при входе
                 document.getElementById('m-bet').disabled = false; // Разблокируем поля ставок
                 document.getElementById('m-bombs').disabled = false;
+                document.getElementById('m-start').disabled = false; // Разблокируем кнопку "Играть"
                 document.getElementById('m-back').style.display = 'block'; // Показываем кнопку назад
             }
         }
-
-        function toggleMenu() {
+[17.03.2026 22:27] Сэм – ChatGPT нейросеть 🧠: function toggleMenu() {
             const m = document.getElementById('menu');
             const o = document.getElementById('overlay');
             m.classList.toggle('open');
@@ -341,11 +375,12 @@ html
                 sendToBot('update_balance', { amount: winAmount, type: 'add', game_name: 'Dice' });
             }
 
-            // Разблокируем кнопки после небольшой задержки для UI эффекта
-            setTimeout(() => {
-                document.querySelectorAll('#dice-game .btn').forEach(btn => btn.disabled = false);
-                document.querySelectorAll('#dice-game input').forEach(input => input.disabled = false);
-            }, 1000); // 1 секунда
+            // Разблокируем кнопки после небольшой задержки для UI эффекта (обновление баланса придет от бота)
+            // Эти кнопки разблокируются в tg.onEvent('message') после получения BALANCE_UPDATE/BALANCE_ERROR
+            // setTimeout(() => {
+            //     document.querySelectorAll('#dice-game .btn').forEach(btn => btn.disabled = false);
+            //     document.querySelectorAll('#dice-game input').forEach(input => input.disabled = false);
+            // }, 1000); // 1 секунда
         }
 
         // КЕЙСЫ ЛОГИКА
@@ -355,7 +390,8 @@ html
             'c3': { name: 'СТАЛКЕР', price: 100, items: [20, 50, 100, 150, 200, 500] },
             'c4': { name: 'ЗОЛОТОЙ', price: 500, items: [100, 250, 500, 750, 1000, 2500] },
             'c5': { name: 'ЭЛИТНЫЙ', price: 1000, items: [200, 500, 1000, 1500, 2000, 5000] },
-            'fox': { name: 'FOX CASE', price: 5000, items: [1000, 2500, 5000, 10000, 25000] }
+            'fox': { name: 'FOX CASE', price:
+[17.03.2026 22:27] Сэм – ChatGPT нейросеть 🧠: 5000, items: [1000, 2500, 5000, 10000, 25000] }
         };
         let activeCase = null;
         let isSpinning = false;
@@ -369,6 +405,8 @@ html
             document.getElementById('case-opening').style.display = 'block';
             document.getElementById('spin-btn').style.display = 'block'; // Показываем кнопку "Открыть"
             document.getElementById('case-result-display').style.display = 'none'; // Скрываем результат
+            document.getElementById('spin-btn').disabled = false; // Разблокируем кнопку, если она была заблокирована из-за ошибки
+            document.getElementById('case-back').style.opacity = '1'; // Разблокируем кнопку назад
             fillTape();
         }
 
@@ -379,7 +417,8 @@ html
             document.getElementById('case-opening').style.display = 'none';
         }
 
-        function fillTape() {const tape = document.getElementById('tape');
+        function fillTape() {
+            const tape = document.getElementById('tape');
             tape.style.transition = 'none';
             tape.style.transform = 'translateX(0px)';
             tape.innerHTML = '';
@@ -429,7 +468,7 @@ html
                 document.getElementById('case-result-display').style.display = 'block';
                 document.getElementById('spin-btn').style.display = 'none'; // Скрываем кнопку "Открыть" после выигрыша
                 isSpinning = false;
-                document.getElementById('spin-btn').disabled = false;
+                // document.getElementById('spin-btn').disabled = false; // Не разблокируем, т.к. кнопка скрыта
                 document.getElementById('case-back').style.opacity = '1';
                 // fillTape(); // Больше не крутится, не обновляем ленту
             }, 6500);
@@ -452,7 +491,8 @@ html
 
             // Блокируем поля ввода и кнопку "Играть"
             document.getElementById('m-bet').disabled = true;
-            document.getElementById('m-bombs').disabled = true;document.getElementById('m-start').disabled = true;
+            document.getElementById('m-bombs').disabled = true;
+            document.getElementById('m-start').disabled = true;
             document.getElementById('m-back').style.display = 'none'; // Скрываем кнопку назад
 
             // Отправляем ставку боту
@@ -498,8 +538,7 @@ html
                 let mult = 0.98;
                 for(let j=0; j<mData.op; j++) mult *= (25-j)/(25-mData.n-j);
                 document.getElementById('m-coeff').innerText = 'x' + mult.toFixed(2);
-            }
-        }
+            }}
         function cashMines() {
             if (!mData.active) { // Нельзя забрать, если игра неактивна (уже проиграли или не начали)
                 tg.showAlert("Игра не активна!");
@@ -541,9 +580,11 @@ html
         }
 
         // Вызываем initApp при загрузке страницы
-        tg.ready();
-        initApp();
-        tg.expand();
+        tg.ready(function() { // Теперь initApp вызывается после готовности WebApp
+            initApp(); 
+            tg.expand();
+        });
+        
     </script>
 </body>
 </html>
