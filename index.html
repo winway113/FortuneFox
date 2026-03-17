@@ -1,17 +1,78 @@
 html
 <!-- index.html -->
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FortuneFox Premium</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root { --orange: #f39c12; --bg: #121212; --card: #1c1c1c; --green: #2ecc71; --red: #e74c3c; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        
-        body { 
+...
+    <script>
+        let tg = window.Telegram.WebApp;
+        let balance = 0.00;
+        let user = tg.initDataUnsafe?.user;
+
+        tg.onEvent('message', function(event) {
+            console.log('Received message from bot:', event.data.text); // НОВОЕ: Логгируем входящее сообщение
+            let text = event.data.text;
+            if (text.startsWith('BALANCE_UPDATE:')) {
+                balance = parseFloat(text.replace('BALANCE_UPDATE:', ''));
+                updateBal();
+                tg.showAlert('Баланс обновлен!');
+                
+                if (document.getElementById('reg-screen').classList.contains('active')) {
+                    console.log('BALANCE_UPDATE: Transitioning to lobby.'); // НОВОЕ: Логгируем переход
+                    showScreen('lobby');
+                    document.getElementById('fab').style.display = 'flex';
+                    document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+                }
+
+                document.getElementById('spin-btn').disabled = false;
+                document.getElementById('m-start').disabled = false;
+                document.querySelectorAll('#dice-game .btn').forEach(btn => btn.disabled = false);
+                document.querySelectorAll('#dice-game input').forEach(input => input.disabled = false);
+
+            } else if (text.startsWith('BALANCE_ERROR:')) {
+                let errorMessage = text.replace('BALANCE_ERROR:', '');
+                tg.showAlert('Ошибка: ' + errorMessage);
+                console.error('BALANCE_ERROR:', errorMessage); // НОВОЕ: Логгируем ошибку
+                
+                document.getElementById('spin-btn').disabled = false;
+                document.getElementById('m-start').disabled = false;
+                document.querySelectorAll('#dice-game .btn').forEach(btn => btn.disabled = false);
+                document.querySelectorAll('#dice-game input').forEach(input => input.disabled = false);
+            }
+        });
+
+        function sendToBot(action, data = {}) {
+            data.action = action;
+            const jsonData = JSON.stringify(data);
+            console.log('Sending to bot:', jsonData); // НОВОЕ: Логгируем отправляемые данные
+            tg.sendData(jsonData);
+        }
+
+        function initApp() {
+            console.log('initApp called. Requesting balance from bot.'); // НОВОЕ: Логгируем вызов
+            sendToBot('get_balance'); 
+            document.getElementById('reg-screen').classList.add('active');
+        }
+
+        function showLobbyAfterInit() {
+            console.log('showLobbyAfterInit called. Current balance:', balance); // НОВОЕ: Логгируем текущий баланс
+            if (balance > 0) {
+                console.log('Balance is positive, showing lobby.');
+                showScreen('lobby');
+                document.getElementById('fab').style.display = 'flex';
+                document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+            } else {
+                tg.showAlert("Загружаем ваш баланс...");
+                console.log('Balance is 0, waiting for bot response. Disabling "ИГРАТЬ" button.');
+                document.querySelector('#reg-screen .btn-main').disabled = true;
+                // Дополнительно, если кнопка "ИГРАТЬ" была нажата, а баланс еще не пришел
+                // Повторно запросим баланс на случай, если первый запрос не дошел
+                sendToBot('get_balance'); 
+            }
+        }
+// ... (остальной код) ...
+        tg.ready(function() {
+            console.log('Telegram WebApp is ready.'); // НОВОЕ: Логгируем готовность WebApp
+            initApp(); 
+            tg.expand();
+        });
             background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow: hidden; height: 100vh; width: 100vw;
         }
