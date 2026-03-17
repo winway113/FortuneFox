@@ -210,6 +210,31 @@ html
     </div>
 
     <script>
+        javascript
+// Загрузка баланса при входе
+function loadBalance() {
+    let savedBalance = localStorage.getItem('fox_balance');
+    if (savedBalance) {
+        balance = parseFloat(savedBalance);
+    } else {
+        balance = 100.00; // Если первый раз зашел
+    }
+    updateBal();
+}
+
+// Сохранение баланса при каждом изменении
+function updateBal() {
+    document.getElementById('balance').innerText = balance.toFixed(2);
+    localStorage.setItem('fox_balance', balance); // Сохраняем в память телефона
+}
+
+// В функции register() вызови загрузку
+function register() {
+    loadBalance(); 
+    showScreen('lobby');
+    document.getElementById('fab').style.display = 'flex';
+    document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+}
         let tg = window.Telegram.WebApp;
         let balance = 0.00;
         let user = tg.initDataUnsafe?.user;
