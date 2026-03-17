@@ -1,4 +1,5 @@
 html
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -39,6 +40,7 @@ html
         .btn:active { transform: scale(0.97); }
         .btn-main { background: var(--orange); color: black; width: 100%; }
         .btn-sec { background: #333; color: white; width: 100%; }
+        .btn-green { background: var(--green); color: black; width: 100%; } /* Добавил цвет для кнопки "Забрать" */
 
         .input-box { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; width: 100%; }
         .input-box label { font-size: 10px; color: #666; display: block; margin-bottom: 5px; text-transform: uppercase; }
@@ -51,6 +53,8 @@ html
         .cell { aspect-ratio: 1/1; background: #252525; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .cell.gem { background: var(--green) !important; border-color: white; }
         .cell.bomb { background: var(--red) !important; border-color: white; }
+        .cell.disabled { pointer-events: none; opacity: 0.7; } /* Новый класс для отключения ячеек */
+
 
         /* Кейсы Анимация */
         .case-roulette { width: 100%; height: 100px; background: #111; border: 2px solid var(--orange); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; }
@@ -144,7 +148,7 @@ html
 
         <!-- МИНЫ -->
         <div id="mines-game" class="screen">
-            <h2 id="m-coeff" style="text-align:center; color:var(--orange); font-size:32px;">x0.00</h2>
+            <h2 id="m-coeff"style="text-align:center; color:var(--orange); font-size:32px;">x0.00</h2>
             <div class="mines-grid" id="m-grid"></div>
             <div class="grid-2">
                 <div class="input-box"><label>Ставка</label><input type="number" id="m-bet" value="10"></div>
@@ -152,7 +156,7 @@ html
             </div>
             <button class="btn btn-main" id="m-start" onclick="startMines()">ИГРАТЬ</button>
             <button class="btn btn-green" id="m-cash" style="display:none;" onclick="cashMines()">ЗАБРАТЬ</button>
-            <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
+            <button class="btn btn-sec" id="m-back" onclick="showScreen('lobby')">НАЗАД</button>
         </div>
 
         <!-- КЕЙСЫ (ОБНОВЛЕНО) -->
@@ -173,6 +177,7 @@ html
                     <div class="case-tape" id="tape"></div>
                 </div>
                 <button class="btn btn-main" id="spin-btn" onclick="startCaseSpin()">ОТКРЫТЬ</button>
+                <div id="case-result-display" style="font-size: 24px; font-weight: bold; margin-top: 15px; color: var(--green); display: none;"></div>
                 <button class="btn btn-sec" id="case-back" style="margin-top:10px;" onclick="closeCaseMenu()">НАЗАД</button>
             </div>
             <button class="btn btn-sec" id="cases-exit" onclick="showScreen('lobby')">В ЛОББИ</button>
@@ -182,8 +187,8 @@ html
         <div id="bonus-screen" class="screen">
             <div class="card">
                 <h3 style="color:var(--orange); margin-bottom:10px;">ПРОМОКОД</h3>
-                <input type="text" placeholder="Введите промокод" class="input-box" style="margin-bottom:10px;">
-                <button class="btn btn-main">АКТИВИРОВАТЬ</button>
+                <input type="text" placeholder="Введите промокод" id="promo-input" class="input-box" style="margin-bottom:10px;">
+                <button class="btn btn-main" onclick="activatePromo()">АКТИВИРОВАТЬ</button>
             </div>
             <div class="card">
                 <h3 style="color:var(--green); margin-bottom:5px;">БОНУС 24Ч</h3>
@@ -214,18 +219,61 @@ html
         let balance = 0.00;
         let user = tg.initDataUnsafe?.user;
 
-        function register() {
-            balance = 100.00; 
-            updateBal();
-            showScreen('lobby');
-            document.getElementById('fab').style.display = 'flex';
-            document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+        // === ИНИЦИАЛИЗАЦИЯ И ОБРАБОТКА СООБЩЕНИЙ ОТ БОТА ===
+        tg.onEvent('message', function(event) {
+            let text = event.data.text;
+            if (text.startsWith('BALANCE_UPDATE:')) {
+                balance = parseFloat(text.replace('BALANCE_UPDATE:', ''));
+                updateBal();
+                tg.showAlert('Баланс обновлен!');
+                // После обновления баланса, если мы были на экране регистрации, переходим в лобби
+                if (document.getElementById('reg-screen').classList.contains('active')) {
+                     showScreen('lobby');
+                     document.getElementById('fab').style.display = 'flex';
+                     document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+                }
+            } else if (text.startsWith('BALANCE_ERROR:')) {
+                tg.showAlert('Ошибка: ' + text.replace('BALANCE_ERROR:', ''));
+                // В случае ошибки с балансом, возможно, нужно разрешить кнопку "играть" снова
+                document.getElementById('spin-btn').disabled = false; // Для кейсов
+                document.getElementById('m-start').disabled = false; // Для мин
+                document.getElementById('d-bet').disabled = false; // Для Dice
+                document.getElementById('d-chance').disabled = false;
+            }
+            // TODO: Добавить обработку для промокодов и заданий
+        });
+
+        // Отправка данных боту
+        function sendToBot(action, data = {}) {
+            data.action = action;
+            tg.sendData(JSON.stringify(data));
+        }
+
+        // === ГЛОБАЛЬНЫЕ ФУНКЦИИ ===
+        
+        // Переименовал register в initApp для более точного названия
+        function initApp() {
+            // При загрузке WebApp запрашиваем актуальный баланс у бота
+            sendToBot('get_balance'); 
+            // Экран регистрации остается активным, пока не получим баланс
         }
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if(document.getElementById('menu').classList.contains('open')) toggleMenu();
+
+            // Специальная логика для экрана Mines
+            if (id === 'mines-game') {
+                resetMinesUI(); // Сбрасываем поле при входе в игру
+                document.getElementById('m-start').style.display = 'block';
+                document.getElementById('m-cash').style.display = 'none';
+                document.getElementById('m-coeff').innerText = 'x0.00';
+                mData.active = false; // Убедимся, что игра неактивна при входе
+                document.getElementById('m-bet').disabled = false; // Разблокируем поля ставок
+                document.getElementById('m-bombs').disabled = false;
+                document.getElementById('m-back').style.display = 'block'; // Показываем кнопку назад
+            }
         }
 
         function toggleMenu() {
@@ -235,7 +283,13 @@ html
             o.style.display = m.classList.contains('open') ? 'block' : 'none';
         }
 
-        function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
+        function updateBal() { 
+            document.getElementById('balance').innerText = balance.toFixed(2); 
+            // Также обновим максимальную ставку для DICE
+            if (document.getElementById('d-bet')) {
+                updDice(); 
+            }
+        }
 
         function modifyBet(inputId, type, factor) {
             let el = document.getElementById(inputId);
@@ -243,28 +297,55 @@ html
             if(type === 'min') el.value = factor;
             if(type === 'div') el.value = Math.max(factor, (val / 2).toFixed(2));
             if(type === 'mult') el.value = (val * 2).toFixed(2);
-            if(type === 'max') el.value = (inputId === 'd-bet' ? balance.toFixed(2) : 95);
+            // 'max' для ставки DICE должен учитывать текущий баланс
+            if(type === 'max') el.value = (inputId === 'd-bet' ? balance.toFixed(2) : 95); 
             updDice();
         }
 
         function updDice() {
             let b = parseFloat(document.getElementById('d-bet').value) || 0;
             let c = parseFloat(document.getElementById('d-chance').value) || 1;
+            // Проверка на NaN или бесконечность
+            if (isNaN(b) || isNaN(c) || c === 0) {
+                document.getElementById('d-win-text').innerText = '0.00';
+                return;
+            }
             document.getElementById('d-win-text').innerText = (b * (95/c)).toFixed(2);
         }
 
         function playDice(mode) {
             let b = parseFloat(document.getElementById('d-bet').value);
             let c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance || b <= 0) return;
-            balance -= b;
+            if(b > balance || b <= 0) { tg.showAlert("Недостаточно средств или неверная ставка!"); return; }
+            if(c < 1 || c > 95) { tg.showAlert("Шанс должен быть от 1% до 95%!"); return; }
+
+            // Блокируем кнопки во время игры
+            document.querySelectorAll('#dice-game .btn').forEach(btn => btn.disabled = true);
+            document.querySelectorAll('#dice-game input').forEach(input => input.disabled = true);
+
+
+            // Отправляем ставку на сервер
+            sendToBot('update_balance', { amount: b, type: 'subtract', game_name: 'Dice' });
+            
+            // Генерируем результат локально (но выигрыш/проигрыш обрабатывается ботом)
             let roll = (Math.random() * 999999 + 1).toFixed(0);
             let win = mode === 'less' ? (roll/10000 <= c) : (roll/10000 >= (100-c));
-            if(win) balance += (b * (95/c));
-            updateBal();
+            
             let res = document.getElementById('d-result');
-            res.style.display = 'block'; res.style.background = win ? 'var(--green)' : 'var(--red)';
+            res.style.display = 'block'; 
+            res.style.background = win ? 'var(--green)' : 'var(--red)';
             res.innerText = (win ? "ВЫИГРЫШ: " : "ПРОИГРЫШ: ") + roll;
+
+            if (win) {
+                let winAmount = (b * (95/c));
+                sendToBot('update_balance', { amount: winAmount, type: 'add', game_name: 'Dice' });
+            }
+
+            // Разблокируем кнопки после небольшой задержки для UI эффекта
+            setTimeout(() => {
+                document.querySelectorAll('#dice-game .btn').forEach(btn => btn.disabled = false);
+                document.querySelectorAll('#dice-game input').forEach(input => input.disabled = false);
+            }, 1000); // 1 секунда
         }
 
         // КЕЙСЫ ЛОГИКА
@@ -278,6 +359,7 @@ html
         };
         let activeCase = null;
         let isSpinning = false;
+        let caseWinValue = 0; // Для хранения значения выигрыша
 
         function openCaseMenu(id) {
             activeCase = cases[id];
@@ -285,6 +367,8 @@ html
             document.getElementById('case-selection').style.display = 'none';
             document.getElementById('cases-exit').style.display = 'none';
             document.getElementById('case-opening').style.display = 'block';
+            document.getElementById('spin-btn').style.display = 'block'; // Показываем кнопку "Открыть"
+            document.getElementById('case-result-display').style.display = 'none'; // Скрываем результат
             fillTape();
         }
 
@@ -295,8 +379,7 @@ html
             document.getElementById('case-opening').style.display = 'none';
         }
 
-        function fillTape() {
-            const tape = document.getElementById('tape');
+        function fillTape() {const tape = document.getElementById('tape');
             tape.style.transition = 'none';
             tape.style.transform = 'translateX(0px)';
             tape.innerHTML = '';
@@ -307,16 +390,33 @@ html
         }
 
         function startCaseSpin() {
-            if(balance < activeCase.price || isSpinning) { alert("Мало средств!"); return; }
-            balance -= activeCase.price; updateBal();
+            if(balance < activeCase.price || isSpinning) { tg.showAlert("Недостаточно средств или уже крутится!"); return; }
+            
             isSpinning = true;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('case-back').style.opacity = '0.5';
+            document.getElementById('case-result-display').style.display = 'none'; // Скрываем предыдущий результат
+
+            // Сначала списываем ставку
+            sendToBot('update_balance', { amount: activeCase.price, type: 'subtract', game_name: 'Cases' });
 
             const tape = document.getElementById('tape');
-            const winVal = activeCase.items[Math.floor(Math.random()*activeCase.items.length)];
+            caseWinValue = activeCase.items[Math.floor(Math.random()*activeCase.items.length)]; // Определяем выигрыш
             const winIdx = 50; 
-            tape.children[winIdx].innerHTML = `<span style="color:var(--orange)">${winVal}₽</span>`;
+            
+            // Вставляем выигрышное значение в нужную позицию на ленте
+            // Создаем временный массив для генерации элементов ленты с гарантированным выигрышем
+            let tapeItems = [];
+            for (let i = 0; i < 60; i++) {
+                if (i === winIdx) {
+                    tapeItems.push(caseWinValue); // Вставляем выигрыш
+                } else {
+                    tapeItems.push(activeCase.items[Math.floor(Math.random() * activeCase.items.length)]);
+                }
+            }
+            // Обновляем HTML ленты
+            tape.innerHTML = tapeItems.map(val => `<div class="case-item">${val}₽</div>`).join('');
+            tape.children[winIdx].innerHTML = `<span style="color:var(--orange)">${caseWinValue}₽</span>`; // Подсвечиваем выигрыш
 
             let step = 80; 
             let offset = (winIdx * step) - (document.getElementById('tape').parentElement.offsetWidth / 2) + (step/2);
@@ -324,17 +424,19 @@ html
             tape.style.transform = `translateX(-${offset}px)`;
 
             setTimeout(() => {
-                balance += winVal; updateBal();
-                alert("Выиграно: " + winVal + " ₽");
+                sendToBot('update_balance', { amount: caseWinValue, type: 'add', game_name: 'Cases' });
+                document.getElementById('case-result-display').innerText = `Вы выиграли: ${caseWinValue} ₽!`;
+                document.getElementById('case-result-display').style.display = 'block';
+                document.getElementById('spin-btn').style.display = 'none'; // Скрываем кнопку "Открыть" после выигрыша
                 isSpinning = false;
                 document.getElementById('spin-btn').disabled = false;
                 document.getElementById('case-back').style.opacity = '1';
-                fillTape();
+                // fillTape(); // Больше не крутится, не обновляем ленту
             }, 6500);
         }
 
         // МИНЫ
-        let mData = {active: false, b: 0, n: 0, op: 0, grid: []};
+        let mData = {active: false, b: 0, n: 0, op: 0, grid: [], revealed: Array(25).fill(false)}; // Добавил revealed
         function resetMinesUI() {
             const g = document.getElementById('m-grid'); g.innerHTML = '';
             for(let i=0; i<25; i++) {
@@ -345,26 +447,50 @@ html
         function startMines() {
             let b = parseFloat(document.getElementById('m-bet').value);
             let n = parseInt(document.getElementById('m-bombs').value);
-            if(b > balance || n < 1 || n > 24) return;
-            balance -= b; updateBal();
-            mData = {active: true, b: b, n: n, op: 0, grid: Array(25).fill('g')};
+            if(b > balance || b <= 0) { tg.showAlert("Недостаточно средств или неверная ставка!"); return; }
+            if(n < 1 || n > 24) { tg.showAlert("Количество бомб должно быть от 1 до 24!"); return; }
+
+            // Блокируем поля ввода и кнопку "Играть"
+            document.getElementById('m-bet').disabled = true;
+            document.getElementById('m-bombs').disabled = true;document.getElementById('m-start').disabled = true;
+            document.getElementById('m-back').style.display = 'none'; // Скрываем кнопку назад
+
+            // Отправляем ставку боту
+            sendToBot('update_balance', { amount: b, type: 'subtract', game_name: 'Mines' });
+
+            mData = {active: true, b: b, n: n, op: 0, grid: Array(25).fill('g'), revealed: Array(25).fill(false)}; // Обновляем
             let cnt = 0; while(cnt < n) {
                 let r = Math.floor(Math.random()*25);
                 if(mData.grid[r] === 'g') { mData.grid[r] = 'b'; cnt++; }
             }
             document.getElementById('m-start').style.display = 'none';
             document.getElementById('m-cash').style.display = 'none';
+            document.getElementById('m-coeff').innerText = 'x0.00';
             resetMinesUI();
         }
         function clickMine(i) {
-            if(!mData.active) return;
+            if(!mData.active || mData.revealed[i]) return; // Запрещаем повторные клики по открытым ячейкам
+            
             let cells = document.getElementById('m-grid').children;
-            if(cells[i].classList.contains('gem')) return;
+            mData.revealed[i] = true; // Отмечаем ячейку как открытую
+            cells[i].classList.add('disabled'); // Отключаем клики по этой ячейке
+
             if(mData.grid[i] === 'b') {
                 cells[i].classList.add('bomb'); cells[i].innerText = '💣';
-                mData.active = false; alert("БОМБА!");
-                document.getElementById('m-start').style.display = 'block';
+                mData.active = false; 
+                tg.showAlert("БОМБА!");
+                // Открываем все оставшиеся бомбы для наглядности
+                for (let j = 0; j < 25; j++) {
+                    if (mData.grid[j] === 'b' && !mData.revealed[j]) {
+                        cells[j].classList.add('bomb'); cells[j].innerText = '💣';
+                    }
+                }
+                document.getElementById('m-start').style.display = 'block'; // Показываем кнопку "Играть" снова
+                document.getElementById('m-start').disabled = false; // Разблокируем ее
                 document.getElementById('m-cash').style.display = 'none';
+                document.getElementById('m-bet').disabled = false; // Разблокируем поля ставок
+                document.getElementById('m-bombs').disabled = false;
+                document.getElementById('m-back').style.display = 'block'; // Показываем кнопку назад
             } else {
                 cells[i].classList.add('gem'); cells[i].innerText = '💎';
                 mData.op++;
@@ -375,25 +501,48 @@ html
             }
         }
         function cashMines() {
+            if (!mData.active) { // Нельзя забрать, если игра неактивна (уже проиграли или не начали)
+                tg.showAlert("Игра не активна!");
+                return;
+            }
+            if (mData.op === 0) { // Нельзя забрать, если не открыто ни одной ячейки
+                tg.showAlert("Откройте хотя бы одну ячейку, чтобы забрать выигрыш!");
+                return;
+            }
+
             let mult = parseFloat(document.getElementById('m-coeff').innerText.replace('x',''));
-            balance += mData.b * mult; updateBal();
+            let winAmount = mData.b * mult;
+
+            sendToBot('update_balance', { amount: winAmount, type: 'add', game_name: 'Mines' });
+            
             mData.active = false;
             document.getElementById('m-start').style.display = 'block';
+            document.getElementById('m-start').disabled = false;
             document.getElementById('m-cash').style.display = 'none';
-            alert("Забрали!");
+            document.getElementById('m-bet').disabled = false;
+            document.getElementById('m-bombs').disabled = false;
+            document.getElementById('m-back').style.display = 'block';
+            tg.showAlert("Вы успешно забрали: " + winAmount.toFixed(2) + " ₽!");
         }
 
         function getDaily() {
-            let win = (Math.random() * 24 + 1).toFixed(2);
-            balance += parseFloat(win); updateBal();
-            alert("Бонус: " + win + " ₽");
+            // Отправляем запрос на получение бонуса боту
+            sendToBot('get_daily_bonus'); // Это действие нужно будет реализовать в main.py
+            tg.showAlert("Запрос на получение бонуса отправлен!");
+            // Пока просто обновляем баланс на UI, пока не будет ответа от бота
+            // let win = (Math.random() * 24 + 1).toFixed(2);
+            // balance += parseFloat(win); updateBal();
+            // tg.showAlert("Бонус: " + win + " ₽");
         }
 
         function copyRef() {
             navigator.clipboard.writeText(document.getElementById('r-link').innerText);
-            alert("Скопировано!");
+            tg.showAlert("Скопировано!");
         }
 
+        // Вызываем initApp при загрузке страницы
+        tg.ready();
+        initApp();
         tg.expand();
     </script>
 </body>
