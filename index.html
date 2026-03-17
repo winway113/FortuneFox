@@ -4,246 +4,252 @@ html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FortuneFox</title>
+    <title>FortuneFox Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root { --orange: #f39c12; --bg: #121212; --card: #1c1c1c; --green: #2ecc71; --red: #e74c3c; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        
         body { 
-            background-color: #121212; color: white; 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow: hidden; height: 100vh; width: 100vw;
         }
-        
+
         /* Шапка */
-        .header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 15px; background: #1a1a1a; border-bottom: 2px solid #f39c12; 
-            height: 60px; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; 
+        .header {
+            height: 60px; background: #1a1a1a; border-bottom: 2px solid var(--orange);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 1000;
         }
-        .balance-badge { background: #252525; padding: 8px 15px; border-radius: 10px; border: 1px solid #333; }
-        .balance-amount { color: #2ecc71; font-weight: 800; }
+        .bal-box { background: #252525; padding: 8px 12px; border-radius: 10px; border: 1px solid #333; font-weight: 800; color: var(--green); }
 
-        /* Контейнер для экранов */
-        .main-container { 
-            margin-top: 60px; height: calc(100vh - 60px); 
-            overflow-y: auto; padding: 15px; position: relative; z-index: 1;
-        }
-
-        /* Управление экранами */
-        .screen { display: none; flex-direction: column; gap: 15px; width: 100%; }
-        .active-screen { display: flex !important; }
-
-        /* Игры и Карточки */
-        .game-card { 
-            background: #1e1e1e; padding: 20px; border-radius: 15px; 
-            text-align: center; border: 1px solid #333; font-weight: bold; 
-            cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .game-card:active { transform: scale(0.98); border-color: #f39c12; }
-        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-        
-        .btn { border: none; border-radius: 12px; padding: 16px; font-weight: bold; width: 100%; cursor: pointer; }
-        .btn-main { background: #f39c12; color: #000; }
-        .btn-back { background: #333; color: #ccc; margin-top: 10px; }
-
-        /* Боковое меню */
-        .side-menu { 
-            position: fixed; top: 0; left: -100%; width: 75%; height: 100%; 
-            background: #1a1a1a; z-index: 2000; transition: 0.3s; 
-            padding: 20px; border-right: 2px solid #f39c12; box-shadow: 10px 0 20px rgba(0,0,0,0.8);
-        }
-        .side-menu.open { left: 0; }
-        .menu-item { 
-            padding: 20px; color: #fff; border-bottom: 1px solid #333; 
-            font-weight: bold; font-size: 18px; display: block; text-decoration: none;
+        /* Контейнер контента */
+        .app-container {
+            margin-top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+            padding: 15px; display: flex; flex-direction: column;
         }
 
-        /* Кнопка открытия меню */
-        .menu-trigger {
-            position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px;
-            background: #f39c12; border-radius: 15px; z-index: 1100;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        }
+        /* Экраны */
+        .screen { display: none; width: 100%; flex-direction: column; gap: 15px; }
+        .active { display: flex !important; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Ввод данных */
-        .promo-input { 
-            width: 100%; padding: 15px; background: #252525; border: 1px solid #444; 
-            border-radius: 10px; color: #fff; margin-bottom: 10px; font-size: 16px; outline: none;
-        }
+        /* Карточки */
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #2a2a2a; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* Кнопки */
+        .btn { border: none; border-radius: 10px; padding: 15px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .btn:active { transform: scale(0.97); }
+        .btn-main { background: var(--orange); color: black; }
+        .btn-sec { background: #333; color: white; }
+        .btn-green { background: var(--green); color: white; }
+
+        /* Dice (WheelVura Style) */
+        .dice-display { font-size: 35px; font-weight: 900; text-align: center; color: var(--orange); margin: 10px 0; }
+        .input-box { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; }
+        .input-box label { font-size: 10px; color: #666; display: block; margin-bottom: 5px; }
+        .input-box div { display: flex; align-items: center; gap: 10px; }
+        .input-box input { background: none; border: none; color: white; font-size: 18px; width: 100%; outline: none; font-weight: bold; }
+        .ctrl-btn { background: #252525; padding: 5px 8px; border-radius: 5px; font-size: 11px; border: 1px solid #444; }
 
         /* Мины */
-        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 10px 0; }
-        .mine-cell { aspect-ratio: 1/1; background: #333; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .open-gem { background: #2ecc71 !important; }
-        .open-bomb { background: #e74c3c !important; }
+        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+        .cell { aspect-ratio: 1/1; background: #252525; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .cell.gem { background: var(--green) !important; border-color: white; }
+        .cell.bomb { background: var(--red) !important; border-color: white; }
 
-        /* Результат Dice */
-        .res-badge { padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 10px; display: none; }
-        .win { background: #2ecc71; color: white; }
-        .lose { background: #e74c3c; color: white; }
+        /* Рефералы */
+        .ref-stat { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a2a; }
+
+        /* Меню */
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 1500; }
+        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1a1a1a; z-index: 2000; transition: 0.3s; padding: 25px; border-right: 2px solid var(--orange); }
+        .side-menu.open { left: 0; }
+        .menu-link { padding: 15px 0; border-bottom: 1px solid #2a2a2a; display: block; color: white; text-decoration: none; font-weight: bold; font-size: 18px; }
+        
+        /* Плавающая кнопка меню */
+        .menu-fab { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1400; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
+    <!-- Меню -->
+    <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="side-menu" id="menu">
+        <h2 style="color:var(--orange); margin-bottom:20px;">FortuneFox 🦊</h2>
+        <a href="#" class="menu-link" onclick="showScreen('lobby')">🎮 Игры</a>
+        <a href="#" class="menu-link" onclick="showScreen('bonus-screen')">🎁 Бонусы</a>
+        <a href="#" class="menu-link" onclick="showScreen('ref-screen')">👥 Рефералы</a>
+        <a href="https://t.me/FortuneFox_support" class="menu-link">🛠 Поддержка</a>
+        <button class="btn btn-sec" style="margin-top:20px; width:100%;" onclick="toggleMenu()">ЗАКРЫТЬ</button>
+    </div>
+
+    <!-- Шапка -->
     <div class="header">
-        <div class="balance-badge">💰 <span id="balance">100.00</span> ₽</div>
-        <div style="color: #f39c12; font-weight: 900;">FORTUNEFOX</div>
-        <div onclick="showScreen('dep-screen')" style="background:#f39c12; color:#000; padding:5px 10px; border-radius:5px; font-weight:bold;">+ ПУШ</div>
+        <div class="bal-box"><span id="balance">0.00</span> ₽</div>
+        <div style="font-weight: 900; letter-spacing: 1px;">FORTUNE FOX</div>
+        <div onclick="showScreen('dep-screen')" style="background:var(--orange); width:30px; height:30px; border-radius:5px; display:flex; align-items:center; justify-content:center; color:black; font-weight:bold;">+</div>
     </div>
 
-    <!-- Кнопка вызова меню -->
-    <div class="menu-trigger" onclick="toggleMenu()">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-    </div>
-
-    <!-- Само меню -->
-    <div class="side-menu" id="side-menu">
-        <h2 style="color:#f39c12; margin-bottom:20px;">FortuneFox</h2>
-        <div class="menu-item" onclick="showScreen('lobby')">🎰 ИГРЫ</div>
-        <div class="menu-item" onclick="showScreen('bonus-screen')">🎁 БОНУСЫ</div>
-        <div class="menu-item" onclick="showScreen('ref-screen')">👥 РЕФЕРАЛЫ</div>
-        <a href="https://t.me/FortuneFox_support" class="menu-item">🛠 ПОДДЕРЖКА</a>
-        <button class="btn btn-back" onclick="toggleMenu()">ЗАКРЫТЬ</button>
-    </div>
-
-    <div class="main-container">
+    <!-- Контент -->
+    <div class="app-container">
         
-        <!-- ГЛАВНЫЙ ЭКРАН -->
-        <div id="lobby" class="screen active-screen">
-            <div class="game-card" style="padding:40px; font-size:24px; border-color:#f39c12;">🎰 СЛОТЫ <br><small style="font-size:12px; color:#aaa;">В РАЗРАБОТКЕ</small></div>
-            <div class="grid-2col">
-                <div class="game-card" onclick="showScreen('mines-game')">💣 МИНЫ</div>
-                <div class="game-card" onclick="showScreen('dice-game')">🎲 DICE</div>
+        <!-- Регистрация -->
+        <div id="reg-screen" class="screen active" style="text-align:center; padding-top:100px;">
+            <div style="font-size: 60px;">🦊</div>
+            <h1 style="margin: 10px 0;">FortuneFox</h1>
+            <p style="color: #666; margin-bottom: 30px;">Лучшее казино в Telegram</p>
+            <button class="btn btn-main" style="width: 80%;" onclick="register()">ИГРАТЬ</button>
+        </div>
+
+        <!-- Лобби -->
+        <div id="lobby" class="screen">
+            <div class="card" style="height:120px; display:flex; align-items:center; justify-content:center; border-color:var(--orange);">
+                <h2 style="color:var(--orange);">🎰 СЛОТЫ (СКОРО)</h2>
             </div>
-            <div class="game-card" onclick="showScreen('cases-game')">📦 КЕЙСЫ</div>
+            <div class="grid-2">
+                <div class="card" onclick="showScreen('mines-game')" style="text-align:center;">💣<br>МИНЫ</div>
+                <div class="card" onclick="showScreen('dice-game')" style="text-align:center;">🎲<br>DICE</div>
+            </div>
+            <div class="card" onclick="alert('В разработке')">📦 КЕЙСЫ</div>
         </div>
 
         <!-- DICE -->
         <div id="dice-game" class="screen">
-            <h2 style="text-align:center;">DICE</h2>
-            <div id="d-win-amount" style="font-size:45px; color:#f39c12; text-align:center; font-weight:bold;">20.00</div>
-            <div class="res-badge" id="dice-res"></div>
-            <div class="grid-2col">
-                <input type="number" id="d-bet" value="10" class="promo-input" oninput="updDice()">
-                <input type="number" id="d-chance" value="50" class="promo-input" oninput="updDice()">
+            <div class="card">
+                <div id="d-win-text" class="dice-display">20.00</div>
+                <div id="d-result" style="text-align:center; padding:10px; border-radius:8px; margin-bottom:10px; font-weight:bold; display:none;"></div>
+                
+                <div class="input-box" style="margin-bottom:15px;">
+                    <label>СТАВКА</label>
+                    <div>
+                        <input type="number" id="d-bet" value="10" oninput="updDice()">
+                        <span class="ctrl-btn" onclick="modifyBet('min')">MIN</span>
+                        <span class="ctrl-btn" onclick="modifyBet('div')">/2</span>
+                        <span class="ctrl-btn" onclick="modifyBet('mult')">X2</span>
+                        <span class="ctrl-btn" onclick="modifyBet('max')">MAX</span>
+                    </div>
+                </div>
+
+                <div class="input-box" style="margin-bottom:15px;">
+                    <label>ШАНС %</label>
+                    <input type="number" id="d-chance" value="50" oninput="updDice()">
+                </div>
+
+                <div class="grid-2">
+                    <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
+                    <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
+                </div>
             </div>
-            <div class="grid-2col">
-                <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
-                <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
-            </div>
-            <button class="btn btn-back" onclick="showScreen('lobby')">НАЗАД</button>
+            <button class="btn btn-sec" onclick="showScreen('lobby')">В ЛОББИ</button>
         </div>
 
         <!-- МИНЫ -->
         <div id="mines-game" class="screen">
-            <h2 id="m-coeff" style="text-align:center; color:#f39c12;">x0.00</h2>
+            <h2 id="m-coeff" style="text-align:center; color:var(--orange); font-size:30px;">x0.00</h2>
             <div class="mines-grid" id="m-grid"></div>
-            <div class="grid-2col">
-                <input type="number" id="m-bet" value="10" class="promo-input">
-                <input type="number" id="m-bombs" value="3" class="promo-input">
+            <div class="grid-2" style="margin-top:10px;">
+                <div class="input-box"><label>СТАВКА</label><input type="number" id="m-bet" value="10"></div>
+                <div class="input-box"><label>МИНЫ</label><input type="number" id="m-bombs" value="3"></div>
             </div>
             <button class="btn btn-main" id="m-start" onclick="startMines()">ИГРАТЬ</button>
-            <button class="btn btn-main" id="m-cash" style="display:none; background:#2ecc71;" onclick="cashMines()">ЗАБРАТЬ</button>
-            <button class="btn btn-back" onclick="showScreen('lobby')">НАЗАД</button>
-        </div>
-
-        <!-- ПОПОЛНЕНИЕ -->
-        <div id="dep-screen" class="screen">
-            <h2>ПОПОЛНЕНИЕ</h2>
-            <div class="game-card">
-                <p>Введите сумму (от 100 ₽)</p>
-                <input type="number" id="dep-sum" class="promo-input" value="100">
-                <button class="btn btn-main" onclick="alert('Крипто-оплата подключается...')">ОПЛАТИТЬ ЧЕРЕЗ CRYPTOBOT</button>
-                <p style="font-size:10px; margin-top:10px; color:#777;">Это безопасно и анонимно</p>
-            </div>
-            <button class="btn btn-back" onclick="showScreen('lobby')">НАЗАД</button>
+            <button class="btn btn-green" id="m-cash" style="display:none;" onclick="cashMines()">ЗАБРАТЬ</button>
+            <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
         </div>
 
         <!-- РЕФЕРАЛЫ -->
         <div id="ref-screen" class="screen">
-            <h2>РЕФЕРАЛЫ</h2>
-            <div class="game-card">
-                <p>Твоя ссылка:</p>
-                <div id="ref-link" style="font-size:10px; padding:10px; background:#111; margin:10px 0;">Загрузка...</div>
-                <button class="btn btn-main" onclick="copyRef()">КОПИРОВАТЬ</button>
+            <div class="card">
+                <h2 style="color:var(--orange);">РЕФЕРАЛЫ</h2>
+                <p style="font-size:12px; color:#888; margin: 10px 0;">Приглашай друзей и получай <b>30.00 ₽</b> за каждого!</p>
+                <div class="ref-stat"><span>Приведено:</span> <span id="r-cnt">0</span></div>
+                <div class="ref-stat"><span>Заработано:</span> <span id="r-earn">0.00 ₽</span></div>
+                <div class="input-box" style="margin-top:15px; font-size:11px; word-break:break-all;" id="r-link">...</div>
+                <button class="btn btn-main" style="width:100%; margin-top:10px;" onclick="copyRef()">КОПИРОВАТЬ</button>
             </div>
-            <button class="btn btn-back" onclick="showScreen('lobby')">НАЗАД</button>
+            <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
         </div>
 
     </div>
 
+    <!-- Кнопка меню -->
+    <div class="menu-fab" id="fab" style="display:none;" onclick="toggleMenu()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </div>
+
     <script>
         let tg = window.Telegram.WebApp;
-        let balance = 100.0;
-        tg.expand();
+        let balance = 0.00;
+        let user = tg.initDataUnsafe?.user;
+
+        function register() {
+            balance = 100.00; // Стартовые
+            updateBal();
+            showScreen('lobby');
+            document.getElementById('fab').style.display = 'flex';
+            document.getElementById('r-link').innerText = "t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+        }
 
         function showScreen(id) {
-            // Прячем абсолютно все экраны
-            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-            
-            // Показываем нужный
-            const active = document.getElementById(id);
-            active.style.display = 'flex';
-            active.classList.add('active-screen');
-            
-            // Закрываем меню если открыто
-            document.getElementById('side-menu').classList.remove('open');
-            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(document.getElementById('menu').classList.contains('open')) toggleMenu();
             if(id === 'mines-game') resetMinesUI();
         }
 
         function toggleMenu() {
-            document.getElementById('side-menu').classList.toggle('open');
+            document.getElementById('menu').classList.toggle('open');
+            document.getElementById('overlay').style.display = document.getElementById('menu').classList.contains('open') ? 'block' : 'none';
+        }
+
+        function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
+
+        // DICE
+        function modifyBet(type) {
+            let b = document.getElementById('d-bet');let v = parseFloat(b.value) || 0;
+            if(type==='min') b.value = 1;
+            if(type==='div') b.value = Math.max(1, (v/2).toFixed(2));
+            if(type==='mult') b.value = (v*2).toFixed(2);
+            if(type==='max') b.value = balance.toFixed(2);
+            updDice();
         }
 
         function updDice() {
             let b = parseFloat(document.getElementById('d-bet').value) || 0;
             let c = parseFloat(document.getElementById('d-chance').value) || 1;
             if(c > 95) c = 95;
-            document.getElementById('d-win-amount').innerText = (b * (95/c)).toFixed(2);
+            document.getElementById('d-win-text').innerText = (b * (95/c)).toFixed(2);
         }
 
         function playDice(mode) {
             let b = parseFloat(document.getElementById('d-bet').value);
             let c = parseFloat(document.getElementById('d-chance').value);
-            let resBadge = document.getElementById('dice-res');
+            let res = document.getElementById('d-result');
+            if(b > balance || b <= 0) return;
             
-            if(b > balance) { alert("Мало денег!"); return; }
             balance -= b;
-            updateBal();
+            let roll = Math.floor(Math.random() * 999999) + 1;
+            let rollNorm = roll / 10000;
+            let win = (mode === 'less') ? (rollNorm <= c) : (rollNorm >= (100 - c));
 
-            let roll = Math.floor(Math.random() * 999999) + 1; // ОТ 1 ДО 999999
-            let win = false;
-            
-            // Логика шанса: roll_normalized от 0 до 100
-            let rollNorm = roll / 10000; 
-            if(mode === 'less' && rollNorm <= c) win = true;
-            if(mode === 'more' && rollNorm >= (100-c)) win = true;
-
-            resBadge.style.display = 'block';
+            res.style.display = 'block';
             if(win) {
-                let winSum = b * (95/c);
-                balance += winSum;
-                resBadge.className = 'res-badge win';
-                resBadge.innerText = `ВЫИГРЫШ! Число: ${roll}`;
+                let w = b * (95/c); balance += w;
+                res.style.background = 'var(--green)'; res.innerText = "ВЫИГРЫШ: " + roll;
             } else {
-                resBadge.className = 'res-badge lose';
-                resBadge.innerText = `ПРОИГРЫШ! Число: ${roll}`;
+                res.style.background = 'var(--red)'; res.innerText = "ПРОИГРЫШ: " + roll;
             }
             updateBal();
+            tg.HapticFeedback.notificationOccurred(win ? 'success' : 'error');
         }
 
-        function updateBal() {
-            document.getElementById('balance').innerText = balance.toFixed(2);
-        }
-
-        // МИНЫ (Кратко)
+        // MINES
         let mData = {active: false, b: 0, n: 0, op: 0, grid: []};
         function resetMinesUI() {
             const g = document.getElementById('m-grid'); g.innerHTML = '';
             for(let i=0; i<25; i++) {
-                let c = document.createElement('div'); c.className = 'mine-cell';
+                let c = document.createElement('div'); c.className = 'cell';
                 c.onclick = () => clickMine(i); g.appendChild(c);
             }
         }
@@ -253,26 +259,27 @@ html
             if(b > balance || n < 1 || n > 24) return;
             balance -= b; updateBal();
             mData = {active: true, b: b, n: n, op: 0, grid: Array(25).fill('g')};
-            let count = 0; while(count < n) {
+            let cnt = 0; while(cnt < n) {
                 let r = Math.floor(Math.random()*25);
-                if(mData.grid[r] === 'g') { mData.grid[r] = 'b'; count++; }
+                if(mData.grid[r] === 'g') { mData.grid[r] = 'b'; cnt++; }
             }
             document.getElementById('m-start').style.display = 'none';
-            document.getElementById('m-cash').style.display = 'block';
+            document.getElementById('m-cash').style.display = 'none';
             resetMinesUI();
         }
         function clickMine(i) {
             if(!mData.active) return;
             let cells = document.getElementById('m-grid').children;
-            if(cells[i].classList.contains('open-gem')) return;
+            if(cells[i].classList.contains('gem')) return;
             if(mData.grid[i] === 'b') {
-                cells[i].classList.add('open-bomb'); cells[i].innerText = '💣';
+                cells[i].classList.add('bomb'); cells[i].innerText = '💣';
                 mData.active = false; alert("БОМБА!");
                 document.getElementById('m-start').style.display = 'block';
                 document.getElementById('m-cash').style.display = 'none';
             } else {
-                cells[i].classList.add('open-gem'); cells[i].innerText = '💎';
+                cells[i].classList.add('gem'); cells[i].innerText = '💎';
                 mData.op++;
+                document.getElementById('m-cash').style.display = 'block';
                 let mult = 0.98;
                 for(let j=0; j<mData.op; j++) mult *= (25-j)/(25-mData.n-j);
                 document.getElementById('m-coeff').innerText = 'x' + mult.toFixed(2);
@@ -284,12 +291,15 @@ html
             mData.active = false;
             document.getElementById('m-start').style.display = 'block';
             document.getElementById('m-cash').style.display = 'none';
-            alert("Забрали!");
+            alert("Забрали выигрыш!");
         }
 
-        const uid = tg.initDataUnsafe?.user?.id || "123";
-        document.getElementById('ref-link').innerText = "t.me/FortuneFox_Bot?start=" + uid;
-        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-link').innerText); alert("Скопировано!"); }
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('r-link').innerText);
+            alert("Скопировано!");
+        }
+
+        tg.expand();
     </script>
 </body>
 </html>
