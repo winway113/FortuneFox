@@ -62,7 +62,6 @@
         .menu-fab { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1400; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; }
         
         .loading { text-align: center; padding: 20px; color: var(--orange); }
-        .error-message { color: var(--red); text-align: center; padding: 10px; }
     </style>
 </head>
 <body>
@@ -92,14 +91,6 @@
             <h1 style="color:var(--orange);">FortuneFox</h1>
             <p style="color: #666; margin-bottom: 40px;">Загрузка...</p>
             <div class="loading">Подключаемся к серверу</div>
-        </div>
-
-        <!-- Вход -->
-        <div id="reg-screen" class="screen" style="text-align:center; padding-top:80px; align-items:center;">
-            <div style="font-size: 80px; margin-bottom:10px;">🦊</div>
-            <h1 style="color:var(--orange);">FortuneFox</h1>
-            <p style="color: #666; margin-bottom: 40px;">Лучшее казино в Telegram</p>
-            <button class="btn btn-main" style="max-width:280px;" onclick="register()">НАЧАТЬ ИГРУ</button>
         </div>
 
         <!-- Лобби -->
@@ -252,37 +243,57 @@
     </div>
 
     <script>
+        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
         let tg = window.Telegram.WebApp;
         let balance = 0.00;
         let user = tg.initDataUnsafe?.user;
         let API_URL = "http://185.96.80.219:8000";
 
-        // Инициализация
+        // Для игры в мины
+        let mData = {active: false, b: 0, n: 0, op: 0, grid: []};
+        
+        // Для кейсов
+        const cases = {
+            'c1': { name: 'НОВИЧОК', price: 10, items: [2, 5, 10, 15, 20, 50] },
+            'c2': { name: 'ОБЫЧНЫЙ', price: 50, items: [10, 25, 50, 75, 100, 250] },
+            'c3': { name: 'СТАЛКЕР', price: 100, items: [20, 50, 100, 150, 200, 500] },
+            'c4': { name: 'ЗОЛОТОЙ', price: 500, items: [100, 250, 500, 750, 1000, 2500] },
+            'c5': { name: 'ЭЛИТНЫЙ', price: 1000, items: [200, 500, 1000, 1500, 2000, 5000] },
+            'fox': { name: 'FOX CASE', price: 5000, items: [1000, 2500, 5000, 10000, 25000] }
+        };
+        let activeCase = null;
+        let isSpinning = false;
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         tg.expand();
         
-        // Проверяем есть ли пользователь
         if (user) {
+            console.log("Пользователь найден, ID:", user.id);
             loadUserBalance();
         } else {
-            // Если нет пользователя в TG, показываем экран регистрации
+            console.log("Пользователь не найден");
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.remove('active');
                 document.getElementById('reg-screen').classList.add('active');
             }, 1000);
         }
 
-        // Загрузка баланса пользователя
+        // ========== РАБОТА С API ==========
         async function loadUserBalance() {
             try {
-                console.log("Загружаем баланс для user_id:", user.id);
+                console.log("Отправляем запрос на", API_URL + '/api/get_balance');
                 
-                // Пробуем GET запрос
-                const response = await fetch(API_URL + '/api/get_balance?user_id=' + user.id, {
-                    method: 'GET',
-                    headers: {'Content-Type': 'application/json'}
+                const response = await fetch(API_URL + '/api/get_balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: user.id
+                    })
                 });
                 
-                console.log("Ответ от сервера:", response.status);
+                console.log("Статус ответа:", response.status);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -293,53 +304,59 @@
                         updateBal();
                         showScreen('lobby');
                         document.getElementById('fab').style.display = 'flex';
-                        document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
+                        document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + user.id;
                         return;
                     }
                 }
                 
-                // Если GET не сработал, пробуем POST
-                const postResponse = await fetch(API_URL + '/api/get_balance', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({user_id: user.id})
-                });
-                
-                if (postResponse.ok) {
-                    const data = await postResponse.json();
-                    if (data.balance !== undefined) {
-                        balance = data.balance;
-                        updateBal();
-                        showScreen('lobby');
-                        document.getElementById('fab').style.display = 'flex';
-                        document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (user?.id || "000");
-                        return;
-                    }
-                }
-                
-                // Если ничего не сработало
-                setTimeout(() => {
-                    document.getElementById('loading-screen').classList.remove('active');
-                    document.getElementById('reg-screen').classList.add('active');
-                }, 1000);
+                throw new Error("Ошибка загрузки баланса");
                 
             } catch (error) {
-                console.error("Ошибка загрузки баланса:", error);
-                setTimeout(() => {
-                    document.getElementById('loading-screen').classList.remove('active');
-                    document.getElementById('reg-screen').classList.add('active');
-                }, 1000);
+                console.error("Ошибка:", error);
+                document.getElementById('loading-screen').innerHTML = `
+                    <div style="font-size: 80px; margin-bottom:10px;">🦊</div>
+                    <h1 style="color:var(--orange);">Ошибка</h1>
+                    <p style="color: #666; margin-bottom: 20px;">${error.message}</p>
+                    <p style="color: #ff6b6b; margin-bottom: 40px;">Проверь сервер</p>
+                    <button class="btn btn-main" onclick="location.reload()">ПЕРЕЗАГРУЗИТЬ</button>
+                `;
             }
         }
 
-        function register() {
-            if (user) {
-                loadUserBalance();
-            } else {
-                alert("Ошибка: не удалось получить данные пользователя");
+        async function updateServerBalance() {
+            try {
+                await fetch(API_URL + '/api/update_balance', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        balance: balance
+                    })
+                });
+            } catch (error) {
+                console.error("Ошибка обновления баланса:", error);
             }
         }
 
+        async function saveGame(game, bet, win, result) {
+            try {
+                await fetch(API_URL + '/api/save_game', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        game: game,
+                        bet: bet,
+                        win: win,
+                        result: result
+                    })
+                });
+            } catch (error) {
+                console.error("Ошибка сохранения игры:", error);
+            }
+        }
+
+        // ========== НАВИГАЦИЯ ==========
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -357,6 +374,15 @@
             document.getElementById('balance').innerText = balance.toFixed(2); 
         }
 
+        function register() {
+            if (user) {
+                loadUserBalance();
+            } else {
+                alert("Ошибка: не удалось получить данные пользователя");
+            }
+        }
+
+        // ========== DICE ИГРА ==========
         function modifyBet(inputId, type, factor) {
             let el = document.getElementById(inputId);
             let val = parseFloat(el.value) || 0;
@@ -384,6 +410,7 @@
             
             balance -= b;
             updateBal();
+            await updateServerBalance();
             
             let roll = (Math.random() * 999999 + 1).toFixed(0);
             let win = mode === 'less' ? (roll/10000 <= c) : (roll/10000 >= (100-c));
@@ -393,21 +420,10 @@
                 winAmount = b * (95/c);
                 balance += winAmount;
                 updateBal();
+                await updateServerBalance();
             }
             
-            // Сохраняем результат игры
-            try {
-                await fetch(API_URL + '/api/save_game?user_id=' + user.id + '&game=dice&bet=' + b + '&win=' + (win ? winAmount : 0) + '&result=' + (win ? 'win' : 'lose'), {
-                    method: 'GET'
-                });
-                
-                // Обновляем баланс на сервере
-                await fetch(API_URL + '/api/update_balance?user_id=' + user.id + '&balance=' + balance, {
-                    method: 'GET'
-                });
-            } catch (error) {
-                console.error("Ошибка сохранения игры:", error);
-            }
+            await saveGame('dice', b, win ? winAmount : 0, win ? 'win' : 'lose');
             
             let res = document.getElementById('d-result');
             res.style.display = 'block'; 
@@ -415,18 +431,86 @@
             res.innerText = (win ? "ВЫИГРЫШ: " : "ПРОИГРЫШ: ") + roll;
         }
 
-        // КЕЙСЫ ЛОГИКА
-        const cases = {
-            'c1': { name: 'НОВИЧОК', price: 10, items: [2, 5, 10, 15, 20, 50] },
-            'c2': { name: 'ОБЫЧНЫЙ', price: 50, items: [10, 25, 50, 75, 100, 250] },
-            'c3': { name: 'СТАЛКЕР', price: 100, items: [20, 50, 100, 150, 200, 500] },
-            'c4': { name: 'ЗОЛОТОЙ', price: 500, items: [100, 250, 500, 750, 1000, 2500] },
-            'c5': { name: 'ЭЛИТНЫЙ', price: 1000, items: [200, 500, 1000, 1500, 2000, 5000] },
-            'fox': { name: 'FOX CASE', price: 5000, items: [1000, 2500, 5000, 10000, 25000] }
-        };
-        let activeCase = null;
-        let isSpinning = false;
+        // ========== МИНЫ ==========
+        function resetMinesUI() {
+            const g = document.getElementById('m-grid'); 
+            g.innerHTML = '';
+            for(let i=0; i<25; i++) {
+                let c = document.createElement('div'); 
+                c.className = 'cell';
+                c.onclick = () => clickMine(i); 
+                g.appendChild(c);
+            }
+        }
+        
+        function startMines() {
+            let b = parseFloat(document.getElementById('m-bet').value);
+            let n = parseInt(document.getElementById('m-bombs').value);
+            if(b > balance || n < 1 || n > 24) return;
+            
+            balance -= b; 
+            updateBal();
+            updateServerBalance();
+            
+            mData = {active: true, b: b, n: n, op: 0, grid: Array(25).fill('g')};
+            
+            let cnt = 0; 
+            while(cnt < n) {
+                let r = Math.floor(Math.random()*25);
+                if(mData.grid[r] === 'g') { 
+                    mData.grid[r] = 'b'; 
+                    cnt++; 
+                }
+            }
+            
+            document.getElementById('m-start').style.display = 'none';
+            document.getElementById('m-cash').style.display = 'none';
+            resetMinesUI();
+        }
+        
+        async function clickMine(i) {
+            if(!mData.active) return;
+            
+            let cells = document.getElementById('m-grid').children;
+            if(cells[i].classList.contains('gem')) return;
+            
+            if(mData.grid[i] === 'b') {
+                cells[i].classList.add('bomb'); 
+                cells[i].innerText = '💣';
+                mData.active = false; 
+                
+                await saveGame('mines', mData.b, 0, 'lose');
+                alert("БОМБА!");
+                document.getElementById('m-start').style.display = 'block';
+                document.getElementById('m-cash').style.display = 'none';
+            } else {
+                cells[i].classList.add('gem'); 
+                cells[i].innerText = '💎';
+                mData.op++;
+                document.getElementById('m-cash').style.display = 'block';
+                
+                let mult = 0.98;
+                for(let j=0; j<mData.op; j++) mult *= (25-j)/(25-mData.n-j);
+                document.getElementById('m-coeff').innerText = 'x' + mult.toFixed(2);
+            }
+        }
+        
+        async function cashMines() {
+            let mult = parseFloat(document.getElementById('m-coeff').innerText.replace('x',''));
+            let winAmount = mData.b * mult;
+            balance += winAmount; 
+            updateBal();
+            
+            await saveGame('mines', mData.b, winAmount, 'win');
+            await updateServerBalance();
+            
+            mData.active = false;
+            document.getElementById('m-start').style.display = 'block';
+            document.getElementById('m-cash').style.display = 'none';
+            alert("Забрали " + winAmount.toFixed(2) + " ₽");
+        }
 
+        // ========== КЕЙСЫ ==========
         function openCaseMenu(id) {
             activeCase = cases[id];
             document.getElementById('case-title').innerText = activeCase.name;
@@ -462,6 +546,8 @@
             
             balance -= activeCase.price; 
             updateBal();
+            await updateServerBalance();
+            
             isSpinning = true;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('case-back').style.opacity = '0.5';
@@ -480,19 +566,8 @@
                 balance += winVal; 
                 updateBal();
                 
-                // Сохраняем результат игры
-                try {
-                    await fetch(API_URL + '/api/save_game?user_id=' + user.id + '&game=case&bet=' + activeCase.price + '&win=' + winVal + '&result=win', {
-                        method: 'GET'
-                    });
-                    
-                    // Обновляем баланс на сервере
-                    await fetch(API_URL + '/api/update_balance?user_id=' + user.id + '&balance=' + balance, {
-                        method: 'GET'
-                    });
-                } catch (error) {
-                    console.error("Ошибка сохранения игры:", error);
-                }
+                await saveGame('case', activeCase.price, winVal, 'win');
+                await updateServerBalance();
                 
                 alert("Выиграно: " + winVal + " ₽");
                 isSpinning = false;
@@ -502,104 +577,56 @@
             }, 6500);
         }
 
-        // МИНЫ
-        let mData = {active: false, b: 0, n: 0, op: 0, grid: []};
-        
-        function resetMinesUI() {
-            const g = document.getElementById('m-grid'); 
-            g.innerHTML = '';
-            for(let i=0; i<25; i++) {
-                let c = document.createElement('div'); 
-                c.className = 'cell';
-                c.onclick = () => clickMine(i); 
-                g.appendChild(c);
-            }
-        }
-        
-        function startMines() {
-            let b = parseFloat(document.getElementById('m-bet').value);
-            let n = parseInt(document.getElementById('m-bombs').value);
-            if(b > balance || n < 1 || n > 24) return;
-            
-            balance -= b; 
+        // ========== БОНУСЫ ==========
+        function getDaily() {
+            let win = (Math.random() * 24 + 1).toFixed(2);
+            balance += parseFloat(win); 
             updateBal();
-            mData = {active: true, b: b, n: n, op: 0, grid: Array(25).fill('g')};
-            
-            let cnt = 0; 
-            while(cnt < n) {
-                let r = Math.floor(Math.random()*25);
-                if(mData.grid[r] === 'g') { 
-                    mData.grid[r] = 'b'; 
-                    cnt++; 
-                }
+            updateServerBalance();
+            alert("Бонус: " + win + " ₽");
+        }
+
+        async function activatePromo() {
+            let promo = document.getElementById('promo-input').value;
+            if(!promo) {
+                alert("Введите промокод");
+                return;
             }
             
-            document.getElementById('m-start').style.display = 'none';
-            document.getElementById('m-cash').style.display = 'none';
-            resetMinesUI();
-        }
-        
-        async function clickMine(i) {
-            if(!mData.active) return;
-            
-            let cells = document.getElementById('m-grid').children;
-            if(cells[i].classList.contains('gem')) return;
-            
-            if(mData.grid[i] === 'b') {
-                cells[i].classList.add('bomb'); 
-                cells[i].innerText = '💣';
-                mData.active = false; 
-                
-                // Сохраняем результат игры
-                try {
-                    await fetch(API_URL + '/api/save_game?user_id=' + user.id + '&game=mines&bet=' + mData.b + '&win=0&result=lose', {
-                        method: 'GET'
-                    });
-                    
-                    // Обновляем баланс на сервере
-                    await fetch(API_URL + '/api/update_balance?user_id=' + user.id + '&balance=' + balance, {
-                        method: 'GET'
-                    });
-                } catch (error) {
-                    console.error("Ошибка сохранения игры:", error);
-                }
-                
-                alert("БОМБА!");
-                document.getElementById('m-start').style.display = 'block';
-                document.getElementById('m-cash').style.display = 'none';
-            } else {
-                cells[i].classList.add('gem'); 
-                cells[i].innerText = '💎';
-                mData.op++;
-                document.getElementById('m-cash').style.display = 'block';
-                
-                let mult = 0.98;
-                for(let j=0; j<mData.op; j++) mult *= (25-j)/(25-mData.n-j);
-                document.getElementById('m-coeff').innerText = 'x' + mult.toFixed(2);
-            }
-        }
-        
-        async function cashMines() {
-            let mult = parseFloat(document.getElementById('m-coeff').innerText.replace('x',''));
-            let winAmount = mData.b * mult;
-            balance += winAmount; 
-            updateBal();
-            
-            // Сохраняем результат игры
             try {
-                await fetch(API_URL + '/api/save_game?user_id=' + user.id + '&game=mines&bet=' + mData.b + '&win=' + winAmount + '&result=win', {
-                    method: 'GET'
+                const response = await fetch(API_URL + '/api/use_promo', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        promo: promo
+                    })
                 });
                 
-                // Обновляем баланс на сервере
-                await fetch(API_URL + '/api/update_balance?user_id=' + user.id + '&balance=' + balance, {
-                    method: 'GET'
-                });
+                const data = await response.json();
+                if(data.success) {
+                    balance += data.amount;
+                    updateBal();
+                    alert("Промокод активирован! +" + data.amount + " ₽");
+                } else {
+                    alert("Недействительный промокод");
+                }
             } catch (error) {
-                console.error("Ошибка сохранения игры:", error);
+                alert("Ошибка активации промокода");
             }
-            
-            mData.active = false;
-            document.getElementById('m-start').style.display = 'block';
-            document.getElementById('m-cash').style.display = 'none';
-            alert("Забрали " + winAmount.toFixed(2
+        }
+
+        // ========== ТОП ИГРОКОВ ==========
+        async function loadTopPlayers() {
+            try {
+                const response = await fetch(API_URL + '/api/get_top_players', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+                
+                const data = await response.json();
+                let html = '<h3 style="color:var(--orange); margin-bottom:10px;">Топ 10 игроков:</h3>';
+                data.top.forEach((player, index) => {
+                    html += `<div style="margin:5px 0;">${index+1}. ${player.username} — ${player.balance} ₽</div>`;
+                });
+                document.getElementById('top-list').inner
