@@ -9,28 +9,21 @@ html
     <style>
         :root { --orange: #f39c12; --bg: #121212; --card: #1c1c1c; --green: #2ecc71; --red: #e74c3c; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        body { background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; height: 100vh; }
         .header { height: 60px; background: #1a1a1a; border-bottom: 2px solid var(--orange); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 1000; }
-        .bal-box { background: #252525; padding: 8px 12px; border-radius: 10px; border: 1px solid #333; font-weight: 800; color: var(--green); }
-        .app-container { margin-top: 60px; height: calc(100vh - 60px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .screen { display: none; width: 100%; flex-direction: column; gap: 15px; }
-        .active { display: flex !important; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #2a2a2a; width: 100%; position: relative; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-        .btn { border: none; border-radius: 10px; padding: 15px; font-weight: bold; cursor: pointer; font-size: 15px; text-align: center; }
+        .bal-box { background: #252525; padding: 8px 12px; border-radius: 10px; color: var(--green); font-weight: bold; }
+        .app-container { margin-top: 60px; height: calc(100vh - 60px); overflow-y: auto; padding: 15px; }
+        .screen { display: none; flex-direction: column; gap: 15px; }
+        .active { display: flex !important; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #2a2a2a; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { border: none; border-radius: 10px; padding: 15px; font-weight: bold; cursor: pointer; text-align: center; }
         .btn-main { background: var(--orange); color: black; width: 100%; }
         .btn-sec { background: #333; color: white; width: 100%; }
-        .input-box { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; width: 100%; margin-bottom: 10px; }
-        .input-box label { font-size: 10px; color: #666; display: block; margin-bottom: 5px; }
-        .input-row input { background: none; border: none; color: white; font-size: 18px; width: 100%; outline: none; font-weight: bold; }
-        
         /* Кейсы */
-        .case-roulette { width: 100%; height: 100px; background: #111; border: 2px solid var(--orange); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; }
-        .case-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: var(--orange); z-index: 10; }
-        .case-tape { display: flex; position: absolute; left: 0; top: 0; height: 100%; }
-        .case-item { min-width: 80px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #222; font-weight: bold; background: #1a1a1a; }
-
+        .case-roulette { width: 100%; height: 80px; background: #111; border: 2px solid var(--orange); position: relative; overflow: hidden; margin-bottom: 10px; }
+        .case-tape { display: flex; position: absolute; left: 0; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); }
+        .case-item { min-width: 70px; height: 80px; display: flex; align-items: center; justify-content: center; border-right: 1px solid #222; font-weight: bold; }
         /* Меню */
         .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1a1a1a; z-index: 2000; transition: 0.3s; padding: 25px; border-right: 2px solid var(--orange); }
         .side-menu.open { left: 0; }
@@ -41,46 +34,43 @@ html
 
     <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="side-menu" id="menu">
-        <h2 style="color:var(--orange); margin-bottom:20px;">FortuneFox 🦊</h2>
-        <a href="#" class="menu-link" onclick="showScreen('lobby')" style="display:block; color:white; padding:15px 0; text-decoration:none; font-weight:bold;">🎰 Игры</a>
-        <a href="#" class="menu-link" onclick="showScreen('bonus-screen')" style="display:block; color:white; padding:15px 0; text-decoration:none; font-weight:bold;">🎁 Бонусы</a>
-        <a href="#" class="menu-link" onclick="showScreen('ref-screen')" style="display:block; color:white; padding:15px 0; text-decoration:none; font-weight:bold;">👥 Рефералы</a>
-        <button class="btn btn-sec" style="margin-top:20px; width:100%;" onclick="toggleMenu()">ЗАКРЫТЬ</button>
+        <h2 style="color:var(--orange);">меню</h2>
+        <div onclick="showScreen('lobby')" style="padding:15px 0; cursor:pointer;">🎰 Игры</div>
+        <div onclick="showScreen('bonus-screen')" style="padding:15px 0; cursor:pointer;">🎁 Бонусы</div>
+        <div onclick="showScreen('ref-screen')" style="padding:15px 0; cursor:pointer;">👥 Рефералы</div>
+        <button class="btn btn-sec" style="margin-top:20px;" onclick="toggleMenu()">ЗАКРЫТЬ</button>
     </div>
 
     <div class="header">
         <div class="bal-box"><span id="balance">0.00</span> ₽</div>
-        <div style="font-weight: 900; color: var(--orange);">FORTUNE FOX</div>
-        <div onclick="toggleMenu()" style="cursor:pointer; font-size:24px;">☰</div>
+        <div style="color: var(--orange); font-weight: bold;">FORTUNE FOX</div>
+        <div onclick="toggleMenu()" style="font-size: 24px;">☰</div>
     </div>
 
     <div class="app-container">
         
-        <!-- Загрузка/Вход -->
-        <div id="reg-screen" class="screen active" style="text-align:center; padding-top:80px;">
-            <div style="font-size: 80px;">🦊</div>
+        <div id="reg-screen" class="screen active" style="text-align:center;">
+            <div style="font-size: 60px; margin-top: 50px;">🦊</div>
             <h1 style="color:var(--orange);">FortuneFox</h1>
-            <p id="welcome-text">Загрузка данных...</p>
-            <button id="start-btn" class="btn btn-main" style="margin-top:20px; display:none;" onclick="showScreen('lobby')">ИГРАТЬ</button>
+            <p id="welcome-text">Загрузка...</p>
+            <button id="start-btn" class="btn btn-main" style="display:none; margin-top:20px;" onclick="showScreen('lobby')">ИГРАТЬ</button>
         </div>
 
-        <!-- Лобби -->
         <div id="lobby" class="screen">
-            <div class="card" style="text-align:center; border: 2px solid var(--orange);" onclick="alert('В разработке')"><h2>🎰 СЛОТЫ</h2></div>
+            <div class="card" onclick="alert('В разработке')"><h2>🎰 СЛОТЫ</h2></div>
             <div class="grid-2">
-                <div class="card" onclick="showScreen('mines-game')" style="text-align:center;">💣 МИНЫ</div>
-                <div class="card" onclick="showScreen('dice-game')" style="text-align:center;">🎲 DICE</div>
+                <div class="card" onclick="showScreen('mines-game')">💣 МИНЫ</div>
+                <div class="card" onclick="showScreen('dice-game')">🎲 DICE</div>
             </div>
-            <div class="card" onclick="showScreen('cases-game')" style="text-align:center;">📦 КЕЙСЫ</div>
+            <div class="card" onclick="showScreen('cases-game')">📦 КЕЙСЫ</div>
         </div>
 
         <!-- DICE -->
         <div id="dice-game" class="screen">
             <div class="card">
                 <h2 id="d-win-text" style="text-align:center; color:var(--orange);">20.00</h2>
-                <div id="d-result" style="text-align:center; padding:10px; margin:10px 0; border-radius:10px; display:none;"></div>
-                <div class="input-box"><label>Ставка</label><input type="number" id="d-bet" value="10" style="background:none; border:none; color:white; font-size:18px; width:100%;"></div>
-                <div class="input-box"><label>Шанс %</label><input type="number" id="d-chance" value="50" style="background:none; border:none; color:white; font-size:18px; width:100%;"></div>
+                <input type="number" id="d-bet" value="10" style="width:100%; padding:10px; margin:10px 0; background:#111; color:white; border:1px solid #333;">
+                <input type="number" id="d-chance" value="50" style="width:100%; padding:10px; margin:10px 0; background:#111; color:white; border:1px solid #333;">
                 <div class="grid-2">
                     <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
                     <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
@@ -92,18 +82,15 @@ html
         <!-- КЕЙСЫ -->
         <div id="cases-game" class="screen">
             <div id="case-selection" class="grid-2">
-                <div class="card" onclick="openCaseMenu('c1')">📦 Новичок<br>10 ₽</div>
-                <div class="card" onclick="openCaseMenu('c2')">📦 Обычный<br>50 ₽</div>
-                <div class="card" onclick="openCaseMenu('c3')">📦 Сталкер<br>100 ₽</div>
-                <div class="card" onclick="openCaseMenu('c4')">📦 Золотой<br>500 ₽</div>
-                <div class="card" onclick="openCaseMenu('c5')">📦 Элитный<br>1000 ₽</div>
-                <div class="card" onclick="openCaseMenu('fox')" style="border-color:var(--orange);">🦊 FOX<br>5000 ₽</div>
+                <div class="card" onclick="openCaseMenu('c1')">📦 Новичок<br>10₽</div>
+                <div class="card" onclick="openCaseMenu('c2')">📦 Обычный<br>50₽</div>
+                <div class="card" onclick="openCaseMenu('fox')">🦊 FOX<br>5000₽</div>
             </div>
             <div id="case-opening" class="card" style="display:none; text-align:center;">
-                <h3 id="case-title" style="color:var(--orange);">КЕЙС</h3>
-                <div class="case-roulette"><div class="case-pointer"></div><div class="case-tape" id="tape"></div></div>
+                <h3 id="case-title">КЕЙС</h3>
+                <div class="case-roulette"><div class="case-tape" id="tape"></div></div>
                 <button class="btn btn-main" id="spin-btn" onclick="startCaseSpin()">ОТКРЫТЬ</button>
-                <button class="btn btn-sec" id="case-back" style="margin-top:10px;" onclick="closeCaseMenu()">НАЗАД</button>
+                <button class="btn btn-sec" style="margin-top:10px;" onclick="closeCaseMenu()">НАЗАД</button>
             </div>
         </div>
 
@@ -111,25 +98,12 @@ html
         <div id="bonus-screen" class="screen">
             <div class="card">
                 <h3>🎟 ПРОМОКОД</h3>
-                <input type="text" id="promo-input" class="input-box" placeholder="Введите код...">
-                <button class="btn btn-main" onclick="alert('Промокод не найден')">АКТИВИРОВАТЬ</button>
+                <input type="text" class="btn btn-sec" style="width:100%; text-align:left; margin:10px 0;" placeholder="Введите код...">
+                <button class="btn btn-main">АКТИВИРОВАТЬ</button>
             </div>
             <div class="card">
-                <h3>🎁 ЕЖЕДНЕВНЫЙ БОНУС</h3>
-                <p style="font-size:12px; color:#888; margin-bottom:10px;">От 1 до 25 ₽ каждые 24 часа</p>
+                <h3>🎁 БОНУС 24Ч</h3>
                 <button class="btn btn-sec" onclick="getDaily()">ПОЛУЧИТЬ</button>
-            </div>
-            <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
-        </div>
-
-        <!-- РЕФЕРАЛЫ -->
-        <div id="ref-screen" class="screen">
-            <div class="card">
-                <h2>👥 РЕФЕРАЛЫ</h2>
-                <p>Вы получили: <span style="color:var(--green)">0 ₽</span></p>
-                <p style="font-size:12px; margin:10px 0;">За каждого друга: 30 ₽</p>
-                <div id="r-link" class="input-box" style="font-size:10px; word-break:break-all;">...</div>
-                <button class="btn btn-main" onclick="copyRef()">КОПИРОВАТЬ ССЫЛКУ</button>
             </div>
             <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
         </div>
@@ -142,19 +116,20 @@ html
         let isSpinning = false;
 
         window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const balParam = urlParams.get('bal');
-            if(balParam) {
-                balance = parseFloat(balParam);
-                document.getElementById('welcome-text').innerText = "Твой баланс: " + balance.toFixed(2) + " ₽";
-                document.getElementById('start-btn').style.display = "block";
-                updateBal();
-            }
-            document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (tg.initDataUnsafe?.user?.id || "000");
+            const params = new URLSearchParams(window.location.search);
+            balance = parseFloat(params.get('bal')) || 0;
+            document.getElementById('welcome-text').innerText = "Баланс: " + balance.toFixed(2) + " ₽";
+            document.getElementById('start-btn').style.display = "block";
+            updateBal();
         };
 
         function saveToDB() {
+            // ОТПРАВКА БАЛАНСА БОТУ
             tg.sendData(JSON.stringify({new_balance: balance.toFixed(2)}));
+        }
+
+        function updateBal() { 
+            document.getElementById('balance').innerText = balance.toFixed(2); 
         }
 
         function showScreen(id) {
@@ -169,98 +144,66 @@ html
             document.getElementById('overlay').style.display = m.classList.contains('open') ? 'block' : 'none';
         }
 
-        function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
-
-        // DICE
         function playDice(mode) {
             let b = parseFloat(document.getElementById('d-bet').value);
             let c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance || b <= 0) { alert("Мало денег!"); return; }
-            
-            balance -= b; // Списываем сразу!
-            updateBal();
-            
+            if(b > balance || b <= 0) return;
+            balance -= b;
             let roll = Math.random() * 100;
-            let win = mode === 'less' ? (roll <= c) : (roll >= (100-c));
-            
-            if(win) {
-                let prize = b * (95/c);
-                balance += prize;
-            }
-            
-            saveToDB(); // Отправляем новый баланс боту
+            if(mode === 'less' && roll <= c) balance += (b * (95/c));
+            if(mode === 'more' && roll >= (100-c)) balance += (b * (95/c));
             updateBal();
-            
-            let res = document.getElementById('d-result');
-            res.style.display = 'block';
-            res.style.background = win ? 'var(--green)' : 'var(--red)';
-            res.innerText = (win ? "ПОБЕДА! " : "ПРОИГРЫШ! ") + roll.toFixed(2);
+            saveToDB(); // СОХРАНЯЕМ В БД
         }
 
-        // КЕЙСЫ ЛОГИКА
         const cases = {
-            'c1': { name: 'НОВИЧОК', price: 10, items: [2, 5, 10, 15, 20, 50] },
-            'c2': { name: 'ОБЫЧНЫЙ', price: 50, items: [10, 25, 50, 75, 100, 250] },
-            'c3': { name: 'СТАЛКЕР', price: 100, items: [20, 50, 100, 150, 200, 500] },
-            'c4': { name: 'ЗОЛОТОЙ', price: 500, items: [100, 250, 500, 750, 1000, 2500] },
-            'c5': { name: 'ЭЛИТНЫЙ', price: 1000, items: [200, 500, 1000, 1500, 2000, 5000] },
-            'fox': { name: 'FOX CASE', price: 5000, items: [1000, 2500, 5000, 10000, 25000] }
+            'c1': { name: 'НОВИЧОК', price: 10, items: [2, 5, 10, 20, 50] },
+            'c2': { name: 'ОБЫЧНЫЙ', price: 50, items: [10, 20, 50, 100, 200] },
+            'fox': { name: 'FOX', price: 5000, items: [1000, 5000, 10000] }
         };
         let activeCase = null;
 
         function openCaseMenu(id) {
             activeCase = cases[id];
-            document.getElementById('case-title').innerText = activeCase.name + " - " + activeCase.price + "₽";
+            document.getElementById('case-title').innerText = activeCase.name;
             document.getElementById('case-selection').style.display = 'none';
             document.getElementById('case-opening').style.display = 'block';
             fillTape();
         }
 
-        function closeCaseMenu() {
-            if(isSpinning) return;
-            document.getElementById('case-selection').style.display = 'grid';
-            document.getElementById('case-opening').style.display = 'none';
-        }
-
         function fillTape() {
             const tape = document.getElementById('tape');
             tape.innerHTML = '';
-            for(let i=0; i<40; i++) {
-                let val = activeCase.items[Math.floor(Math.random()*activeCase.items.length)];
-                let div = document.createElement('div');
-                div.className = 'case-item';
-                div.innerText = val + "₽";
-                tape.appendChild(div);
+            for(let i=0; i<30; i++) {
+                let v = activeCase.items[Math.floor(Math.random()*activeCase.items.length)];
+                tape.innerHTML += `<div class="case-item">${v}₽</div>`;
             }
         }
 
         function startCaseSpin() {
-            if(balance < activeCase.price || isSpinning) { alert("Мало средств!"); return; }
-            
-            balance -= activeCase.price; // Списываем сразу!
+            if(balance < activeCase.price || isSpinning) return;
+            balance -= activeCase.price;
             updateBal();
             isSpinning = true;
-            
             const tape = document.getElementById('tape');
             const winVal = activeCase.items[Math.floor(Math.random()*activeCase.items.length)];
-            const winIdx = 30;
-            tape.children[winIdx].innerText = winVal + "₽";
-            tape.children[winIdx].style.color = "var(--orange)";
-
-            let offset = (winIdx * 80) - (tape.parentElement.offsetWidth / 2) + 40;
-            tape.style.transition = 'transform 4s cubic-bezier(0.1, 0, 0.1, 1)';
-            tape.style.transform = `translateX(-${offset}px)`;
-
+            tape.children[25].innerText = winVal + "₽";
+            tape.style.transform = `translateX(-${25 * 70 - 100}px)`;
             setTimeout(() => {
                 balance += winVal;
                 updateBal();
-                saveToDB(); // Сохраняем результат
-                alert("Выпало: " + winVal + " ₽");
+                saveToDB(); // СОХРАНЯЕМ В БД
                 isSpinning = false;
+                alert("Выпало: " + winVal + "₽");
                 tape.style.transition = 'none';
                 tape.style.transform = 'translateX(0)';
-                fillTape();
+                closeCaseMenu();
             }, 4500);
+        }
+
+        function closeCaseMenu() {
+            document.getElementById('case-selection').style.display = 'grid';
+            document.getElementById('case-opening').style.display = 'none';
         }
 
         function getDaily() {
@@ -268,15 +211,8 @@ html
             balance += win;
             updateBal();
             saveToDB();
-            alert("Вы получили бонус: " + win + " ₽!");
+            alert("Бонус: " + win + "₽");
         }
-
-        function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('r-link').innerText);
-            alert("Ссылка скопирована!");
-        }
-
-        tg.expand();
     </script>
 </body>
 </html>
