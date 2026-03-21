@@ -9,142 +9,100 @@ html
     <style>
         :root { --orange: #f39c12; --bg: #121212; --card: #1c1c1c; --green: #2ecc71; --red: #e74c3c; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        
-        body { 
-            background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden; height: 100vh; width: 100vw;
-        }
-
-        .header {
-            height: 60px; background: #1a1a1a; border-bottom: 2px solid var(--orange);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 1000;
-        }
-        .bal-box { background: #252525; padding: 8px 12px; border-radius: 10px; border: 1px solid #333; font-weight: 800; color: var(--green); }
-
-        .app-container {
-            margin-top: 60px; height: calc(100vh - 60px); overflow-y: auto;
-            padding: 15px; display: flex; flex-direction: column; align-items: center;
-        }
-
+        body { background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; height: 100vh; }
+        .header { height: 60px; background: #1a1a1a; border-bottom: 2px solid var(--orange); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .bal-box { background: #252525; padding: 8px 12px; border-radius: 10px; color: var(--green); font-weight: bold; }
+        .app-container { margin-top: 60px; height: calc(100vh - 60px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .screen { display: none; width: 100%; flex-direction: column; gap: 15px; }
         .active { display: flex !important; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #2a2a2a; width: 100%; position: relative; overflow: hidden; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #2a2a2a; width: 100%; text-align: center; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-
-        .btn { border: none; border-radius: 10px; padding: 15px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; text-align: center; }
-        .btn:active { transform: scale(0.97); }
+        .btn { border: none; border-radius: 10px; padding: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-main { background: var(--orange); color: black; width: 100%; }
         .btn-sec { background: #333; color: white; width: 100%; }
-        .btn-green { background: var(--green); color: black; width: 100%; }
-
-        .input-box { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; width: 100%; }
-        .input-box label { font-size: 10px; color: #666; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        .input-row { display: flex; align-items: center; gap: 5px; }
-        .input-row input { background: none; border: none; color: white; font-size: 18px; width: 100%; outline: none; font-weight: bold; }
-        .ctrl-btn { background: #252525; padding: 6px 4px; border-radius: 5px; font-size: 10px; border: 1px solid #444; min-width: 35px; text-align: center; color: #fff; }
-
-        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; width: 100%; }
-        .cell { aspect-ratio: 1/1; background: #252525; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .cell.gem { background: var(--green) !important; border-color: white; }
-        .cell.bomb { background: var(--red) !important; border-color: white; }
-        .cell.disabled { pointer-events: none; opacity: 0.7; }
-
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1500; }
-        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1a1a1a; z-index: 2000; transition: 0.3s; padding: 25px; border-right: 2px solid var(--orange); }
-        .side-menu.open { left: 0; }
-        .menu-link { padding: 18px 0; border-bottom: 1px solid #2a2a2a; display: block; color: white; text-decoration: none; font-weight: bold; font-size: 18px; }
-        .menu-fab { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1400; }
+        .input-box { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; width: 100%; margin-bottom: 10px; }
+        .input-box input { background: none; border: none; color: white; width: 100%; text-align: center; font-size: 18px; outline: none; }
+        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; margin: 10px 0; }
+        .cell { aspect-ratio: 1/1; background: #252525; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid #333; }
+        .cell.gem { background: var(--green) !important; }
+        .cell.bomb { background: var(--red) !important; }
+        
+        /* Кейсы */
+        .case-roulette { width: 100%; height: 80px; background: #111; border: 2px solid var(--orange); border-radius: 12px; position: relative; overflow: hidden; }
+        .case-tape { display: flex; position: absolute; left: 0; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); }
+        .case-item { min-width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-right: 1px solid #222; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
-    <div class="side-menu" id="menu">
-        <h2 style="color:var(--orange); margin-bottom:20px;">FortuneFox 🦊</h2>
-        <a href="#" class="menu-link" onclick="showScreen('lobby')">🎰 Игры</a>
-        <a href="#" class="menu-link" onclick="showScreen('bonus-screen')">🎁 Бонусы</a>
-        <a href="https://t.me/FortuneFox_support" class="menu-link">🛠 Поддержка</a>
-        <button class="btn btn-sec" style="margin-top:20px;" onclick="toggleMenu()">ЗАКРЫТЬ</button>
-    </div>
-
     <div class="header">
         <div class="bal-box"><span id="balance">100.00</span> ₽</div>
-        <div style="font-weight: 900; color: var(--orange);">FORTUNE FOX</div>
-        <div onclick="showScreen('dep-screen')" style="background:var(--orange); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:black; font-weight:bold; cursor:pointer;">+</div>
+        <div style="color: var(--orange); font-weight: bold;">FORTUNE FOX</div>
+        <div style="background:var(--orange); width:30px; height:30px; border-radius:5px; color:black; display:flex; align-items:center; justify-content:center; font-weight:bold;">+</div>
     </div>
 
     <div class="app-container">
-        
-        <!-- Вход -->
-        <div id="reg-screen" class="screen active" style="text-align:center; padding-top:80px; align-items:center;">
-            <div style="font-size: 80px; margin-bottom:10px;">🦊</div>
-            <h1 style="color:var(--orange);">FortuneFox</h1>
-            <p style="color: #666; margin-bottom: 40px;">Лучшее казино в Telegram</p>
-            <button class="btn btn-main" style="max-width:280px;" onclick="showLobbyAfterInit()">ИГРАТЬ</button>
+        <!-- Регистрация -->
+        <div id="reg-screen" class="screen active">
+            <div style="font-size: 60px; margin-top: 50px;">🦊</div>
+            <h2>FortuneFox</h2>
+            <p style="color: #666; margin-bottom: 20px;">Добро пожаловать!</p>
+            <button class="btn btn-main" onclick="showScreen('lobby')">ИГРАТЬ</button>
         </div>
 
         <!-- Лобби -->
         <div id="lobby" class="screen">
-            <div class="card" style="height:110px; display:flex; align-items:center; justify-content:center; border: 2px solid var(--orange); cursor:pointer;" onclick="alert('Слоты в разработке')">
-                <h2 style="color:var(--orange);">🎰 СЛОТЫ</h2>
-            </div>
+            <div class="card" style="border: 2px solid var(--orange);">🎰 СЛОТЫ (В РАЗРАБОТКЕ)</div>
             <div class="grid-2">
-                <div class="card" onclick="showScreen('mines-game')" style="text-align:center; cursor:pointer;">💣<br>МИНЫ</div>
-                <div class="card" onclick="showScreen('dice-game')" style="text-align:center; cursor:pointer;">🎲<br>DICE</div>
-            </div>
+                <div class="card" onclick="showScreen('mines-game')">💣 МИНЫ</div>
+                <div class="card" onclick="showScreen('dice-game')">🎲 DICE</div></div>
+            <div class="card" onclick="showScreen('cases-game')">📦 КЕЙСЫ</div>
         </div>
 
         <!-- DICE -->
         <div id="dice-game" class="screen">
             <div class="card">
-                <div id="d-win-text" style="font-size:40px; font-weight:900; text-align:center; color:var(--orange); margin:10px 0;">20.00</div>
-                <div class="input-box" style="margin-bottom:12px;">
-                    <label>Ставка</label>
-                    <input type="number" id="d-bet" value="10" oninput="updDice()">
-                </div>
-                <div class="input-box" style="margin-bottom:20px;">
-                    <label>Шанс %</label>
-                    <input type="number" id="d-chance" value="50" oninput="updDice()">
-                </div>
-                <div class="grid-2">
-                    <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
-                    <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
-                </div>
+                <h3 id="d-win-text" style="color:var(--orange); font-size:30px;">20.00</h3>
+                <div class="input-box"><label>Ставка</label><input type="number" id="d-bet" value="10"></div>
+                <div class="input-box"><label>Шанс %</label><input type="number" id="d-chance" value="50"></div>
+                <button class="btn btn-main" onclick="playDice()">ИГРАТЬ</button>
             </div>
             <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
         </div>
 
         <!-- МИНЫ -->
         <div id="mines-game" class="screen">
-            <h2 id="m-coeff" style="text-align:center; color:var(--orange); font-size:32px;">x0.00</h2>
+            <h2 id="m-coeff" style="color:var(--orange)">x0.00</h2>
             <div class="mines-grid" id="m-grid"></div>
-            <div class="grid-2">
-                <div class="input-box"><label>Ставка</label><input type="number" id="m-bet" value="10"></div>
-                <div class="input-box"><label>Бомбы</label><input type="number" id="m-bombs" value="3"></div>
-            </div>
-            <button class="btn btn-main" id="m-start" onclick="startMines()">ИГРАТЬ</button>
-            <button class="btn btn-green" id="m-cash" style="display:none;" onclick="cashMines()">ЗАБРАТЬ</button>
-            <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
+            <div class="input-box"><input type="number" id="m-bet" value="10"></div>
+            <button class="btn btn-main" id="m-start" onclick="startMines()">СТАРТ</button>
+            <button class="btn btn-main" id="m-cash" style="display:none; background:var(--green)" onclick="cashMines()">ЗАБРАТЬ</button>
+            <button class="btn btn-sec" style="margin-top:10px;" onclick="showScreen('lobby')">НАЗАД</button>
         </div>
 
-    </div>
-
-    <div class="menu-fab" id="fab" style="display:none;" onclick="toggleMenu()">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <!-- КЕЙСЫ -->
+        <div id="cases-game" class="screen">
+            <div id="case-selection" class="grid-2">
+                <div class="card" onclick="openCaseMenu(10)">📦 Новичок<br>10 ₽</div>
+                <div class="card" onclick="openCaseMenu(100)">📦 Профи<br>100 ₽</div>
+            </div>
+            <div id="case-opening" class="card" style="display:none;">
+                <div class="case-roulette"><div class="case-tape" id="tape"></div></div>
+                <button class="btn btn-main" id="spin-btn" style="margin-top:15px;" onclick="startCase()">ОТКРЫТЬ</button>
+                <button class="btn btn-sec" style="margin-top:10px;" onclick="location.reload()">НАЗАД</button>
+            </div>
+            <button class="btn btn-sec" onclick="showScreen('lobby')">В ЛОББИ</button>
+        </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         let balance = 100.00;
 
-        // Когда бот присылает обновление баланса
-        tg.onEvent('message', function(event) {
-            let text = event.data.text;
-            if (text && text.startsWith('BALANCE_UPDATE:')) {
-                balance = parseFloat(text.replace('BALANCE_UPDATE:', ''));
+        tg.onEvent('message', (e) => {
+            if (e.data.startsWith('BALANCE_UPDATE:')) {
+                balance = parseFloat(e.data.split(':')[1]);
                 document.getElementById('balance').innerText = balance.toFixed(2);
             }
         });
@@ -154,69 +112,75 @@ html
             tg.sendData(JSON.stringify(data));
         }
 
-        function showLobbyAfterInit() {
-            showScreen('lobby');
-            document.getElementById('fab').style.display = 'flex';
-            sendToBot('get_balance'); // Просим актуальный баланс у бота
-        }
-
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(document.getElementById('menu').classList.contains('open')) toggleMenu();
+            if(id === 'lobby') sendToBot('get_balance');
         }
 
-        function toggleMenu() {
-            const m = document.getElementById('menu');
-            const o = document.getElementById('overlay');
-            m.classList.toggle('open');
-            o.style.display = m.classList.contains('open') ? 'block' : 'none';
-        }
-
-        function updDice() {
-            let b = parseFloat(document.getElementById('d-bet').value) || 0;
-            let c = parseFloat(document.getElementById('d-chance').value) || 1;
-            document.getElementById('d-win-text').innerText = (b * (95/c)).toFixed(2);
-        }
-
-        function playDice(mode) {
+        // DICE
+        function playDice() {
             let b = parseFloat(document.getElementById('d-bet').value);
-            if(b > balance) { tg.showAlert("Недостаточно средств!"); return; }
-            
-            let roll = Math.random() * 100;
-            let win = mode === 'less' ? roll < 50 : roll > 50;
-            
-            if(win) {
-                let winAmt = b * 0.95;
-                sendToBot('update_balance', { amount: winAmt, type: 'add', game_name: 'Dice' });
-            } else {
-                sendToBot('update_balance', { amount: b, type: 'subtract', game_name: 'Dice' });
-            }
+            if(b > balance) return tg.showAlert("Мало денег");
+            sendToBot('update_balance', {amount: b, type: 'subtract', game_name: 'Dice'});
+            setTimeout(() => {
+                if(Math.random() > 0.5) sendToBot('update_balance', {amount: b*1.9, type: 'add', game_name: 'Dice'});
+            }, 500);
         }
 
-        // Логика мин (упрощенно)
-        let mData = {active: false, b: 0};
+        // MINES
+        let mData = {active: false, b: 0, bombs: []};
         function startMines() {
             let b = parseFloat(document.getElementById('m-bet').value);
-            if(b > balance) { tg.showAlert("Мало средств!"); return; }
-            mData.active = true; mData.b = b;
-            document.getElementById('m-start').style.display = 'none';
-            document.getElementById('m-cash').style.display = 'block';
-            // Генерация поля... (тут твоя старая логика)
-            const g = document.getElementById('m-grid'); g.innerHTML = '';
+            if(b > balance) return tg.showAlert("Мало денег");
+            sendToBot('update_balance', {amount: b, type: 'subtract', game_name: 'Mines'});
+            mData = {active: true, b: b, bombs: [Math.floor(Math.random()*25)]};
+            document.getElementById('m-grid').innerHTML = '';
             for(let i=0; i<25; i++) {
                 let c = document.createElement('div'); c.className = 'cell';
-                c.onclick = () => { if(mData.active) { c.classList.add('gem'); c.innerText='💎'; } };
-                g.appendChild(c);
+                c.onclick = () => {
+                    if(!mData.active) return;if(mData.bombs.includes(i)) {
+                        c.classList.add('bomb'); c.innerText='💣'; mData.active=false; tg.showAlert("БОМБА!");
+                        setTimeout(()=>showScreen('lobby'), 1500);
+                    } else {
+                        c.classList.add('gem'); c.innerText='💎';
+                        document.getElementById('m-cash').style.display = 'block';
+                    }
+                };
+                document.getElementById('m-grid').appendChild(c);
             }
+            document.getElementById('m-start').style.display='none';
         }
-
         function cashMines() {
-            sendToBot('update_balance', { amount: mData.b * 1.2, type: 'add', game_name: 'Mines' });
+            sendToBot('update_balance', {amount: mData.b*1.5, type: 'add', game_name: 'Mines'});
             showScreen('lobby');
         }
 
+        // КЕЙСЫ
+        let currentCasePrice = 0;
+        function openCaseMenu(price) {
+            currentCasePrice = price;
+            document.getElementById('case-selection').style.display='none';
+            document.getElementById('case-opening').style.display='block';
+            const tape = document.getElementById('tape');
+            tape.innerHTML = '';
+            for(let i=0; i<40; i++) tape.innerHTML += `<div class="case-item">${Math.floor(Math.random()*price*2)}₽</div>`;
+        }
+        function startCase() {
+            if(balance < currentCasePrice) return tg.showAlert("Мало денег");
+            sendToBot('update_balance', {amount: currentCasePrice, type: 'subtract', game_name: 'Cases'});
+            const tape = document.getElementById('tape');
+            let win = Math.floor(Math.random()*currentCasePrice*2);
+            tape.children[35].innerText = win + "₽";
+            tape.style.transform = "translateX(-2800px)";
+            setTimeout(() => {
+                sendToBot('update_balance', {amount: win, type: 'add', game_name: 'Cases'});
+                tg.showAlert("Выигрыш: " + win + "₽");
+            }, 4100);
+        }
+
         tg.expand();
+        sendToBot('get_balance');
     </script>
 </body>
 </html>
