@@ -177,48 +177,74 @@ html
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        let balance = 0.00;
+    let tg = window.Telegram.WebApp;
+    let balance = 0.00;
+    let userId = 0;
 
-        // Инициализация данных при входе
-        window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const balParam = urlParams.get('bal');
-            if(balParam) {
-                balance = parseFloat(balParam);
-                document.getElementById('welcome-text').innerText = "Ваш баланс: " + balance + " ₽";
-                document.getElementById('start-btn').style.display = "block";
-            } else {
-                document.getElementById('welcome-text').innerText = "Ошибка входа через бота";
-            }
-            updateBal();
-        };
-
-        // Отправка данных в бота (сохранение в БД)
-        function saveToDB() {
-            tg.sendData(JSON.stringify({new_balance: balance.toFixed(2)}));
+    // 1. ПОЛУЧАЕМ ДАННЫЕ ПРИ ВХОДЕ
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const balParam = urlParams.get('bal');
+        const idParam = urlParams.get('id');
+        
+        if(balParam) {
+            balance = parseFloat(balParam);
+            userId = idParam;
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            document.getElementById('welcome-text').innerText = "Твой баланс: " + balance.toFixed(2) + " ₽";
+            document.getElementById('start-btn').style.display = "block";
+        } else {
+            document.getElementById('welcome-text').innerText = "Зайдите через бота!";
         }
+    };
 
-        function register() {
-            showScreen('lobby');
-            document.getElementById('fab').style.display = 'flex';
-            document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (tg.initDataUnsafe?.user?.id || "000");
-        }
+    // 2. ФУНКЦИЯ СОХРАНЕНИЯ (ОТПРАВКА БОТУ)
+    function saveToDB() {
+        // Отправляем новый баланс боту и закрываем приложение
+        tg.sendData(JSON.stringify({new_balance: balance.toFixed(2)}));
+    }
 
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
+    // 3. ОБНОВЛЕНИЕ БАЛАНСА НА ЭКРАНЕ
+    function updateBal() { 
+        document.getElementById('balance').innerText = balance.toFixed(2); 
+    }
 
-        function toggleMenu() {
-            const m = document.getElementById('menu');
-            m.classList.toggle('open');
-            document.getElementById('overlay').style.display = m.classList.contains('open') ? 'block' : 'none';
-        }
+    function register() {
+        showScreen('lobby');
+        document.getElementById('fab').style.display = 'flex';
+    }
 
-        function updateBal() { 
-            document.getElementById('balance').innerText = balance.toFixed(2); 
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // Пример DICE (исправленный)
+    function playDice(mode) {
+        let b = parseFloat(document.getElementById('d-bet').value);
+        let c = parseFloat(document.getElementById('d-chance').value);
+        if(b > balance || b <= 0) { alert("Недостаточно денег!"); return; }
+        
+        balance -= b;
+        let roll = (Math.random() * 100);
+        let win = mode === 'less' ? (roll <= c) : (roll >= (100-c));
+        
+        if(win) {
+            balance += (b * (95/c));
         }
+        
+        updateBal();
+        // После каждой игры можно вызвать сохранение, но Телеграм закроет окно.
+        // Поэтому лучше добавить кнопку "ВЫЙТИ И СОХРАНИТЬ" в меню.
+    }
+
+    // Добавь эту функцию, чтобы игрок мог выйти и сохранить деньги
+    function exitAndSave() {
+        saveToDB();
+    }
+
+    tg.expand();
+</script>
 
         // DICE LOGIC
         function playDice(mode) {
