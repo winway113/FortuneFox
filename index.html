@@ -9,57 +9,32 @@ html
     <style>
         :root { --orange: #f39c12; --bg: #121212; --card: #1c1c1c; --green: #2ecc71; --red: #e74c3c; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        
-        body { 
-            background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden; height: 100vh; width: 100vw;
-        }
-
-        .header {
-            height: 60px; background: #1a1a1a; border-bottom: 2px solid var(--orange);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 1000;
-        }
+        body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        .header { height: 60px; background: #1a1a1a; border-bottom: 2px solid var(--orange); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 1000; }
         .bal-box { background: #252525; padding: 8px 12px; border-radius: 10px; border: 1px solid #333; font-weight: 800; color: var(--green); }
-
-        .app-container {
-            margin-top: 60px; height: calc(100vh - 60px); overflow-y: auto;
-            padding: 15px; display: flex; flex-direction: column; align-items: center;
-        }
-
+        .app-container { margin-top: 60px; height: calc(100vh - 60px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .screen { display: none; width: 100%; flex-direction: column; gap: 15px; }
         .active { display: flex !important; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #2a2a2a; width: 100%; position: relative; overflow: hidden; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #2a2a2a; width: 100%; position: relative; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-
-        .btn { border: none; border-radius: 10px; padding: 15px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; text-align: center; }
-        .btn:active { transform: scale(0.97); }
+        .btn { border: none; border-radius: 10px; padding: 15px; font-weight: bold; cursor: pointer; font-size: 15px; text-align: center; }
         .btn-main { background: var(--orange); color: black; width: 100%; }
         .btn-sec { background: #333; color: white; width: 100%; }
-
-        .input-box { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; width: 100%; }
-        .input-box label { font-size: 10px; color: #666; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        .input-row { display: flex; align-items: center; gap: 5px; }
+        .input-box { background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333; width: 100%; margin-bottom: 10px; }
+        .input-box label { font-size: 10px; color: #666; display: block; margin-bottom: 5px; }
         .input-row input { background: none; border: none; color: white; font-size: 18px; width: 100%; outline: none; font-weight: bold; }
-        .ctrl-btn { background: #252525; padding: 6px 4px; border-radius: 5px; font-size: 10px; border: 1px solid #444; min-width: 35px; text-align: center; color: #fff; }
-
-        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; width: 100%; }
-        .cell { aspect-ratio: 1/1; background: #252525; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .cell.gem { background: var(--green) !important; border-color: white; }
-        .cell.bomb { background: var(--red) !important; border-color: white; }
-
+        
+        /* Кейсы */
         .case-roulette { width: 100%; height: 100px; background: #111; border: 2px solid var(--orange); border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 15px; }
         .case-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: var(--orange); z-index: 10; }
-        .case-tape { display: flex; position: absolute; left: 0; top: 0; height: 100%; transition: transform 6s cubic-bezier(0.1, 0, 0.1, 1); }
-        .case-item { min-width: 80px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #222; font-weight: bold; font-size: 14px; background: #1a1a1a; color: #fff; }
+        .case-tape { display: flex; position: absolute; left: 0; top: 0; height: 100%; }
+        .case-item { min-width: 80px; height: 100%; display: flex; align-items: center; justify-content: center; border-right: 1px solid #222; font-weight: bold; background: #1a1a1a; }
 
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1500; }
+        /* Меню */
         .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1a1a1a; z-index: 2000; transition: 0.3s; padding: 25px; border-right: 2px solid var(--orange); }
         .side-menu.open { left: 0; }
-        .menu-link { padding: 18px 0; border-bottom: 1px solid #2a2a2a; display: block; color: white; text-decoration: none; font-weight: bold; font-size: 18px; }
-        .menu-fab { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1400; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1500; }
     </style>
 </head>
 <body>
@@ -67,58 +42,45 @@ html
     <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="side-menu" id="menu">
         <h2 style="color:var(--orange); margin-bottom:20px;">FortuneFox 🦊</h2>
-        <a href="#" class="menu-link" onclick="showScreen('lobby')">🎰 Игры</a>
-        <a href="#" class="menu-link" onclick="showScreen('bonus-screen')">🎁 Бонусы</a>
-        <a href="#" class="menu-link" onclick="showScreen('ref-screen')">👥 Рефералы</a>
-        <a href="https://t.me/FortuneFox_support" class="menu-link">🛠 Поддержка</a>
-        <button class="btn btn-sec" style="margin-top:20px;" onclick="toggleMenu()">ЗАКРЫТЬ</button>
+        <a href="#" class="menu-link" onclick="showScreen('lobby')" style="display:block; color:white; padding:15px 0; text-decoration:none; font-weight:bold;">🎰 Игры</a>
+        <a href="#" class="menu-link" onclick="showScreen('bonus-screen')" style="display:block; color:white; padding:15px 0; text-decoration:none; font-weight:bold;">🎁 Бонусы</a>
+        <a href="#" class="menu-link" onclick="showScreen('ref-screen')" style="display:block; color:white; padding:15px 0; text-decoration:none; font-weight:bold;">👥 Рефералы</a>
+        <button class="btn btn-sec" style="margin-top:20px; width:100%;" onclick="toggleMenu()">ЗАКРЫТЬ</button>
     </div>
 
     <div class="header">
         <div class="bal-box"><span id="balance">0.00</span> ₽</div>
         <div style="font-weight: 900; color: var(--orange);">FORTUNE FOX</div>
-        <div onclick="showScreen('dep-screen')" style="background:var(--orange); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:black; font-weight:bold; cursor:pointer;">+</div>
+        <div onclick="toggleMenu()" style="cursor:pointer; font-size:24px;">☰</div>
     </div>
 
     <div class="app-container">
         
-        <!-- Вход -->
-        <div id="reg-screen" class="screen active" style="text-align:center; padding-top:80px; align-items:center;">
-            <div style="font-size: 80px; margin-bottom:10px;">🦊</div>
+        <!-- Загрузка/Вход -->
+        <div id="reg-screen" class="screen active" style="text-align:center; padding-top:80px;">
+            <div style="font-size: 80px;">🦊</div>
             <h1 style="color:var(--orange);">FortuneFox</h1>
-            <p id="welcome-text" style="color: #666; margin-bottom: 40px;">Загрузка данных...</p>
-            <button id="start-btn" class="btn btn-main" style="max-width:280px; display:none;" onclick="register()">ИГРАТЬ</button>
+            <p id="welcome-text">Загрузка данных...</p>
+            <button id="start-btn" class="btn btn-main" style="margin-top:20px; display:none;" onclick="showScreen('lobby')">ИГРАТЬ</button>
         </div>
 
         <!-- Лобби -->
         <div id="lobby" class="screen">
-            <div class="card" style="height:110px; display:flex; align-items:center; justify-content:center; border: 2px solid var(--orange); cursor:pointer;" onclick="alert('Слоты в разработке')">
-                <h2 style="color:var(--orange);">🎰 СЛОТЫ</h2>
-            </div>
+            <div class="card" style="text-align:center; border: 2px solid var(--orange);" onclick="alert('В разработке')"><h2>🎰 СЛОТЫ</h2></div>
             <div class="grid-2">
-                <div class="card" onclick="showScreen('mines-game')" style="text-align:center; cursor:pointer;">💣<br>МИНЫ</div>
-                <div class="card" onclick="showScreen('dice-game')" style="text-align:center; cursor:pointer;">🎲<br>DICE</div>
+                <div class="card" onclick="showScreen('mines-game')" style="text-align:center;">💣 МИНЫ</div>
+                <div class="card" onclick="showScreen('dice-game')" style="text-align:center;">🎲 DICE</div>
             </div>
-            <div class="card" onclick="showScreen('cases-game')" style="text-align:center; cursor:pointer;">📦 КЕЙСЫ</div>
+            <div class="card" onclick="showScreen('cases-game')" style="text-align:center;">📦 КЕЙСЫ</div>
         </div>
 
         <!-- DICE -->
         <div id="dice-game" class="screen">
             <div class="card">
-                <div id="d-win-text" style="font-size:40px; font-weight:900; text-align:center; color:var(--orange); margin:10px 0;">20.00</div>
-                <div id="d-result" style="text-align:center; padding:12px; border-radius:10px; margin-bottom:15px; font-weight:bold; display:none;"></div>
-                <div class="input-box" style="margin-bottom:12px;">
-                    <label>Ставка</label>
-                    <div class="input-row">
-                        <input type="number" id="d-bet" value="10" oninput="updDice()">
-                    </div>
-                </div>
-                <div class="input-box" style="margin-bottom:20px;">
-                    <label>Шанс %</label>
-                    <div class="input-row">
-                        <input type="number" id="d-chance" value="50" oninput="updDice()">
-                    </div>
-                </div>
+                <h2 id="d-win-text" style="text-align:center; color:var(--orange);">20.00</h2>
+                <div id="d-result" style="text-align:center; padding:10px; margin:10px 0; border-radius:10px; display:none;"></div>
+                <div class="input-box"><label>Ставка</label><input type="number" id="d-bet" value="10" style="background:none; border:none; color:white; font-size:18px; width:100%;"></div>
+                <div class="input-box"><label>Шанс %</label><input type="number" id="d-chance" value="50" style="background:none; border:none; color:white; font-size:18px; width:100%;"></div>
                 <div class="grid-2">
                     <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
                     <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
@@ -127,87 +89,78 @@ html
             <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
         </div>
 
-        <!-- МИНЫ -->
-        <div id="mines-game" class="screen">
-            <h2 id="m-coeff" style="text-align:center; color:var(--orange); font-size:32px;">x0.00</h2>
-            <div class="mines-grid" id="m-grid"></div>
-            <div class="grid-2">
-                <div class="input-box"><label>Ставка</label><input type="number" id="m-bet" value="10"></div>
-                <div class="input-box"><label>Бомбы</label><input type="number" id="m-bombs" value="3"></div>
-            </div>
-            <button class="btn btn-main" id="m-start" onclick="startMines()">ИГРАТЬ</button>
-            <button class="btn btn-green" id="m-cash" style="display:none;" onclick="cashMines()">ЗАБРАТЬ</button>
-            <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
-        </div>
-
         <!-- КЕЙСЫ -->
         <div id="cases-game" class="screen">
             <div id="case-selection" class="grid-2">
                 <div class="card" onclick="openCaseMenu('c1')">📦 Новичок<br>10 ₽</div>
+                <div class="card" onclick="openCaseMenu('c2')">📦 Обычный<br>50 ₽</div>
+                <div class="card" onclick="openCaseMenu('c3')">📦 Сталкер<br>100 ₽</div>
+                <div class="card" onclick="openCaseMenu('c4')">📦 Золотой<br>500 ₽</div>
+                <div class="card" onclick="openCaseMenu('c5')">📦 Элитный<br>1000 ₽</div>
                 <div class="card" onclick="openCaseMenu('fox')" style="border-color:var(--orange);">🦊 FOX<br>5000 ₽</div>
             </div>
             <div id="case-opening" class="card" style="display:none; text-align:center;">
-                <h3 id="case-title" style="margin-bottom:15px; color:var(--orange);">КЕЙС</h3>
+                <h3 id="case-title" style="color:var(--orange);">КЕЙС</h3>
                 <div class="case-roulette"><div class="case-pointer"></div><div class="case-tape" id="tape"></div></div>
                 <button class="btn btn-main" id="spin-btn" onclick="startCaseSpin()">ОТКРЫТЬ</button>
                 <button class="btn btn-sec" id="case-back" style="margin-top:10px;" onclick="closeCaseMenu()">НАЗАД</button>
             </div>
-            <button class="btn btn-sec" id="cases-exit" onclick="showScreen('lobby')">В ЛОББИ</button>
         </div>
 
         <!-- БОНУСЫ -->
         <div id="bonus-screen" class="screen">
-            <div class="card"><h3>БОНУС 24Ч</h3><button class="btn btn-sec" onclick="getDaily()">ПОЛУЧИТЬ</button></div>
+            <div class="card">
+                <h3>🎟 ПРОМОКОД</h3>
+                <input type="text" id="promo-input" class="input-box" placeholder="Введите код...">
+                <button class="btn btn-main" onclick="alert('Промокод не найден')">АКТИВИРОВАТЬ</button>
+            </div>
+            <div class="card">
+                <h3>🎁 ЕЖЕДНЕВНЫЙ БОНУС</h3>
+                <p style="font-size:12px; color:#888; margin-bottom:10px;">От 1 до 25 ₽ каждые 24 часа</p>
+                <button class="btn btn-sec" onclick="getDaily()">ПОЛУЧИТЬ</button>
+            </div>
             <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
         </div>
 
         <!-- РЕФЕРАЛЫ -->
         <div id="ref-screen" class="screen">
             <div class="card">
-                <h2 style="color:var(--orange);">РЕФЕРАЛЫ</h2>
-                <div style="background:#111; padding:15px; border-radius:10px; margin-top:10px; font-size:11px; word-break:break-all;" id="r-link">...</div>
-                <button class="btn btn-main" style="margin-top:10px;" onclick="copyRef()">КОПИРОВАТЬ</button>
+                <h2>👥 РЕФЕРАЛЫ</h2>
+                <p>Вы получили: <span style="color:var(--green)">0 ₽</span></p>
+                <p style="font-size:12px; margin:10px 0;">За каждого друга: 30 ₽</p>
+                <div id="r-link" class="input-box" style="font-size:10px; word-break:break-all;">...</div>
+                <button class="btn btn-main" onclick="copyRef()">КОПИРОВАТЬ ССЫЛКУ</button>
             </div>
-            <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button></div>
+            <button class="btn btn-sec" onclick="showScreen('lobby')">НАЗАД</button>
+        </div>
 
-    </div>
-
-    <div class="menu-fab" id="fab" style="display:none;" onclick="toggleMenu()">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         let balance = 0.00;
+        let isSpinning = false;
 
-        // Инициализация данных при входе
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const balParam = urlParams.get('bal');
             if(balParam) {
                 balance = parseFloat(balParam);
-                document.getElementById('welcome-text').innerText = "Ваш баланс: " + balance + " ₽";
+                document.getElementById('welcome-text').innerText = "Твой баланс: " + balance.toFixed(2) + " ₽";
                 document.getElementById('start-btn').style.display = "block";
-            } else {
-                document.getElementById('welcome-text').innerText = "Ошибка входа через бота";
+                updateBal();
             }
-            updateBal();
+            document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (tg.initDataUnsafe?.user?.id || "000");
         };
 
-        // Отправка данных в бота (сохранение в БД)
         function saveToDB() {
             tg.sendData(JSON.stringify({new_balance: balance.toFixed(2)}));
-        }
-
-        function register() {
-            showScreen('lobby');
-            document.getElementById('fab').style.display = 'flex';
-            document.getElementById('r-link').innerText = "https://t.me/FortuneFox_Bot?start=" + (tg.initDataUnsafe?.user?.id || "000");
         }
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            if(document.getElementById('menu').classList.contains('open')) toggleMenu();
         }
 
         function toggleMenu() {
@@ -216,82 +169,111 @@ html
             document.getElementById('overlay').style.display = m.classList.contains('open') ? 'block' : 'none';
         }
 
-        function updateBal() { 
-            document.getElementById('balance').innerText = balance.toFixed(2); 
-        }
+        function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
 
-        // DICE LOGIC
+        // DICE
         function playDice(mode) {
             let b = parseFloat(document.getElementById('d-bet').value);
             let c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance || b <= 0) { alert("Недостаточно средств"); return; }
-            balance -= b;
-            let roll = (Math.random() * 100);
-            let win = mode === 'less' ? (roll <= c) : (roll >= (100-c));
-            if(win) balance += (b * (95/c));
+            if(b > balance || b <= 0) { alert("Мало денег!"); return; }
+            
+            balance -= b; // Списываем сразу!
             updateBal();
-            saveToDB(); // Сохраняем после игры
+            
+            let roll = Math.random() * 100;
+            let win = mode === 'less' ? (roll <= c) : (roll >= (100-c));
+            
+            if(win) {
+                let prize = b * (95/c);
+                balance += prize;
+            }
+            
+            saveToDB(); // Отправляем новый баланс боту
+            updateBal();
+            
             let res = document.getElementById('d-result');
-            res.style.display = 'block'; res.style.background = win ? 'var(--green)' : 'var(--red)';
-            res.innerText = (win ? "ВЫИГРЫШ: " : "ПРОИГРЫШ: ") + roll.toFixed(2);
+            res.style.display = 'block';
+            res.style.background = win ? 'var(--green)' : 'var(--red)';
+            res.innerText = (win ? "ПОБЕДА! " : "ПРОИГРЫШ! ") + roll.toFixed(2);
         }
 
-        // MINES LOGIC
-        let mData = {active: false, b: 0, n: 0, op: 0, grid: []};
-        function startMines() {
-            let b = parseFloat(document.getElementById('m-bet').value);
-            let n = parseInt(document.getElementById('m-bombs').value);
-            if(b > balance) return;
-            balance -= b; updateBal();
-            mData = {active: true, b: b, n: n, op: 0, grid: Array(25).fill('g')};
-            let cnt = 0; while(cnt < n) {
-                let r = Math.floor(Math.random()*25);
-                if(mData.grid[r] === 'g') { mData.grid[r] = 'b'; cnt++; }
-            }
-            document.getElementById('m-start').style.display = 'none';
-            resetMinesUI();
+        // КЕЙСЫ ЛОГИКА
+        const cases = {
+            'c1': { name: 'НОВИЧОК', price: 10, items: [2, 5, 10, 15, 20, 50] },
+            'c2': { name: 'ОБЫЧНЫЙ', price: 50, items: [10, 25, 50, 75, 100, 250] },
+            'c3': { name: 'СТАЛКЕР', price: 100, items: [20, 50, 100, 150, 200, 500] },
+            'c4': { name: 'ЗОЛОТОЙ', price: 500, items: [100, 250, 500, 750, 1000, 2500] },
+            'c5': { name: 'ЭЛИТНЫЙ', price: 1000, items: [200, 500, 1000, 1500, 2000, 5000] },
+            'fox': { name: 'FOX CASE', price: 5000, items: [1000, 2500, 5000, 10000, 25000] }
+        };
+        let activeCase = null;
+
+        function openCaseMenu(id) {
+            activeCase = cases[id];
+            document.getElementById('case-title').innerText = activeCase.name + " - " + activeCase.price + "₽";
+            document.getElementById('case-selection').style.display = 'none';
+            document.getElementById('case-opening').style.display = 'block';
+            fillTape();
         }
 
-        function resetMinesUI() {
-            const g = document.getElementById('m-grid'); g.innerHTML = '';
-            for(let i=0; i<25; i++) {
-                let c = document.createElement('div'); c.className = 'cell';
-                c.onclick = () => clickMine(i); g.appendChild(c);
-            }
+        function closeCaseMenu() {
+            if(isSpinning) return;
+            document.getElementById('case-selection').style.display = 'grid';
+            document.getElementById('case-opening').style.display = 'none';
         }
 
-        function clickMine(i) {
-            if(!mData.active) return;
-            let cells = document.getElementById('m-grid').children;
-            if(mData.grid[i] === 'b') {
-                cells[i].classList.add('bomb'); cells[i].innerText = '💣';
-                mData.active = false; saveToDB();
-                alert("БОМБА!");
-                document.getElementById('m-start').style.display = 'block';
-                document.getElementById('m-cash').style.display = 'none';
-            } else {
-                cells[i].classList.add('gem'); cells[i].innerText = '💎';
-                mData.op++;
-                document.getElementById('m-cash').style.display = 'block';
-                let mult = 1.5; // Упрощенный множитель
-                document.getElementById('m-coeff').innerText = 'x' + mult.toFixed(2);
+        function fillTape() {
+            const tape = document.getElementById('tape');
+            tape.innerHTML = '';
+            for(let i=0; i<40; i++) {
+                let val = activeCase.items[Math.floor(Math.random()*activeCase.items.length)];
+                let div = document.createElement('div');
+                div.className = 'case-item';
+                div.innerText = val + "₽";
+                tape.appendChild(div);
             }
         }
 
-        function cashMines() {
-            let mult = parseFloat(document.getElementById('m-coeff').innerText.replace('x',''));
-            balance += mData.b * mult; updateBal();
-            mData.active = false;
-            saveToDB();
-            document.getElementById('m-start').style.display = 'block';
-            document.getElementById('m-cash').style.display = 'none';
+        function startCaseSpin() {
+            if(balance < activeCase.price || isSpinning) { alert("Мало средств!"); return; }
+            
+            balance -= activeCase.price; // Списываем сразу!
+            updateBal();
+            isSpinning = true;
+            
+            const tape = document.getElementById('tape');
+            const winVal = activeCase.items[Math.floor(Math.random()*activeCase.items.length)];
+            const winIdx = 30;
+            tape.children[winIdx].innerText = winVal + "₽";
+            tape.children[winIdx].style.color = "var(--orange)";
+
+            let offset = (winIdx * 80) - (tape.parentElement.offsetWidth / 2) + 40;
+            tape.style.transition = 'transform 4s cubic-bezier(0.1, 0, 0.1, 1)';
+            tape.style.transform = `translateX(-${offset}px)`;
+
+            setTimeout(() => {
+                balance += winVal;
+                updateBal();
+                saveToDB(); // Сохраняем результат
+                alert("Выпало: " + winVal + " ₽");
+                isSpinning = false;
+                tape.style.transition = 'none';
+                tape.style.transform = 'translateX(0)';
+                fillTape();
+            }, 4500);
         }
 
         function getDaily() {
-            let win = 10.00;
-            balance += win; updateBal();
+            let win = Math.floor(Math.random() * 24) + 1;
+            balance += win;
+            updateBal();
             saveToDB();
-            alert("Получено 10 ₽!");
+            alert("Вы получили бонус: " + win + " ₽!");
+        }
+
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('r-link').innerText);
+            alert("Ссылка скопирована!");
         }
 
         tg.expand();
