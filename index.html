@@ -255,7 +255,29 @@ html
         }
         function backToCases() { if(!isSpinning) { document.getElementById('cases-grid').style.display='grid'; document.getElementById('case-view').style.display='none'; } }
 
-        window.onload = () => { tg.expand(); loadUserData(); };
+        window.onload = () => {
+    tg.expand();
+    tg.ready();
+
+    // 1. Пробуем взять ID из официального Telegram API
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id;
+    }
+
+    // 2. Если Телеграм не отдал (бывает в браузере), берем из ссылки
+    if (!userId) {
+        const params = new URLSearchParams(window.location.search);
+        userId = parseInt(params.get('id') || 0);
+    }
+
+    console.log("Пытаюсь загрузить баланс для ID:", userId);
+
+    if (userId !== 0) {
+        loadUserData(); // Запускаем загрузку
+    } else {
+        alert("Ошибка: Не удалось определить ваш ID. Зайдите через бота!");
+    }
+};
     </script>
 </body>
 </html>
