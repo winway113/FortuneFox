@@ -83,59 +83,82 @@ html
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        let balance = 0.00;
-        let userId = 0;
-        let SERVER_URL = "https://dennise-ulcerative-kolby.ngrok-free.dev -> http://localhost:8000"; // ТВОЙ IP
-
-        window.onload = () => {
-            const params = new URLSearchParams(window.location.search);
-            balance = parseFloat(params.get('bal') || 0);
-            userId = parseInt(params.get('id') || 0);
-            document.getElementById('balance').innerText = balance.toFixed(2);
-            document.getElementById('myid').innerText = userId;
-            document.getElementById('welcome-text').innerText = "Ваш баланс: " + balance + " ₽";
-            tg.expand();
-        };
-
-        <script>
-    let tg = window.Telegram.WebApp;
-    // ВСТАВЬ СЮДА СВОЮ ССЫЛКУ ИЗ NGROK (ОБЯЗАТЕЛЬНО С HTTPS)
-    let SERVER_URL = "https://dennise-ulcerative-kolby.ngrok-free.dev -> http://localhost:8000"; 
-    
+        const tg = window.Telegram.WebApp;
     let balance = 0.00;
     let userId = 0;
+    
+    // СЮДА ВСТАВЬ СВОЮ АКТУАЛЬНУЮ ССЫЛКУ ИЗ NGROK
+    const SERVER_URL = "https://dennise-ulcerative-kolby.ngrok-free.dev -> http://localhost:8000"; 
 
     window.onload = () => {
-    // 1. Пытаемся взять данные из системы Telegram (самый надежный способ)
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        userId = tg.initDataUnsafe.user.id;
-        console.log("ID взят из системы TG:", userId);
+        tg.expand();
+        tg.ready();
+
+        // 1. Пытаемся вытащить ID из системы Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userId = tg.initDataUnsafe.user.id;
+        }
+
+        // 2. Если не вышло, ищем в ссылке
+        const params = new URLSearchParams(window.location.search);
+        if (userId === 0) {
+            userId = parseInt(params.get('id') || 0);
+        }
+        
+        // 3. Берем баланс
+        balance = parseFloat(params.get('bal') || 0);
+
+        // ОБНОВЛЯЕМ ИНТЕРФЕЙС
+        document.getElementById('balance').innerText = balance.toFixed(2);
+        document.getElementById('myid').innerText = userId;
+        
+        if (userId !== 0) {
+            document.getElementById('welcome-text').innerText = "Баланс: " + balance.toFixed(2) + " ₽";
+        } else {
+            document.getElementById('welcome-text').innerText = "ОШИБКА: ID не найден!";
+        }
+    };
+
+    function updateDB() {
+        if (userId === 0) return;
+        
+        document.getElementById('balance').innerText = balance.toFixed(2);
+        
+        fetch(`${SERVER_URL}/update_balance`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            mode: 'cors',
+            body: JSON.stringify({
+                user_id: userId,
+                new_balance: balance.toFixed(2)
+            })
+        })
+        .then(res => res.json())
+        .then(data => console.log("Сохранено:", data))
+        .catch(e => console.error("Ошибка сети:", e));
     }
 
-    // 2. Если в системе нет, ищем в ссылке
-    const urlParams = new URLSearchParams(window.location.search);
-    if (userId === 0) {
-        userId = parseInt(urlParams.get('id') || 0);
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // DICE
+    function playDice(mode) {
+        let bet = parseFloat(document.getElementById('d-bet').value);
+        let chance = parseFloat(document.getElementById('d-chance').value);
+        if(bet > balance || bet <= 0) return alert("Недостаточно денег!");
+        
+        balance -= bet;
+        let roll = Math.random() * 100;
+        let win = mode === 'less' ? roll <= chance : roll >= (100 - chance);
+        if(win) balance += bet * (95 / chance);
+        
+        document.getElementById('d-result').innerText = win ? "ВЫИГРЫШ!" : "ПРОИГРЫШ";
+        updateDB();
     }
     
-    // 3. Берем баланс из ссылки
-    balance = parseFloat(urlParams.get('bal') || 0);
-
-    // ОБНОВЛЯЕМ ЭКРАН
-    document.getElementById('balance').innerText = balance.toFixed(2);
-    document.getElementById('myid').innerText = userId;
-    
-    if (userId !== 0) {
-        document.getElementById('welcome-text').innerText = "Ваш баланс: " + balance.toFixed(2) + " ₽";
-        document.getElementById('start-btn').style.display = "block"; // Показываем кнопку играть если была скрыта
-    } else {
-        document.getElementById('welcome-text').innerText = "Ошибка: ID не найден. Запустите через бота!";
-    }
-    
-    tg.expand();
-};
-
+    // Остальные функции (Mines и т.д.) добавь ниже по аналогии
     function updateDB() {
         console.log("Попытка сохранить баланс:", balance.toFixed(2)); // ПРОВЕРКА В КОНСОЛИ
         
