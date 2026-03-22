@@ -169,67 +169,48 @@ html
 
     // 1. ФУНКЦИЯ ЗАГРУЗКИ ДАННЫХ ПРИ СТАРТЕ
     async function loadUserData() {
-    // 1. Пытаемся достать ID из ссылки
     const params = new URLSearchParams(window.location.search);
     userId = parseInt(params.get('id') || 0);
 
-    // Если ID нет в ссылке, пробуем достать из Telegram WebApp напрямую
-    if (!userId && window.Telegram && window.Telegram.WebApp.initDataUnsafe.user) {
-        userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    if (!userId) {
+        // Если в ссылке нет ID, берем из данных телеграма
+        if (window.Telegram && window.Telegram.WebApp.initDataUnsafe.user) {
+            userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        }
     }
 
-    if (!userId || userId === 0) {
-        console.error("ID пользователя не найден!");
-        return;
-    }
+    if (!userId) return; // Если всё еще нет ID, ничего не делаем
 
-    document.getElementById('myid').innerText = userId;
+    document.getElementById('myid').inner Text = userId;
 
     try {
-        // Добавляем кэш-киллер (чтобы браузер не брал старые данные)
-        const response = await fetch(`${SERVER_URL}/get_user?user_id=${userId}&t=${Date.now()}`, {
-            method: 'GET',
-            headers: { 'Accept': 'application/json' }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Ошибка сервера: ${response.status}`);
-        }
-
-        const data = await response.json();
+        // Делаем запрос. Добавляем кэш-киллер.
+        const res = await fetch(`${SERVER_URL}/get_user?user_id=${userId}&cache=${Math.random()}`);
+        const data = await res.json();
         
-        // ПРОВЕРКА: Если сервер прислал баланс
-        if (data && typeof data.balance !== 'undefined') {
+        if (data && data.balance !== undefined) {
             balance = parseFloat(data.balance);
             updateBal();
-            console.log("Баланс успешно загружен:", balance);
-        } else {
-            throw new Error("Сервер прислал пустой ответ");
+            console.log("Успех! Баланс из базы:", balance);
         }
-
-    } catch (e) {
-        console.error("ДЕТАЛЬНАЯ ОШИБКА:", e);
-        // Пока оставляем алерт для отладки, потом уберем
-        alert("Связь установлена, но данные не получены. Проверь консоль.");
+    } catch (err) {
+        console.error("Ошибка загрузки:", err);
+        // Если ошибка всё еще тут, значит Ngrok блокирует запросы с заголовками
+        alert("Ошибка связи. Проверь Ngrok!");
     }
 }
 
-    // 2. ГЛАВНАЯ ФУНКЦИЯ СОХРАНЕНИЯ (ОТПРАВКА В БАЗУ)
-    function saveBalanceToDB() {
-        updateBal(); // Обновляем цифру на экране
+function saveBalanceToDB() {
+    updateBal();
+    if (!userId) return;
 
-        fetch(`${SERVER_URL}/update_balance`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                user_id: userId, 
-                new_balance: balance 
-            })
-        })
-        .then(res => res.json())
-        .then(data => console.log("Сохранено в БД:", data))
-        .catch(e => console.error("Ошибка при сохранении:", e));
-    }
+    fetch(`${SERVER_URL}/update_balance`, {
+        method: 'POST',
+        mode: 'cors', // Важно для работы между доменами
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, new_balance: balance })
+    }).catch(e => console.log("Ошибка сохранения:", e));
+}
 
     function updateBal() { 
         document.getElementById('balance').innerText = balance.toFixed(2); 
