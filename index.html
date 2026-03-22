@@ -107,17 +107,28 @@ html
     let userId = 0;
 
     window.onload = () => {
-        const params = new URLSearchParams(window.location.search);
-        balance = parseFloat(params.get('bal') || 0);
-        userId = parseInt(params.get('id') || 0);
-        
-        console.log("Загрузка игрока ID:", userId, "Баланс:", balance); // ПРОВЕРКА В КОНСОЛИ
-        
-        document.getElementById('balance').innerText = balance.toFixed(2);
-        document.getElementById('myid').innerText = userId;
+    // Пытаемся найти параметры в основной ссылке или во фрейме Телеграма
+    const urlParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.substring(1)); // На всякий случай
+
+    // Берем значения (если в основной ссылке нет, ищем в хэше)
+    balance = parseFloat(urlParams.get('bal') || hashParams.get('bal') || 0);
+    userId = parseInt(urlParams.get('id') || hashParams.get('id') || 0);
+
+    console.log("Данные из ссылки:", { userId, balance });
+
+    // Обновляем текст на экране
+    document.getElementById('balance').innerText = balance.toFixed(2);
+    document.getElementById('myid').innerText = userId;
+    
+    if (userId === 0) {
+        document.getElementById('welcome-text').innerText = "Ошибка: ID не найден. Перезайдите через бота!";
+    } else {
         document.getElementById('welcome-text').innerText = "Ваш баланс: " + balance.toFixed(2) + " ₽";
-        tg.expand();
-    };
+    }
+    
+    tg.expand();
+};
 
     function updateDB() {
         console.log("Попытка сохранить баланс:", balance.toFixed(2)); // ПРОВЕРКА В КОНСОЛИ
