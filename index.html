@@ -118,24 +118,36 @@ html
         const SERVER_URL = "https://dennise-ulcerative-kolby.ngrok-free.dev"; 
 
         async function loadUserData() {
-            const params = new URLSearchParams(window.location.search);
-            userId = parseInt(params.get('id') || 0);
-            if (!userId && tg.initDataUnsafe.user) userId = tg.initDataUnsafe.user.id;
-            if (!userId) return;
+    const params = new URLSearchParams(window.location.search);
+    // Берем ID из ссылки
+    userId = parseInt(params.get('id') || 0);
+    
+    // Если в ссылке нет, берем из данных Телеграма
+    if (!userId && window.Telegram && window.Telegram.WebApp.initDataUnsafe.user) {
+        userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    }
 
-            document.getElementById('myid').innerText = "ID: " + userId;
+    console.log("Загрузка для ID:", userId);
+    if (!userId) return;
 
-            try {
-                const res = await fetch(`${SERVER_URL}/get_user?user_id=${userId}&c=${Math.random()}`);
-                const data = await res.json();
-                if (data && data.balance !== undefined) {
-                    balance = parseFloat(data.balance);
-                    updateBal();
-                }
-            } catch (err) {
-                console.error("Ошибка загрузки:", err);
-            }
+    // ИСПРАВЛЕНО: убрали пробел в innerText
+    const idElement = document.getElementById('myid');
+    if (idElement) idElement.innerText = "ID: " + userId;
+
+    try {
+        const res = await fetch(`${SERVER_URL}/get_user?user_id=${userId}&cache=${Math.random()}`);
+        if (!res.ok) throw new Error("Ошибка сервера");
+        
+        const data = await res.json();
+        if (data && data.balance !== undefined) {
+            balance = parseFloat(data.balance);
+            updateBal(); // Рисуем баланс на экране
+            console.log("Баланс получен:", balance);
         }
+    } catch (err) {
+        console.error("Ошибка загрузки:", err);
+    }
+}
 
         function saveBalanceToDB() {
             updateBal();
