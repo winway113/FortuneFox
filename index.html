@@ -99,13 +99,25 @@ html
         };
 
         function updateDB() {
-            document.getElementById('balance').innerText = balance.toFixed(2);
-            fetch(`${SERVER_URL}/update_balance`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({user_id: userId, new_balance: balance.toFixed(2)})
-            }).catch(e => console.error(e));
-        }
+    document.getElementById('balance').innerText = balance.toFixed(2);
+    
+    // Проверь, что SERVER_URL у тебя вверху файла с https:// от ngrok
+    fetch(`${SERVER_URL}/update_balance`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        mode: 'cors', // Добавь эту строку
+        body: JSON.stringify({
+            user_id: userId,
+            new_balance: balance.toFixed(2)
+        })
+    })
+    .then(res => res.json())
+    .then(data => console.log("Сохранено в базу!", data))
+    .catch(e => console.error("Ошибка сохранения:", e));
+}
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
