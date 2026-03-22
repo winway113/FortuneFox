@@ -48,7 +48,8 @@ html
         </div>
 
         <!-- Лобби -->
-        <div id="lobby" class="screen"><div class="grid-2">
+        <div id="lobby" class="screen">
+            <div class="grid-2">
                 <div class="card" onclick="showScreen('mines-game')">💣<br>МИНЫ</div>
                 <div class="card" onclick="showScreen('dice-game')">🎲<br>DICE</div>
             </div>
@@ -84,179 +85,43 @@ html
 
     <script>
         const tg = window.Telegram.WebApp;
-    let balance = 0.00;
-    let userId = 0;
-    
-    // СЮДА ВСТАВЬ СВОЮ АКТУАЛЬНУЮ ССЫЛКУ ИЗ NGROK
-    const SERVER_URL = "https://dennise-ulcerative-kolby.ngrok-free.dev -> http://localhost:8000"; 
+        let balance = 0.00;
+        let userId = 0;
+        
+        // ВСТАВЬ СВОЮ ССЫЛКУ ИЗ NGROK (БЕЗ СЛОВ localhost И СТРЕЛОЧЕК)
+        const SERVER_URL = "https://dennise-ulcerative-kolby.ngrok-free.dev -> http://localhost:8000"; 
 
-    window.onload = () => {
-        tg.expand();
-        tg.ready();
-
-        // 1. Пытаемся вытащить ID из системы Telegram
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userId = tg.initDataUnsafe.user.id;
-        }
-
-        // 2. Если не вышло, ищем в ссылке
-        const params = new URLSearchParams(window.location.search);
-        if (userId === 0) {
+        window.onload = () => {
+            tg.expand();
+            tg.ready();
+            const params = new URLSearchParams(window.location.search);
             userId = parseInt(params.get('id') || 0);
-        }
-        
-        // 3. Берем баланс
-        balance = parseFloat(params.get('bal') || 0);
+            balance = parseFloat(params.get('bal') || 0);
 
-        // ОБНОВЛЯЕМ ИНТЕРФЕЙС
-        document.getElementById('balance').innerText = balance.toFixed(2);
-        document.getElementById('myid').innerText = userId;
-        
-        if (userId !== 0) {
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            document.getElementById('myid').innerText = userId;
             document.getElementById('welcome-text').innerText = "Баланс: " + balance.toFixed(2) + " ₽";
-        } else {
-            document.getElementById('welcome-text').innerText = "ОШИБКА: ID не найден!";
-        }
-    };
+        };
 
-    function updateDB() {
-        if (userId === 0) return;
-        
-        document.getElementById('balance').innerText = balance.toFixed(2);
-        
-        fetch(`${SERVER_URL}/update_balance`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            mode: 'cors',
-            body: JSON.stringify({
-                user_id: userId,
-                new_balance: balance.toFixed(2)
+        function updateDB() {
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            if (userId === 0) return;
+
+            fetch(`${SERVER_URL}/update_balance`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: userId, new_balance: balance })
             })
-        })
-        .then(res => res.json())
-        .then(data => console.log("Сохранено:", data))
-        .catch(e => console.error("Ошибка сети:", e));
-    }
-
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    // DICE
-    function playDice(mode) {
-        let bet = parseFloat(document.getElementById('d-bet').value);
-        let chance = parseFloat(document.getElementById('d-chance').value);
-        if(bet > balance || bet <= 0) return alert("Недостаточно денег!");
-        
-        balance -= bet;
-        let roll = Math.random() * 100;
-        let win = mode === 'less' ? roll <= chance : roll >= (100 - chance);
-        if(win) balance += bet * (95 / chance);
-        
-        document.getElementById('d-result').innerText = win ? "ВЫИГРЫШ!" : "ПРОИГРЫШ";
-        updateDB();
-    }
-    
-    // Остальные функции (Mines и т.д.) добавь ниже по аналогии
-    function updateDB() {
-        console.log("Попытка сохранить баланс:", balance.toFixed(2)); // ПРОВЕРКА В КОНСОЛИ
-        
-        document.getElementById('balance').innerText = balance.toFixed(2);
-        
-        if (userId === 0) {
-            console.error("Ошибка: userId равен 0, сохранение невозможно");
-            return;
+            .then(res => res.json())
+            .catch(e => console.error("Ошибка сохранения:", e));
         }
 
-        fetch(`${SERVER_URL}/update_balance`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            mode: 'cors',
-            body: JSON.stringify({
-                user_id: userId,
-                new_balance: balance.toFixed(2)
-            })
-        })
-        .then(res => {
-            console.log("Ответ от сервера получен:", res.status);
-            return res.json();
-        })
-        .then(data => console.log("База данных подтвердила сохранение!", data))
-        .catch(e => console.error("ОШИБКА СЕТИ (Сервер не видит сайт):", e));
-    }
-
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    // DICE (Пример с сохранением)
-    function playDice(mode) {
-        let bet = parseFloat(document.getElementById('d-bet').value);
-        let chance = parseFloat(document.getElementById('d-chance').value);
-        if(bet > balance || bet <= 0) return alert("Недостаточно денег!");
-        
-        balance -= bet;
-        let roll = Math.random() * 100;
-        let win = mode === 'less' ? roll <= chance : roll >= (100 - chance);
-        
-        if(win) balance += bet * (95 / chance);
-        
-        document.getElementById('d-result').innerText = win ? "ВЫИГРЫШ!" : "ПРОИГРЫШ";
-        updateDB(); // ВЫЗЫВАЕМ СОХРАНЕНИЕ
-    }
-
-    // МИНЫ (Пример с сохранением)
-    let mData = {active: false, bet: 0, mines: [], opened: 0};
-    function startMines() {
-        let bet = parseFloat(document.getElementById('m-bet').value);
-        if(bet > balance) return alert("Мало денег!");
-        balance -= bet;
-        mData = {active: true, bet: bet, mines: Array(25).fill(0).map(() => Math.random() < 0.2 ? 1 : 0), opened: 0};
-        document.getElementById('m-start').style.display = 'none';
-        document.getElementById('m-cash').style.display = 'block';
-        renderMines();
-        updateDB(); // СОХРАНЯЕМ СПИСАНИЕ СТАВКИ
-    }
-
-    function renderMines() {
-        const grid = document.getElementById('m-grid');
-        grid.innerHTML = '';
-        for(let i=0; i<25; i++) {
-            let cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.onclick = () => clickMine(i, cell);
-            grid.appendChild(cell);
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
-    }
 
-    function clickMine(i, el) {
-        if(!mData.active || el.innerText !== '') return;
-        if(mData.mines[i] === 1) {
-            el.classList.add('bomb'); el.innerText = '💣';
-            mData.active = false;
-            updateDB(); // СОХРАНЯЕМ ПРОИГРЫШ (баланс уже списан при старте)
-            alert("БОМБА!");
-            setTimeout(() => showScreen('lobby'), 1000);
-        } else {
-            el.classList.add('gem'); el.innerText = '💎';
-            mData.opened++;
-            document.getElementById('m-coeff').innerText = 'x' + (1 + mData.opened * 0.2).toFixed(2);
-        }
-    }
-
-    function cashMines() {
-        let coeff = 1 + mData.opened * 0.2;
-        balance += mData.bet * coeff;
-        mData.active = false;
-        document.getElementById('m-start').style.display = 'block';
-        document.getElementById('m-cash').style.display = 'none';
-        updateDB(); // СОХРАНЯЕМ ВЫИГРЫШ
-        alert("Забрали " + (mData.bet * coeff).toFixed(2) + " ₽");
-    }
-</script>
-        // DICE
+        // --- ЛОГИКА DICE ---
         function playDice(mode) {
             let bet = parseFloat(document.getElementById('d-bet').value);
             let chance = parseFloat(document.getElementById('d-chance').value);
@@ -265,21 +130,21 @@ html
             balance -= bet;
             let roll = Math.random() * 100;
             let win = mode === 'less' ? roll <= chance : roll >= (100 - chance);
-            
             if(win) balance += bet * (95 / chance);
             
             document.getElementById('d-result').innerText = win ? "ВЫИГРЫШ!" : "ПРОИГРЫШ";
             updateDB();
         }
 
-        // MINES
+        // --- ЛОГИКА МИНЫ ---
         let mData = {active: false, bet: 0, mines: [], opened: 0};
         function startMines() {
             let bet = parseFloat(document.getElementById('m-bet').value);
-            if(bet > balance) return alert("Мало денег!");
+            if(bet > balance || bet <= 0) return alert("Мало денег!");
             balance -= bet;
             mData = {active: true, bet: bet, mines: Array(25).fill(0).map(() => Math.random() < 0.2 ? 1 : 0), opened: 0};
-            document.getElementById('m-start').style.display = 'none';document.getElementById('m-cash').style.display = 'block';
+            document.getElementById('m-start').style.display = 'none';
+            document.getElementById('m-cash').style.display = 'block';
             renderMines();
             updateDB();
         }
@@ -301,7 +166,11 @@ html
                 el.classList.add('bomb'); el.innerText = '💣';
                 mData.active = false;
                 alert("БОМБА!");
-                setTimeout(() => showScreen('lobby'), 1000);
+                setTimeout(() => {
+                    showScreen('lobby');
+                    document.getElementById('m-start').style.display = 'block';
+                    document.getElementById('m-cash').style.display = 'none';
+                }, 1000);
             } else {
                 el.classList.add('gem'); el.innerText = '💎';
                 mData.opened++;
