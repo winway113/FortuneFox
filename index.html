@@ -160,84 +160,162 @@ html
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        let balance = 0.00; // Изначально 0, загрузим с сервера
-        let userId = tg.initDataUnsafe?.user?.id || "0000";
+    let tg = window.Telegram.WebApp;
+    let balance = 0.00; // Теперь изначально 0, загрузим с сервера
+    let userId = 0;
 
-        // ССЫЛКА НА ТВОЙ СЕРВЕР (NGROK)
-        const SERVER_URL = "https://dennise-ulcerative-kolby.ngrok-free.dev -> http://localhost:8000"; 
+    // !!! ВАЖНО: ЗАМЕНИ НА СВОЮ ССЫЛКУ ИЗ NGROK !!!
+    const SERVER_URL = "https://dennise-ulcerative-kolby.ngrok-free.dev"; 
 
-        // 1. ФУНКЦИЯ ЗАГРУЗКИ ДАННЫХ ПРИ СТАРТЕ
-        async function loadUserData() {
-            try {
-                const response = await fetch(`${SERVER_URL}/get_user?user_id=${userId}`);
-                const data = await response.json();
-                balance = data.balance;
-                document.getElementById('ref-count').innerText = data.ref_count || 0;
-                updateBal();
-            } catch (e) {
-                console.error("Ошибка загрузки:", e);
-                // Если сервер не ответил, берем из параметров (для тестов)
-                const params = new URLSearchParams(window.location.search);
-                balance = parseFloat(params.get('bal') || 100);
-                updateBal();
-            }
+    // 1. ФУНКЦИЯ ЗАГРУЗКИ ДАННЫХ ПРИ СТАРТЕ
+    async function loadUserData() {
+        const params = new URLSearchParams(window.location.search);
+        userId = parseInt(params.get('id') || 0);
+
+        if (userId === 0) {
+            alert("Ошибка: ID пользователя не найден!");
+            return;
         }
 
-        // 2. ФУНКЦИЯ СОХРАНЕНИЯ БАЛАНСА
-        function saveBalance() {
-            updateBal(); // Обновляем цифру на экране
-            fetch(`${SERVER_URL}/update_balance`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ user_id: userId, new_balance: balance })
-            }).catch(e => console.error("Ошибка сохранения:", e));
-        }
-
-        function updateBal() { 
-            document.getElementById('balance').innerText = balance.toFixed(2); 
-        }
-
-        // --- ВАЖНЫЕ ИЗМЕНЕНИЯ В ТВОИХ ФУНКЦИЯХ ---
-        // Везде, где ты делал "balance += ..." или "balance -= ...", 
-        // в конце нужно вызвать saveBalance() вместо updateBal()
-
-        function getDailyBonus() {
-            if (document.getElementById('daily-btn').disabled) return;
-            let amt = (Math.random() * 24 + 1).toFixed(2);
-            balance += parseFloat(amt);
-            saveBalance(); // СОХРАНЯЕМ В БД
-            document.getElementById('daily-btn').disabled = true;
-            document.getElementById('daily-btn').innerText = "ПОЛУЧЕНО";
-        }
-
-        function playDice(t) {
-            let b = parseFloat(document.getElementById('d-bet').value);
-            let c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance || isNaN(b) || b <= 0) { alert("Мало денег!"); return; }
+        try {
+            // Спрашиваем у сервера: "Сколько денег у этого ID в базе?"
+            const response = await fetch(`${SERVER_URL}/get_user?user_id=${userId}`);
+            const data = await response.json();
             
-            balance -= b; 
-            // Тут не вызываем сохранение сразу, подождем результата
-            
-            let r = Math.floor(Math.random() * 1000001);
-            let target = c * 10000;
-            let win = (t === 'less') ? (r < target) : (r >= (1000000 - target));
-            
-            if(win) { balance += b * (95/c); }saveBalance(); // СОХРАНЯЕМ ИТОГ (списание или выигрыш)
-            
-            // ... твой код анимации результата ...
+            balance = data.balance; // Устанавливаем баланс из базы данных
+            updateBal();
+            document.getElementById('myid').innerText = userId; // Если у тебя есть поле ID в хедере
+        } catch (e) {
+            console.error("Ошибка связи с сервером:", e);
+            alert("Сервер не отвечает. Баланс может не сохраняться.");
         }
+    }
 
-        // Аналогично добавь saveBalance() в:
-        // - startMines (после списания ставки)
-        // - cashoutMines (после зачисления выигрыша)
-        // - startCase (после списания за кейс и после выигрыша)
+    // 2. ГЛАВНАЯ ФУНКЦИЯ СОХРАНЕНИЯ (ОТПРАВКА В БАЗУ)
+    function saveBalanceToDB() {
+        updateBal(); // Обновляем цифру на экране
 
-        window.onload = () => {
-            tg.expand();
-            document.getElementById('ref-link').innerText = "https://t.me/FortuneFox_Bot?start=" + userId;
-            loadUserData(); // ЗАГРУЖАЕМ БАЛАНС ПРИ ВХОДЕ
-        };
+        fetch(`${SERVER_URL}/update_balance`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                user_id: userId, 
+                new_balance: balance 
+            })
+        })
+        .then(res => res.json())
+        .then(data => console.log("Сохранено в БД:", data))
+        .catch(e => console.error("Ошибка при сохранении:", e));
+    }
+
+    function updateBal() { 
+        document.getElementById('balance').innerText = balance.toFixed(2); 
+    }
+
+    function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
+    
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById(id).classList.add('active-screen');
+        if(id === 'mines-game') initMinesGrid();
+    }
+
+    function exitToLobby() { showScreen('lobby'); }
+
+    // --- ИЗМЕНЕНИЯ В ИГРАХ ---
+
+    function getDailyBonus() {
+        if (document.getElementById('daily-btn').disabled) return;
+        let amt = (Math.random() * 24 + 1).toFixed(2);
+        balance += parseFloat(amt);
+        
+        saveBalanceToDB(); // СРАЗУ СОХРАНЯЕМ В БАЗУ
+
+        document.getElementById('daily-btn').disabled = true;
+        document.getElementById('daily-btn').innerText = "ПОЛУЧЕНО";
+        alert("Бонус " + amt + " ₽ зачислен!");
+    }
+
+    function playDice(t) {
+        let b = parseFloat(document.getElementById('d-bet').value);
+        let c = parseFloat(document.getElementById('d-chance').value);
+        if(b > balance || isNaN(b) || b <= 0) { alert("Недостаточно баланса!"); return; }
+        
+        balance -= b; // Списываем ставку
+        // Не вызываем сохранение тут, дождемся результата выигрыша
+        
+        let r = Math.floor(Math.random() * 1000001);
+        let target = c * 10000;
+        let win = (t === 'less') ? (r < target) : (r >= (1000000 - target));
+        
+        if(win) { 
+            let w = b * (95/c); 
+            balance += w; 
+        }
+        
+        saveBalanceToDB(); // СОХРАНЯЕМ ИТОГОВЫЙ БАЛАНС В БАЗУ
+        
+        // Визуальная часть (плашка результата)
+        let p = document.getElementById('d-res-plate');
+        p.style.display = 'block';
+        p.style.background = win ? "#2ecc71" : "#ff7675";
+        p.innerText = win ? "ВЫИГРЫШ!" : "ПРОИГРЫШ";
+    }
+
+    // В МИНАХ:
+    function startMines() {
+        let b = parseFloat(document.getElementById('m-bet').value);
+        let n = parseInt(document.getElementById('m-bombs').value);
+        if(b > balance || n < 2 || n > 24) return;
+        
+        balance -= b; 
+        saveBalanceToDB(); // Сохраняем списание ставки
+        
+        mState = { active: true, bet: b, bombs: n, opened: 0, grid: Array(25).fill('gem') };
+        let cnt = 0; while(cnt < n) { let r = Math.floor(Math.random()*25); if(mState.grid[r]==='gem'){mState.grid[r]='bomb'; cnt++;} }
+        document.getElementById('m-start-btn').style.display = 'none';
+        document.getElementById('m-cash-btn').style.display = 'block';
+        initMinesGrid();
+    }
+
+    function cashoutMines() {
+        let win = mState.bet * getMult(); 
+        balance += win; 
+        
+        saveBalanceToDB(); // Сохраняем выигрыш в базу
+        
+        alert('Выиграно: ' + win.toFixed(2) + ' ₽'); 
+        resetMines();
+    }
+
+    // В КЕЙСАХ:
+    function startCase() {
+        if(balance < curCase.p || isSpinning) return;
+        isSpinning = true; 
+        
+        balance -= curCase.p; 
+        // Сохраним списание сразу, чтобы при вылете во время крутки деньги не вернулись
+        saveBalanceToDB(); 
+
+        let t = document.getElementById('tape');
+        let win = getPr(curCase.items, curCase.w);
+        // ... анимация крутки ...
+        setTimeout(() => { 
+            balance += win; 
+            saveBalanceToDB(); // Сохраняем выигрыш после завершения анимации
+            alert('Приз: ' + win + '₽'); 
+            isSpinning = false; 
+        }, 7200);
+    }
+
+    // ЗАПУСК ПРИ ЗАГРУЗКЕ
+    window.onload = () => {
+        tg.expand();
+        loadUserData(); // Идем в базу данных за балансом
+    };
+
+    // Остальные твои функции (initMinesGrid, clickMines, resetMines, getPr, и т.д.) оставь ниже без изменений
+</script>
         function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
         
