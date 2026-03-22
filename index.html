@@ -107,24 +107,30 @@ html
     let userId = 0;
 
     window.onload = () => {
-    // Пытаемся найти параметры в основной ссылке или во фрейме Телеграма
+    // 1. Пытаемся взять данные из системы Telegram (самый надежный способ)
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id;
+        console.log("ID взят из системы TG:", userId);
+    }
+
+    // 2. Если в системе нет, ищем в ссылке
     const urlParams = new URLSearchParams(window.location.search);
-    const hashParams = new URLSearchParams(window.location.hash.substring(1)); // На всякий случай
+    if (userId === 0) {
+        userId = parseInt(urlParams.get('id') || 0);
+    }
+    
+    // 3. Берем баланс из ссылки
+    balance = parseFloat(urlParams.get('bal') || 0);
 
-    // Берем значения (если в основной ссылке нет, ищем в хэше)
-    balance = parseFloat(urlParams.get('bal') || hashParams.get('bal') || 0);
-    userId = parseInt(urlParams.get('id') || hashParams.get('id') || 0);
-
-    console.log("Данные из ссылки:", { userId, balance });
-
-    // Обновляем текст на экране
+    // ОБНОВЛЯЕМ ЭКРАН
     document.getElementById('balance').innerText = balance.toFixed(2);
     document.getElementById('myid').innerText = userId;
     
-    if (userId === 0) {
-        document.getElementById('welcome-text').innerText = "Ошибка: ID не найден. Перезайдите через бота!";
-    } else {
+    if (userId !== 0) {
         document.getElementById('welcome-text').innerText = "Ваш баланс: " + balance.toFixed(2) + " ₽";
+        document.getElementById('start-btn').style.display = "block"; // Показываем кнопку играть если была скрыта
+    } else {
+        document.getElementById('welcome-text').innerText = "Ошибка: ID не найден. Запустите через бота!";
     }
     
     tg.expand();
