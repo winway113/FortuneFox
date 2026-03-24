@@ -174,19 +174,47 @@ html
             let c = parseFloat(document.getElementById('d-chance').value) || 1;
             document.getElementById('d-possible').innerText = (b * (95/c)).toFixed(2);
         }
-        function playDice(t) {
-            let b = parseFloat(document.getElementById('d-bet').value);
-            let c = parseFloat(document.getElementById('d-chance').value);
-            if(b > balance || b <= 0) return alert("Мало денег!");
-            balance -= b;
-            let r = Math.floor(Math.random() * 1000001);
-            let win = (t === 'less') ? (r < c * 10000) : (r >= (1000000 - c *10000));
-            if(win) balance += b * (95/c);
+        async function playDice(mode) {
+    let bet = parseFloat(document.getElementById('d-bet').value);
+    let chance = parseFloat(document.getElementById('d-chance').value);
+
+    if (bet > balance || bet <= 0) return alert("Мало денег!");
+
+    // Блокируем кнопку, чтобы не кликали по 100 раз
+    const btn = event.target;
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(`${SERVER_URL}/play_dice`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: userId,
+                bet: bet,
+                chance: chance,
+                mode: mode
+            })
+        });
+
+        const res = await response.json();
+        if (res.error) {
+            alert(res.error);
+        } else {
+            // Обновляем баланс и визуал из ответа сервера
+            balance = res.new_balance;
+            updateBal();
+
             let p = document.getElementById('d-res-plate');
-            p.style.display = 'block'; p.style.background = win ? "#2ecc71" : "#ff7675";
-            p.innerText = win ? "ВЫИГРЫШ!" : "ПРОИГРЫШ";
-            saveBalanceToDB();
+            p.style.display = 'block';
+            p.style.background = res.win ? "#2ecc71" : "#ff7675";
+            p.innerText = res.win ? `ВЫИГРЫШ! (${res.win_amount}₽) Выпало: ${res.roll}` : `ПРОИГРЫШ! Выпало: ${res.roll}`;
         }
+    } catch (e) {
+        console.error("Ошибка ставки:", e);
+    } finally {
+        btn.disabled = false;
+    }
+}
 
         // MINES
         let mState = { active: false, bet: 0, bombs: 0, opened: 0, grid: [] };
