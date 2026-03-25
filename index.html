@@ -10,18 +10,22 @@
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--dark-bg); color: white; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
         
+        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #161616; border-bottom: 2px solid var(--main-orange); height: 65px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .balance-box { background: #222; padding: 8px 15px; border-radius: 10px; border: 1px solid #333; display: flex; flex-direction: column; }
         .balance-amount { color: #2ecc71; font-weight: 800; font-size: 18px; }
         
+        /* MAIN LAYOUT */
         .main-container { height: calc(100vh - 65px); overflow-y: auto; padding: 20px; }
         .screen { display: none; flex-direction: column; gap: 20px; }
         .active-screen { display: flex; }
         
+        /* GAME CARDS */
         .game-card { background: var(--card-bg); padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #222; transition: 0.2s; position: relative; overflow: hidden; cursor: pointer; }
         .game-card:active { transform: scale(0.97); border-color: var(--main-orange); }
         .game-card h3 { margin: 0; color: var(--main-orange); font-size: 22px; }
 
+        /* INPUTS AND BUTTONS */
         .input-group { background: #222; padding: 10px; border-radius: 12px; border: 1px solid #333; }
         .input-group label { display: block; font-size: 11px; color: var(--text-gray); margin-bottom: 5px; text-transform: uppercase; }
         .input-row { display: flex; gap: 5px; align-items: center; }
@@ -33,14 +37,24 @@
         .btn { border: none; border-radius: 12px; padding: 18px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
         .btn-main { background: var(--main-orange); color: black; box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3); }
         .btn-success { background: #2ecc71; color: white; }
-        .btn-back { background:transparent; color: var(--text-gray); font-size: 14px; }
+        .btn-back { background: transparent; color: var(--text-gray); font-size: 14px; }
 
+        /* MINES SPECIFIC */
         .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 0 auto; width: 100%; max-width: 340px; }
-        .mine-cell { aspect-ratio: 1/1; background: #262626; border-radius: 10px; border-bottom: 4px solid #1a1a1a; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: 0.1s; }
+        .mine-cell { aspect-ratio: 1/1; background: #262626; border-radius: 10px; border-bottom: 4px solid #1a1a1a; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: 0.1s; cursor: pointer; }
         .mine-cell.gem { background: #2ecc71; border-color: #27ae60; box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
         .mine-cell.bomb { background: #e74c3c; border-color: #c0392b; }
 
+        /* DICE SPECIFIC */
         .dice-result { font-size: 50px; font-weight: 900; text-align: center; color: var(--main-orange); text-shadow: 0 0 20px rgba(255, 140, 0, 0.4); }
+        
+        /* SIDE MENU */
+        .menu-btn { position: fixed; bottom: 20px; right: 20px; background: var(--main-orange); width: 50px; height: 50px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .menu-btn span { width: 25px; height: 3px; background: #fff; border-radius: 2px; }
+        .side-menu { position: fixed; top: 0; right: -100%; width: 75%; height: 100%; background: #1e1e1e; z-index: 1000; transition: right 0.3s ease; border-left: 2px solid var(--main-orange); padding: 20px; box-shadow: -4px 0 15px rgba(0,0,0,0.5); }
+        .side-menu.open { right: 0; }
+        .menu-link { display: block; padding: 15px; color: #fff; text-decoration: none; font-weight: bold; border-bottom: 1px solid #333; font-size: 18px; }
+        .side-menu h2 { color: var(--main-orange); margin-top: 0; }
     </style>
 </head>
 <body>
@@ -58,18 +72,9 @@
     <div class="main-container">
         <!-- ЛОББИ -->
         <div id="lobby" class="screen active-screen">
-            <div class="game-card" onclick="showScreen('mines-game')">
-                <h3>💣 MINES</h3>
-                <p style="color: #666; font-size: 12px;">Найди лисьи сокровища</p>
-            </div>
-            <div class="game-card" onclick="showScreen('dice-game')">
-                <h3>🎲 DICE</h3>
-                <p style="color: #666; font-size: 12px;">Угадай число</p>
-            </div>
-            <div class="game-card" onclick="alert('Скоро!')" style="opacity: 0.5;">
-                <h3>🎰 SLOTS</h3>
-                <p style="color: #666; font-size: 12px;">В разработке</p>
-            </div>
+            <div class="game-card" onclick="showScreen('mines-game')"><h3>💣 MINES</h3></div>
+            <div class="game-card" onclick="showScreen('dice-game')"><h3>🎲 DICE</h3></div>
+            <div class="game-card" onclick="alert('Скоро!')" style="opacity: 0.5;"><h3>🎰 SLOTS</h3></div>
         </div>
 
         <!-- МИНЫ -->
@@ -81,8 +86,8 @@
                 <label>Ставка</label>
                 <div class="input-row">
                     <input type="number" id="m-bet" value="10" class="promo-input">
-                    <button class="btn-bet-tool" onclick="adj('m-bet', 0.5)">/2</button>
-                    <button class="btn-bet-tool" onclick="adj('m-bet', 2)">X2</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('m-bet', 0.5)">/2</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('m-bet', 2)">X2</button>
                 </div>
             </div>
             <div class="input-group">
@@ -92,7 +97,7 @@
 
             <button class="btn btn-main" id="m-start-btn" onclick="startMines()">ИГРАТЬ</button>
             <button class="btn btn-success" id="m-cash-btn" style="display:none;" onclick="cashoutMines()">ЗАБРАТЬ</button>
-            <button class="btn btn-back" onclick="exitToLobby()">ВЕРНУТЬСЯ В ЛЕС</button>
+            <button class="btn btn-back" onclick="exitToLobby()">В ЛОББИ</button>
         </div>
 
         <!-- ДАЙС -->
@@ -104,132 +109,182 @@
                 <label>Ставка</label>
                 <div class="input-row">
                     <input type="number" id="d-bet" value="10" class="promo-input" oninput="updDice()">
-                    <button class="btn-bet-tool" onclick="adj('d-bet', 'min')">MIN</button>
-                    <button class="btn-bet-tool" onclick="adj('d-bet', 0.5)">/2</button>
-                    <button class="btn-bet-tool" onclick="adj('d-bet', 2)">X2</button>
-                    <button class="btn-bet-tool" onclick="adj('d-bet', 'max')">MAX</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('d-bet', 'min')">MIN</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('d-bet', 0.5)">/2</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('d-bet', 2)">X2</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('d-bet', 'max')">MAX</button>
                 </div>
             </div>
             <div class="input-group">
                 <label>Шанс выигрыша %</label>
-                <input type="number" id="d-chance" value="50" class="promo-input" oninput="updDice()">
+                <div class="input-row">
+                    <input type="number" id="d-chance" value="50" class="promo-input" oninput="updDice()">
+                    <button class="btn-bet-tool" onclick="adjustInput('d-chance', 'min')">MIN</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('d-chance', 0.5)">/2</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('d-chance', 2)">X2</button>
+                    <button class="btn-bet-tool" onclick="adjustInput('d-chance', 'max')">MAX</button>
+                </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
                 <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
             </div>
-            <button class="btn btn-back" onclick="exitToLobby()">ВЕРНУТЬСЯ В ЛЕС</button>
+            <button class="btn btn-back" onclick="exitToLobby()">В ЛОББИ</button>
         </div>
+    </div>
+
+    <!-- SIDE MENU -->
+    <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    <div class="side-menu" id="side-menu">
+        <h2>FORTUNE FOX</h2>
+        <a href="#" class="menu-link" onclick="exitToLobby(); toggleMenu()">🎰 Игры</a>
+        <a href="#" class="menu-link" onclick="alert('Скоро!'); toggleMenu()">🎁 Бонусы</a>
+        <a href="#" class="menu-link" onclick="alert('Скоро!'); toggleMenu()">👥 Рефералка</a>
+        <a href="#" class="menu-link" onclick="alert('Скоро!'); toggleMenu()">💬 Поддержка</a>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        let balance = 0, userId = 0, mOpened = 0;
-        const SERVER = "https://fortune-fox.fun/"; // ЗАМЕНИ НА СВОЙ URL В АЕЗИ!
+        let balance = 0, userId = 0, mGameStarted = false;
+        const SERVER_URL = "https://fortune-fox.fun/"; // ЗАМЕНИ НА СВОЙ URL В АЕЗИ!
 
         async function load() {
-            const p = new URLSearchParams(window.location.search);
-            userId = p.get('id') || (tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0);
-            document.getElementById('myid').innerText = "ID: " + userId;
-            const r = await fetch(`${SERVER}/get_user?user_id=${userId}`);
-            const d = await r.json();
-            balance = d.balance;
-            updateUI();
+            try {
+                const p = new URLSearchParams(window.location.search);
+                userId = p.get('id') || (tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0);
+                document.getElementById('myid').innerText = "ID: " + userId;
+
+                const r = await fetch(`${SERVER_URL}/get_user?user_id=${userId}`);
+                const d = await r.json();
+                balance = d.balance;
+                updateUI();
+            } catch (error) {
+                console.error("Failed to load user data:", error);
+                alert("Ошибка загрузки данных! Попробуйте перезапустить бота.");
+            }
         }
 
         function updateUI() { document.getElementById('balance').innerText = balance.toFixed(2) + " ₽"; }
         
-        function adj(id, op) {
-            let i = document.getElementById(id);
-            let v = parseFloat(i.value);
-            if(op === 2) i.value = (v*2).toFixed(2);
-            if(op === 0.5) i.value = (v/2).toFixed(2);
-            if(op === 'max') i.value = balance.toFixed(2);
-            if(op === 'min') i.value = 1.00;
-            if(id === 'd-bet') updDice();
+        function adjustInput(id, operation) {
+            let input = document.getElementById(id);
+            let value = parseFloat(input.value) || 0;
+            
+            if (operation === 'min') {
+                input.value = (id === 'm-bombs') ? 2 : 1; // Минималка для мин - 2, для ставки - 1
+            } else if (operation === 'max') {
+                input.value = balance.toFixed(2);
+            } else if (operation === 0.5) {
+                input.value = (value / 2).toFixed(2);
+            } else if (operation === 2) {
+                input.value = (value * 2).toFixed(2);
+            }
+
+            if (id === 'd-bet' || id === 'd-chance') updDice();
         }
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.getElementById(id).classList.add('active-screen');
-            if(id === 'mines-game') initMines();
+            if(id === 'mines-game') resetMinesUI();
         }
         function exitToLobby() { showScreen('lobby'); }
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
 
         // --- DICE ---
         function updDice() {
-            let b = parseFloat(document.getElementById('d-bet').value) || 0;
-            let c = parseFloat(document.getElementById('d-chance').value) || 1;
-            document.getElementById('d-possible').innerText = "Выплата: " + (b * (95/c)).toFixed(2) + " ₽";
+            let bet = parseFloat(document.getElementById('d-bet').value) || 0;
+            let chance = parseFloat(document.getElementById('d-chance').value) || 1;
+            document.getElementById('d-possible').innerText = "Выплата: " + (bet * (95/chance)).toFixed(2) + " ₽";
         }
 
         async function playDice(mode) {
-            let b = parseFloat(document.getElementById('d-bet').value);
-            let c = parseFloat(document.getElementById('d-chance').value);
-            const r = await fetch(`${SERVER}/play_dice`, {
-                method: 'POST', body: JSON.stringify({user_id: userId, bet: b, chance: c, mode: mode})
+            let bet = parseFloat(document.getElementById('d-bet').value);
+            let chance = parseFloat(document.getElementById('d-chance').value);
+            if(bet <= 0 || bet > balance) return alert("Неверная ставка!");
+
+            const response = await fetch(`${SERVER_URL}/play_dice`, {
+                method: 'POST', body: JSON.stringify({user_id: userId, bet: bet, chance: chance, mode: mode})
             });
-            const d = await r.json();
-            if(d.error) return alert(d.error);
-            balance = d.new_balance; updateUI();
+            const data = await response.json();
+            
+            if(data.error) {
+                alert(data.error);
+                return;
+            }
+
+            balance = data.new_balance; updateUI();
             let resP = document.getElementById('d-res-display');
-            resP.innerText = d.roll.toString().padStart(6, '0');
-            resP.style.color = d.win ? "#2ecc71" : "#e74c3c";
+            resP.innerText = data.roll.toString().padStart(6, '0');
+            resP.style.color = data.win ? "#2ecc71" : "#e74c3c";
         }
 
         // --- MINES ---
-        function initMines() {
-            const g = document.getElementById('m-grid'); g.innerHTML = '';
+        function resetMinesUI() {
+            mGameStarted = false;
+            document.getElementById('m-start-btn').style.display = 'block';
+            document.getElementById('m-cash-btn').style.display = 'none';
+            document.getElementById('m-coeff').innerText = 'x0.00';
+            const grid = document.getElementById('m-grid'); grid.innerHTML = '';
             for(let i=0; i<25; i++) {
-                let c = document.createElement('div'); c.className = 'mine-cell';
-                c.onclick = () => clickMine(i, c); g.appendChild(c);
+                let cell = document.createElement('div'); cell.className = 'mine-cell';
+                cell.onclick = () => clickMine(i, cell); grid.appendChild(cell);
             }
         }
 
         async function startMines() {
-            let b = parseFloat(document.getElementById('m-bet').value);
-            let n = parseInt(document.getElementById('m-bombs').value);
-            const r = await fetch(`${SERVER}/mines_start`, {
-                method: 'POST', body: JSON.stringify({user_id: userId, bet: b, bombs: n})
+            let bet = parseFloat(document.getElementById('m-bet').value);
+            let bombs = parseInt(document.getElementById('m-bombs').value);
+            if(bet <= 0 || bet > balance) return alert("Неверная ставка!");
+            if(bombs < 2 || bombs > 24) return alert("Бомб должно быть от 2 до 24!");
+            
+            const response = await fetch(`${SERVER_URL}/mines_start`, {
+                method: 'POST', body: JSON.stringify({user_id: userId, bet: bet, bombs: bombs})
             });
-            const d = await r.json();
-            if(d.error) return alert(d.error);
-            balance = d.balance; updateUI(); mOpened = 0;
+            const data = await response.json();
+            
+            if(data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            balance = data.balance; updateUI();
+            mGameStarted = true;
             document.getElementById('m-start-btn').style.display = 'none';
-            document.getElementById('m-cash-btn').style.display = 'block';initMines();
+            document.getElementById('m-cash-btn').style.display = 'block';
         }
 
         async function clickMine(i, el) {
-            if(el.classList.contains('gem') || el.innerHTML !== '') return;
-            const r = await fetch(`${SERVER}/mines_click`, {
+            if(!mGameStarted || el.classList.contains('gem')) return;
+            
+            const response = await fetch(`${SERVER_URL}/mines_click`, {
                 method: 'POST', body: JSON.stringify({user_id: userId, cell_idx: i})
             });
-            const d = await r.json();
-            if(d.result === 'bomb') {
+            const data = await response.json();
+
+            if(data.result === 'bomb') {
                 el.classList.add('bomb'); el.innerText = '💣';
-                alert('БАБАХ!'); resetMines();
+                alert('БАБАХ! Вы проиграли.');
+                resetMinesUI();
             } else {
                 el.classList.add('gem'); el.innerText = '💎';
-                mOpened++;
-                document.getElementById('m-coeff').innerText = 'x' + d.coeff;
+                document.getElementById('m-coeff').innerText = 'x' + data.coeff;
             }
         }
 
         async function cashoutMines() {
-            if(mOpened === 0) return alert("Открой хоть один гем!");
-            const r = await fetch(`${SERVER}/mines_cashout`, {
+            const response = await fetch(`${SERVER_URL}/mines_cashout`, {
                 method: 'POST', body: JSON.stringify({user_id: userId})
             });
-            const d = await r.json();
-            balance = d.balance; updateUI();
-            alert('Забрал: ' + d.win + ' ₽'); resetMines();
-        }
-
-        function resetMines() {
-            document.getElementById('m-start-btn').style.display = 'block';
-            document.getElementById('m-cash-btn').style.display = 'none';
-            document.getElementById('m-coeff').innerText = 'x0.00';
+            const data = await response.json();
+            if(data.error) {
+                alert(data.error);
+                return;
+            }
+            balance = data.balance; updateUI();
+            alert('Забрал выигрыш: ' + data.win + ' ₽');
+            resetMinesUI();
         }
 
         window.onload = load;
