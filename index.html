@@ -7,7 +7,17 @@ html
     <title>FortuneFox</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+       css
+.btn-small {
+    background: #333;
+    color: white;
+    border: 1px solid #444;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.btn-small:active { background: #f39c12; color: black; } * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background-color: #121212; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #1e1e1e; border-bottom: 1px solid #f39c12; height: 60px; position: sticky; top: 0; z-index: 100; }
         .balance-badge { background: #2b2b2b; padding: 6px 12px; border-radius: 8px; border: 1px solid #333; }
@@ -58,30 +68,55 @@ html
         </div>
 
         <div id="mines-game" class="screen">
-            <div id="m-coeff" style="text-align:center; font-size:24px; color:#f39c12; font-weight:bold;">x0.00</div>
-            <div class="mines-grid" id="m-grid"></div>
-            <div class="grid-2col">
-                <div><label style="font-size:10px; color:#777;">СТАВКА</label><input type="number" id="m-bet" value="10" class="promo-input"></div>
-                <div><label style="font-size:10px; color:#777;">БОМБЫ</label><input type="number" id="m-bombs" value="3" class="promo-input"></div>
+    <div id="m-coeff" style="text-align:center; font-size:24px; color:#f39c12; font-weight:bold;">x0.00</div>
+    <div class="mines-grid" id="m-grid" style="margin-bottom: 15px;"></div>
+    
+    <div class="grid-2col">
+        <div>
+            <label style="font-size:10px; color:#777;">СТАВКА</label>
+            <div style="display: flex; gap: 3px;">
+                <input type="number" id="m-bet" value="10" class="promo-input">
+                <button class="btn-small" onclick="adjustBet('m-bet', 2)">x2</button>
             </div>
-            <button class="btn btn-main" id="m-start-btn" onclick="startMines()">ИГРАТЬ</button>
-            <button class="btn btn-success" id="m-cash-btn" style="display:none;" onclick="cashoutMines()">ЗАБРАТЬ</button>
-            <button class="btn btn-back" onclick="exitToLobby()">НАЗАД</button>
         </div>
+        <div>
+            <label style="font-size:10px; color:#777;">БОМБЫ</label>
+            <input type="number" id="m-bombs" value="3" class="promo-input" min="2" max="24">
+        </div>
+    </div>
+    
+    <button class="btn btn-main" id="m-start-btn" onclick="startMines()">ИГРАТЬ</button>
+    <button class="btn btn-success" id="m-cash-btn" style="display:none;" onclick="cashoutMines()">ЗАБРАТЬ</button>
+    
+    <button class="btn btn-back" onclick="exitToLobby()">НАЗАД</button>
+</div>
 
         <div id="dice-game" class="screen">
-            <div id="d-possible" style="font-size:45px; color:#f39c12; text-align:center; font-weight:bold; margin:10px 0;">20.00</div>
-            <div class="grid-2col">
-                <div><label style="font-size:10px; color:#777;">СТАВКА</label><input type="number" id="d-bet" value="10" class="promo-input" oninput="updDiceWin()"></div>
-                <div><label style="font-size:10px; color:#777;">ШАНС %</label><input type="number" id="d-chance" value="50" class="promo-input" oninput="updDiceWin()"></div>
-            </div>
-            <div class="grid-2col" style="margin-top:10px;">
-                <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
-                <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
-            </div>
-            <div id="d-res-plate" style="padding:15px; border-radius:10px; text-align:center; display:none; font-weight:bold; margin-top:10px;"></div>
-            <button class="btn btn-back" onclick="exitToLobby()">НАЗАД</button>
+    <div id="d-possible" style="font-size:45px; color:#f39c12; text-align:center; font-weight:bold; margin:10px 0;">20.00</div>
+    
+    <!-- Поле ввода и кнопки управления ставкой -->
+    <div style="margin-bottom: 10px;">
+        <label style="font-size:10px; color:#777;">СТАВКА</label>
+        <div style="display: flex; gap: 5px; align-items: center;">
+            <input type="number" id="d-bet" value="10" class="promo-input" oninput="updDiceWin()">
+            <button class="btn-small" onclick="adjustBet('d-bet', 0.5)">/2</button>
+            <button class="btn-small" onclick="adjustBet('d-bet', 2)">x2</button>
+            <button class="btn-small" onclick="adjustBet('d-bet', 'max')">MAX</button>
         </div>
+    </div>
+
+    <div><label style="font-size:10px; color:#777;">ШАНС %</label><input type="number" id="d-chance" value="50" class="promo-input" oninput="updDiceWin()"></div>
+
+    <div class="grid-2col" style="margin-top:10px;">
+        <button class="btn btn-main" onclick="playDice('less')">МЕНЬШЕ</button>
+        <button class="btn btn-main" onclick="playDice('more')">БОЛЬШЕ</button>
+    </div>
+    
+    <!-- Плашка результата -->
+    <div id="d-res-plate" style="padding:15px; border-radius:10px; text-align:center; display:none; font-weight:bold; margin-top:10px; font-size: 20px;"></div>
+    
+    <button class="btn btn-back" onclick="exitToLobby()">НАЗАД</button>
+</div>
 
         <div id="cases-game" class="screen">
             <div id="cases-grid" class="grid-2col">
@@ -203,6 +238,17 @@ html
             // Обновляем баланс и визуал из ответа сервера
             balance = res.new_balance;
             updateBal();
+            
+            // Функция для кнопок /2, x2, MAX
+function adjustBet(inputId, action) {
+    let input = document.getElementById(inputId);
+    let current = parseFloat(input.value) || 0;
+    if (action === 2) input.value = (current * 2).toFixed(2);
+    if (action === 0.5) input.value = (current / 2).toFixed(2);
+    if (action === 'max') input.value = balance.toFixed(2);
+    
+    if (inputId === 'd-bet') updDiceWin(); // Обновить множитель в дайсе сразу
+}
 
             let p = document.getElementById('d-res-plate');
             p.style.display = 'block';
@@ -249,6 +295,7 @@ async function clickMines(i) {
     if(!mState.active) return;
     let cell = document.getElementById('m-grid').children[i];
     if(cell.classList.contains('open-gem')) return;
+    // mState.opened++; // 
 
     const res = await fetch(`${SERVER_URL}/mines_click`, {
         method: 'POST',
@@ -266,7 +313,14 @@ async function clickMines(i) {
     }
 }
 
+// Измененная функция забора в минах
 async function cashoutMines() {
+    // mState.opened — это количество открытых ячеек
+    if (mState.opened === 0) {
+        alert("Откройте хотя бы одну ячейку!");
+        return;
+    }
+    
     const res = await fetch(`${SERVER_URL}/mines_cashout`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -278,6 +332,9 @@ async function cashoutMines() {
         alert('Выиграно: ' + data.win + ' ₽'); resetMines();
     }
 }
+
+// В функции clickMines(i) добавь строку инкремента opened:
+// mState.opened++; // прямо перед отправкой запроса или после получения ответа 'gem'
         function resetMines() {
             mState.active = false;
             document.getElementById('m-start-btn').style.display = 'block';
