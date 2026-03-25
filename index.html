@@ -225,38 +225,59 @@ html
                 cell.onclick = () => clickMines(i); grid.appendChild(cell);
             }
         }
-        function startMines() {
-            let b = parseFloat(document.getElementById('m-bet').value);
-            let n = parseInt(document.getElementById('m-bombs').value);
-            if(b > balance || n < 2 || n > 24) return alert("Ошибка ставки!");
-            balance -= b; saveBalanceToDB();
-            mState = { active: true, bet: b, bombs: n, opened: 0, grid: Array(25).fill('gem') };
-            let cnt = 0; while(cnt < n) { let r = Math.floor(Math.random()*25); if(mState.grid[r]==='gem'){mState.grid[r]='bomb'; cnt++;} }
-            document.getElementById('m-start-btn').style.display = 'none';
-            document.getElementById('m-cash-btn').style.display = 'block';
-            initMinesGrid();
-        }
-        function clickMines(i) {
-            if(!mState.active) return;
-            let cell = document.getElementById('m-grid').children[i];
-            if(cell.classList.contains('open-gem')) return;
-            if(mState.grid[i] === 'bomb') {
-                cell.classList.add('open-bomb'); cell.innerText = '💣';
-                mState.active = false; setTimeout(() => { alert('БОМБА!'); resetMines(); }, 500);
-            } else {
-                cell.classList.add('open-gem'); cell.innerText = '💎';
-                mState.opened++; document.getElementById('m-coeff').innerText = 'x' + getMult();
-            }
-        }
-        function getMult() {
-            let n=25, k=mState.bombs, o=mState.opened; if(o===0) return 0;
-            let res = 0.97; for(let i=0; i<o; i++) res *= (n-i)/(n-k-i);
-            return res.toFixed(2);
-        }
-        function cashoutMines() {
-            let win = mState.bet * getMult(); balance += win; 
-            saveBalanceToDB(); alert('Выиграно: ' + win.toFixed(2) + ' ₽'); resetMines();
-        }
+        async function startMines() {
+    let b = parseFloat(document.getElementById('m-bet').value);
+    let n = parseInt(document.getElementById('m-bombs').value);
+    
+    const res = await fetch(`${SERVER_URL}/mines_start`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: userId, bet: b, bombs: n })
+    });
+    const data = await res.json();
+    
+    if(data.error) return alert(data.error);
+    
+    balance = data.balance; updateBal();
+    mState = { active: true, opened: 0 }; // В JS теперь минимум инфы
+    document.getElementById('m-start-btn').style.display = 'none';
+    document.getElementById('m-cash-btn').style.display = 'block';
+    initMinesGrid();
+}
+
+async function clickMines(i) {
+    if(!mState.active) return;
+    let cell = document.getElementById('m-grid').children[i];
+    if(cell.classList.contains('open-gem')) return;
+
+    const res = await fetch(`${SERVER_URL}/mines_click`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: userId, cell_idx: i })
+    });
+    const data = await res.json();
+
+    if(data.result === 'bomb') {
+        cell.classList.add('open-bomb'); cell.innerText = '💣';
+        mState.active = false; alert('БОМБА!'); resetMines();
+    } else {
+        cell.classList.add('open-gem'); cell.innerText = '💎';
+        document.getElementById('m-coeff').innerText = 'x' + data.coeff;
+    }
+}
+
+async function cashoutMines() {
+    const res = await fetch(`${SERVER_URL}/mines_cashout`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: userId })
+    });
+    const data = await res.json();
+    if(data.win) {
+        balance = data.balance; updateBal();
+        alert('Выиграно: ' + data.win + ' ₽'); resetMines();
+    }
+}
         function resetMines() {
             mState.active = false;
             document.getElementById('m-start-btn').style.display = 'block';
