@@ -280,29 +280,34 @@
         }
 
         async function clickMines(i) {
-            if(!mState.active) return;
-            let cell = document.getElementById('cell-'+i);
-            if(cell.classList.contains('open-gem')) return;
+    if(!mState.active) return;
+    let cell = document.getElementById('cell-'+i);
+    if(cell.classList.contains('open-gem')) return;
 
-            const res = await fetch(`${SERVER_URL}/mines_click`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ user_id: userId, cell_idx: i })
-            }).then(r => r.json());
+    try {
+        const response = await fetch(`${SERVER_URL}/mines_click`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: userId, cell_idx: i })
+        });
+        const res = await response.json(); // Поменял data на res
 
-            if(data.result === 'bomb') {
-                cell.classList.add('open-bomb'); cell.innerText = '💣';
-                mState.active = false;
-                revealAllBombs(res.grid);
-                setTimeout(() => { alert('БОМБА! Игра окончена.'); resetMines(); }, 1000);
-            } else {
-                cell.classList.add('open-gem'); cell.innerText = '💎';
-                mState.opened++;
-                document.getElementById('m-coeff').innerText = 'x' + res.coeff;
-                document.getElementById('m-next').innerText = 'x' + res.next_coeff;
-                document.getElementById('m-cash-btn').style.display = 'block'; // Теперь можно забрать
-            }
+        if(res.result === 'bomb') {
+            cell.classList.add('open-bomb'); cell.innerText = '💣';
+            mState.active = false;
+            revealAllBombs(res.grid);
+            setTimeout(() => { alert('БОМБА! Игра окончена.'); resetMines(); }, 1000);
+        } else {
+            cell.classList.add('open-gem'); cell.innerText = '💎';
+            mState.opened++;
+            document.getElementById('m-coeff').innerText = 'x' + res.coeff;
+            document.getElementById('m-next').innerText = 'x' + res.next_coeff;
+            document.getElementById('m-cash-btn').style.display = 'block';
         }
+    } catch (e) {
+        console.error("Ошибка клика:", e);
+    }
+}
 
         function revealAllBombs(grid) {
             grid.forEach((val, idx) => {
@@ -370,37 +375,45 @@
         }
 
         async function startCase(isFast) {
-            if(isSpinning || balance < caseDB[curCaseId].p) return alert("Мало денег или уже крутится!");
-            
-            isSpinning = true;
-            const res = await fetch(`${SERVER_URL}/open_case`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ user_id: userId, case_id: curCaseId })
-            }).then(r => r.json());
+    if(isSpinning || balance < caseDB[curCaseId].p) return alert("Мало денег или уже крутится!");
+    
+    isSpinning = true;
+    try {
+        const response = await fetch(`${SERVER_URL}/open_case`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: userId, case_id: curCaseId })
+        });
+        const res = await response.json();
 
-            if(res.error) { isSpinning = false; return alert(res.error); }
-
-            let t = document.getElementById('tape');
-            let winAmount = res.win;
-            let winIdx = 60; // На какой элемент ленты приземлимся
-            
-            // Подменяем 60-й элемент на реальный выигрыш
-            t.children[winIdx].innerHTML = `<span style="font-size:10px; color:#f39c12">WINNER</span><b>${winAmount}</b> ₽`;
-            
-            let time = isFast ? 2000 : 5000;
-            let move = (winIdx * 80) - (document.querySelector('.roulette-container').offsetWidth / 2) + 40;
-            
-            t.style.transition = `transform ${time}ms cubic-bezier(0.1, 0, 0.1, 1)`;
-            t.style.transform = `translateX(-${move}px)`;
-
-            setTimeout(() => {
-                balance = res.balance; updateBal();
-                alert(`Выпало: ${winAmount} ₽`);
-                isSpinning = false;
-                resetTape();
-            }, time + 500);
+        if(res.error) { 
+            isSpinning = false; // Важно: разблокируем кнопку при ошибке
+            return alert(res.error); 
         }
+
+        let t = document.getElementById('tape');
+        let winAmount = res.win;
+        let winIdx = 60; 
+        
+        t.children[winIdx].innerHTML = `<span style="font-size:10px; color:#f39c12">WINNER</span><b>${winAmount}</b> ₽`;
+        
+        let time = isFast ? 1500 : 5000; // Быстрое открытие еще быстрее (1.5 сек)
+        let move = (winIdx * 80) - (document.querySelector('.roulette-container').offsetWidth / 2) + 40;
+        
+        t.style.transition = `transform ${time}ms cubic-bezier(0.1, 0, 0.1, 1)`;
+        t.style.transform = `translateX(-${move}px)`;
+
+        setTimeout(() => {
+            balance = res.balance; updateBal();
+            alert(`Выпало: ${winAmount} ₽`);
+            isSpinning = false;
+            resetTape();
+        }, time + 500);
+    } catch (err) {
+        isSpinning = false;
+        alert("Ошибка сервера при открытии кейса!");
+    }
+}
 
         function backToCases() { if(!isSpinning) { document.getElementById('cases-grid').style.display='grid'; document.getElementById('case-view').style.display='none'; } }
 
