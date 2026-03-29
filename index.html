@@ -283,13 +283,11 @@
 
 async function clickMines(i) {
     if(!mState.active || isClicking) return;
-    
     let cell = document.getElementById('cell-'+i);
     if(cell.classList.contains('open-gem') || cell.classList.contains('open-bomb')) return;
 
-    // Визуально показываем, что клетка нажата (ждем ответа)
     cell.style.opacity = "0.5";
-    isClicking = true; 
+    isClicking = true;
 
     try {
         const response = await fetch(`${SERVER_URL}/mines_click`, {
@@ -298,45 +296,40 @@ async function clickMines(i) {
             body: JSON.stringify({ user_id: userId, cell_idx: i })
         });
         const res = await response.json();
-
-        cell.style.opacity = "1"; // Возвращаем яркость
+        cell.style.opacity = "1";
 
         if(res.result === 'bomb') {
-            cell.classList.add('open-bomb'); 
-            cell.innerHTML = '💣';
+            cell.classList.add('open-bomb'); cell.innerHTML = '💣';
             mState.active = false;
             revealAllBombs(res.grid);
-            setTimeout(() => { alert('БОМБА!'); resetMines(); }, 500);
+            // ПРЯЧЕМ КНОПКУ ЗАБРАТЬ ПРИ БОМБЕ
+            document.getElementById('m-cash-btn').style.display = 'none';
+            document.getElementById('m-start-btn').style.display = 'block';
+            setTimeout(() => { alert('БОМБА!'); }, 100);
         } else {
-            cell.classList.add('open-gem'); 
-            cell.innerHTML = '💎';
+            cell.classList.add('open-gem'); cell.innerHTML = '💎';
             mState.opened++;
             document.getElementById('m-coeff').innerText = 'x' + res.coeff;
             document.getElementById('m-next').innerText = 'x' + res.next_coeff;
             document.getElementById('m-cash-btn').style.display = 'block';
         }
-    } catch (e) {
-        console.error("Ошибка:", e);
-        cell.style.opacity = "1";
-    } finally {
-        isClicking = false; // Разблокируем для следующего клика
-    }
+    } catch (e) { console.error(e); } finally { isClicking = false; }
 }
 
-        async function cashoutMines() {
-            const res = await fetch(`${SERVER_URL}/mines_cashout`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ user_id: userId })
-            }).then(r => r.json());
-            
-            if(res.win) {
-                balance = res.balance; updateBal();
-                revealAllBombs(res.grid);
-                alert('Выигрыш: ' + res.win + ' ₽');
-                resetMines();
-            }
-        }
+async function cashoutMines() {
+    const res = await fetch(`${SERVER_URL}/mines_cashout`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: userId })
+    }).then(r => r.json());
+    
+    if(res.win) {
+        balance = res.balance; updateBal();
+        revealAllBombs(res.grid);
+        alert('Выигрыш: ' + res.win + ' ₽');
+    }
+    resetMines(); // Эта функция вернет кнопку ИГРАТЬ
+}
         function resetMines() {
             mState.active = false;
             document.getElementById('m-start-btn').style.display = 'block';
