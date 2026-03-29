@@ -306,13 +306,18 @@ async function clickMines(i) {
         const res = await response.json();
         cell.style.opacity = "1";
 
+        if(res.error) {
+            alert("Игра не найдена или завершена. Начните заново.");
+            resetMines();
+            return;
+        }
+
         if(res.result === 'bomb') {
-            // МГНОВЕННО прячем кнопку забрать и показываем бомбу
             cell.classList.add('open-bomb'); 
             cell.innerHTML = '💣';
             revealAllBombs(res.grid);
-            resetMines(); // Кнопка "Забрать" исчезнет сразу
             alert('БОМБА!');
+            resetMines(); // СРАЗУ возвращаем кнопку ИГРАТЬ
         } else {
             cell.classList.add('open-gem'); 
             cell.innerHTML = '💎';
@@ -320,10 +325,11 @@ async function clickMines(i) {
             document.getElementById('m-coeff').innerText = 'x' + res.coeff;
             document.getElementById('m-next').innerText = 'x' + res.next_coeff;
             document.getElementById('m-cash-btn').style.display = 'block';
+            document.getElementById('m-start-btn').style.display = 'none';
         }
     } catch (e) { 
+        console.error(e);
         cell.style.opacity = "1";
-        console.error(e); 
     } finally { 
         isClicking = false; 
     }
@@ -332,7 +338,7 @@ async function clickMines(i) {
 async function cashoutMines() {
     if(!mState.active) return;
     
-    // МГНОВЕННО прячем кнопку, чтобы не нажали дважды
+    // Сразу блокируем кнопку, чтобы не тыкали дважды
     document.getElementById('m-cash-btn').style.display = 'none';
 
     try {
@@ -348,14 +354,15 @@ async function cashoutMines() {
             updateBal();
             revealAllBombs(res.grid);
             alert('Выиграно: ' + res.win + ' ₽');
+        } else if (res.error) {
+            alert("Ошибка: " + res.error);
         }
     } catch (e) {
-        alert("Ошибка при зачислении!");
+        alert("Ошибка связи с сервером");
     } finally {
-        resetMines(); // Возвращаем кнопку ИГРАТЬ
+        resetMines(); // В любом случае возвращаем кнопку ИГРАТЬ
     }
 }
-
         // --- ЛОГИКА КЕЙСЫ ---
         let curCaseId = null, isSpinning = false;
 
