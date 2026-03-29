@@ -279,10 +279,17 @@
             initMinesGrid();
         }
 
-        async function clickMines(i) {
-    if(!mState.active) return;
+        let isClicking = false; // Блокировка от двойных быстрых кликов
+
+async function clickMines(i) {
+    if(!mState.active || isClicking) return;
+    
     let cell = document.getElementById('cell-'+i);
-    if(cell.classList.contains('open-gem')) return;
+    if(cell.classList.contains('open-gem') || cell.classList.contains('open-bomb')) return;
+
+    // Визуально показываем, что клетка нажата (ждем ответа)
+    cell.style.opacity = "0.5";
+    isClicking = true; 
 
     try {
         const response = await fetch(`${SERVER_URL}/mines_click`, {
@@ -290,34 +297,31 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ user_id: userId, cell_idx: i })
         });
-        const res = await response.json(); // Поменял data на res
+        const res = await response.json();
+
+        cell.style.opacity = "1"; // Возвращаем яркость
 
         if(res.result === 'bomb') {
-            cell.classList.add('open-bomb'); cell.innerText = '💣';
+            cell.classList.add('open-bomb'); 
+            cell.innerHTML = '💣';
             mState.active = false;
             revealAllBombs(res.grid);
-            setTimeout(() => { alert('БОМБА! Игра окончена.'); resetMines(); }, 1000);
+            setTimeout(() => { alert('БОМБА!'); resetMines(); }, 500);
         } else {
-            cell.classList.add('open-gem'); cell.innerText = '💎';
+            cell.classList.add('open-gem'); 
+            cell.innerHTML = '💎';
             mState.opened++;
             document.getElementById('m-coeff').innerText = 'x' + res.coeff;
             document.getElementById('m-next').innerText = 'x' + res.next_coeff;
             document.getElementById('m-cash-btn').style.display = 'block';
         }
     } catch (e) {
-        console.error("Ошибка клика:", e);
+        console.error("Ошибка:", e);
+        cell.style.opacity = "1";
+    } finally {
+        isClicking = false; // Разблокируем для следующего клика
     }
 }
-
-        function revealAllBombs(grid) {
-            grid.forEach((val, idx) => {
-                if(val === 1) {
-                    let c = document.getElementById('cell-'+idx);
-                    if(!c.classList.contains('open-bomb')) c.classList.add('reveal-bomb');
-                    c.innerText = '💣';
-                }
-            });
-        }
 
         async function cashoutMines() {
             const res = await fetch(`${SERVER_URL}/mines_cashout`, {
