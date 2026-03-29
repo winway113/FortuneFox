@@ -281,13 +281,21 @@
 
         let isClicking = false; // Блокировка от двойных быстрых кликов
 
+// Функция сброса интерфейса (возвращаем кнопку ИГРАТЬ)
+function resetMines() {
+    mState.active = false;
+    document.getElementById('m-start-btn').style.display = 'block';
+    document.getElementById('m-cash-btn').style.display = 'none';
+    isClicking = false;
+}
+
 async function clickMines(i) {
     if(!mState.active || isClicking) return;
     let cell = document.getElementById('cell-'+i);
     if(cell.classList.contains('open-gem') || cell.classList.contains('open-bomb')) return;
 
-    cell.style.opacity = "0.5";
     isClicking = true;
+    cell.style.opacity = "0.5";
 
     try {
         const response = await fetch(`${SERVER_URL}/mines_click`, {
@@ -299,42 +307,54 @@ async function clickMines(i) {
         cell.style.opacity = "1";
 
         if(res.result === 'bomb') {
-            cell.classList.add('open-bomb'); cell.innerHTML = '💣';
-            mState.active = false;
+            // МГНОВЕННО прячем кнопку забрать и показываем бомбу
+            cell.classList.add('open-bomb'); 
+            cell.innerHTML = '💣';
             revealAllBombs(res.grid);
-            // ПРЯЧЕМ КНОПКУ ЗАБРАТЬ ПРИ БОМБЕ
-            document.getElementById('m-cash-btn').style.display = 'none';
-            document.getElementById('m-start-btn').style.display = 'block';
-            setTimeout(() => { alert('БОМБА!'); }, 100);
+            resetMines(); // Кнопка "Забрать" исчезнет сразу
+            alert('БОМБА!');
         } else {
-            cell.classList.add('open-gem'); cell.innerHTML = '💎';
+            cell.classList.add('open-gem'); 
+            cell.innerHTML = '💎';
             mState.opened++;
             document.getElementById('m-coeff').innerText = 'x' + res.coeff;
             document.getElementById('m-next').innerText = 'x' + res.next_coeff;
             document.getElementById('m-cash-btn').style.display = 'block';
         }
-    } catch (e) { console.error(e); } finally { isClicking = false; }
+    } catch (e) { 
+        cell.style.opacity = "1";
+        console.error(e); 
+    } finally { 
+        isClicking = false; 
+    }
 }
 
 async function cashoutMines() {
-    const res = await fetch(`${SERVER_URL}/mines_cashout`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ user_id: userId })
-    }).then(r => r.json());
+    if(!mState.active) return;
     
-    if(res.win) {
-        balance = res.balance; updateBal();
-        revealAllBombs(res.grid);
-        alert('Выигрыш: ' + res.win + ' ₽');
-    }
-    resetMines(); // Эта функция вернет кнопку ИГРАТЬ
-}
-        function resetMines() {
-            mState.active = false;
-            document.getElementById('m-start-btn').style.display = 'block';
-            document.getElementById('m-cash-btn').style.display = 'none';
+    // МГНОВЕННО прячем кнопку, чтобы не нажали дважды
+    document.getElementById('m-cash-btn').style.display = 'none';
+
+    try {
+        const response = await fetch(`${SERVER_URL}/mines_cashout`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: userId })
+        });
+        const res = await response.json();
+        
+        if(res.win) {
+            balance = res.balance; 
+            updateBal();
+            revealAllBombs(res.grid);
+            alert('Выиграно: ' + res.win + ' ₽');
         }
+    } catch (e) {
+        alert("Ошибка при зачислении!");
+    } finally {
+        resetMines(); // Возвращаем кнопку ИГРАТЬ
+    }
+}
 
         // --- ЛОГИКА КЕЙСЫ ---
         let curCaseId = null, isSpinning = false;
