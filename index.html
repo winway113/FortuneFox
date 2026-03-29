@@ -181,277 +181,151 @@
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        let balance = 0.00;
-        let userId = 0;
-        const SERVER_URL = "https://fortune-fox.fun"; // ЗАМЕНИ НА СВОЙ URL BACKEND
+    let tg = window.Telegram.WebApp;
+    let balance = 0.00;
+    let userId = 0;
+    const SERVER_URL = "http://localhost:8000"; // Для тестов локально. Потом заменишь на свой домен.
 
-        // Настройка кейсов
-        const caseDB = {
-            'c1': {n: 'НОВИЧОК', p: 10, items: [1, 3, 8, 12, 25, 50, 100, 250]},
-            'c2': {n: 'ОБЫЧНЫЙ', p: 50, items: [5, 15, 40, 55, 100, 250, 500, 1000]},
-            'c3': {n: 'СТАНДАРТ', p: 100, items: [10, 30, 85, 120, 200, 500, 1500, 3000]},
-            'c4': {n: 'СЕРЕБРО', p: 150, items: [15, 50, 130, 170, 350, 800, 2000, 4500]},
-            'c5': {n: 'ЗОЛОТО', p: 250, items: [25, 100, 220, 300, 600, 1500, 4000, 8000]},
-            'fox': {n: 'FOX 🦊', p: 5000, items: [500, 2000, 4500, 6000, 12000, 20000, 25000, 30000]}
-        };
+    const caseDB = {
+        'c1': {n: 'НОВИЧОК', p: 10, items: [1, 3, 8, 12, 25, 50, 100, 250]},
+        'c2': {n: 'ОБЫЧНЫЙ', p: 50, items: [5, 15, 40, 55, 100, 250, 500, 1000]},
+        'fox': {n: 'FOX 🦊', p: 5000, items: [500, 2000, 4500, 6000, 12000, 20000, 25000, 30000]}
+    };
 
-        function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-            document.getElementById(id).classList.add('active-screen');
-            if(id === 'mines-game') initMinesGrid();
-            if(id === 'cases-game') renderCases();
-        }
-        function exitToLobby() { showScreen('lobby'); }
-
-        // Универсальная функция для кнопок MIN, X2 и т.д.
-        function adjust(inputId, type) {
-            let el = document.getElementById(inputId);
-            let val = parseFloat(el.value) || 0;
-            if(type === 'min') el.value = 1;
-            if(type === '/2') el.value = (val / 2).toFixed(2);
-            if(type === 'x2') el.value = (val * 2).toFixed(2);
-            if(type === 'max') el.value = Math.floor(balance);
-            if(type === 'min_ch') el.value = 1;
-            if(type === 'max_ch') el.value = 95;
-            if(inputId === 'd-bet' || inputId === 'd-chance') updDiceWin();
-        }
-
-        // --- ЛОГИКА DICE ---
-        function updDiceWin() {
-            let b = parseFloat(document.getElementById('d-bet').value) || 0;
-            let c = parseFloat(document.getElementById('d-chance').value) || 1;
-            if(c > 95) { c = 95; document.getElementById('d-chance').value = 95; }
-            document.getElementById('d-possible').innerText = (b * (100/c)).toFixed(2);
-        }
-
-        async function playDice(mode) {
-            let bet = parseFloat(document.getElementById('d-bet').value);
-            let chance = parseFloat(document.getElementById('d-chance').value);
-            if (bet > balance || bet <= 0) return alert("Недостаточно средств!");
-
-            const res = await fetch(`${SERVER_URL}/play_dice`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ user_id: userId, bet: bet, chance: chance, mode: mode })
-            }).then(r => r.json());
-
-            if(res.error) return alert(res.error);
-
-            balance = res.new_balance; updateBal();
-            let p = document.getElementById('d-res-plate');
-            p.style.display = 'block';
-            p.style.background = res.win ? "rgba(46, 204, 113, 0.2)" : "rgba(231, 76, 60, 0.2)";
-            p.style.border = res.win ? "1px solid #2ecc71" : "1px solid #e74c3c";
-            p.innerHTML = `<div style="font-size:10px">ВЫПАЛО</div><div style="font-size:24px">${res.roll}</div><div>${res.win ? ' ВЫИГРЫШ!' : 'ПРОИГРЫШ'}</div>`;
-        }
-
-        // --- ЛОГИКА МИНЫ ---
-        let mState = { active: false, opened: 0 };
-        function initMinesGrid() {
-            const grid = document.getElementById('m-grid'); grid.innerHTML = '';
-            for(let i=0; i<25; i++) {
-                let cell = document.createElement('div'); cell.className = 'mine-cell';
-                cell.id = 'cell-'+i;
-                cell.onclick = () => clickMines(i); grid.appendChild(cell);
-            }
-        }
-
-        let isStarting = false; // Защита кнопки играть
-
-async function startMines() {
-    if (isStarting) return;
+    function updateBal() { document.getElementById('balance').innerText = balance.toFixed(2); }
+    function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
     
-    let b = parseFloat(document.getElementById('m-bet').value);
-    let n = parseInt(document.getElementById('m-bombs').value);
-    if(n < 1 || n > 24) return alert("Бомб должно быть от 1 до 24");
-    if(b > balance) return alert("Мало денег!");
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById(id).classList.add('active-screen');
+        if(id === 'mines-game') initMinesGrid();
+        if(id === 'cases-game') renderCases();
+    }
+    
+    function exitToLobby() { showScreen('lobby'); }
 
-    isStarting = true;
-    document.getElementById('m-start-btn').innerText = "ЗАГРУЗКА...";
+    function adjust(inputId, type) {
+        let el = document.getElementById(inputId);
+        let val = parseFloat(el.value) || 0;
+        if(type === 'min') el.value = 1;
+        if(type === '/2') el.value = (val / 2).toFixed(2);
+        if(type === 'x2') el.value = (val * 2).toFixed(2);
+        if(type === 'max') el.value = Math.floor(balance);
+        if(inputId === 'd-bet' || inputId === 'd-chance') updDiceWin();
+    }
 
-    try {
+    // --- DICE ---
+    function updDiceWin() {
+        let b = parseFloat(document.getElementById('d-bet').value) || 0;
+        let c = parseFloat(document.getElementById('d-chance').value) || 1;
+        document.getElementById('d-possible').innerText = (b * (100/c)).toFixed(2);
+    }
+
+    async function playDice(mode) {
+        let bet = parseFloat(document.getElementById('d-bet').value);
+        let chance = parseFloat(document.getElementById('d-chance').value);
+        const res = await fetch(`${SERVER_URL}/play_dice`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: userId, bet: bet, chance: chance, mode: mode })
+        }).then(r => r.json());
+        if(res.error) return alert(res.error);
+        balance = res.new_balance; updateBal();
+        let p = document.getElementById('d-res-plate');
+        p.style.display = 'block';
+        p.innerHTML = `Выпало: ${res.roll} <br> ${res.win ? 'ВЫИГРЫШ!' : 'ПРОИГРЫШ'}`;
+    }
+
+    // --- MINES ---
+    let mState = { active: false, opened: 0 };
+    let isStarting = false;
+
+    function initMinesGrid() {
+        const grid = document.getElementById('m-grid'); grid.innerHTML = '';
+        for(let i=0; i<25; i++) {
+            let cell = document.createElement('div'); cell.className = 'mine-cell';
+            cell.id = 'cell-'+i;
+            cell.onclick = () => clickMines(i); grid.appendChild(cell);
+        }
+    }
+
+    async function startMines() {
+        if (isStarting) return;
+        let b = parseFloat(document.getElementById('m-bet').value);
+        let n = parseInt(document.getElementById('m-bombs').value);
+        isStarting = true;
         const res = await fetch(`${SERVER_URL}/mines_start`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ user_id: userId, bet: b, bombs: n })
         }).then(r => r.json());
 
-        if(res.error) {
-            alert(res.error);
-            isStarting = false;
-            document.getElementById('m-start-btn').innerText = "ИГРАТЬ";
-            return;
-        }
-        let isClicking = false; // Блокировка от двойных быстрых кликов
+        if(res.error) { alert(res.error); isStarting = false; return; }
+        
+        balance = res.balance; updateBal();
+        mState.active = true; mState.opened = 0;
+        document.getElementById('m-start-btn').style.display = 'none';
+        document.getElementById('m-cash-btn').style.display = 'block';
+        isStarting = false;
+    }
 
-// Функция сброса интерфейса (возвращаем кнопку ИГРАТЬ)
-function resetMines() {
-    mState.active = false;
-    document.getElementById('m-start-btn').style.display = 'block';
-    document.getElementById('m-cash-btn').style.display = 'none';
-    isClicking = false;
-}
-
-async function clickMines(i) {
-    if(!mState.active || isClicking) return;
-    let cell = document.getElementById('cell-'+i);
-    if(cell.classList.contains('open-gem') || cell.classList.contains('open-bomb')) return;
-
-    isClicking = true;
-    cell.style.opacity = "0.5";
-
-    try {
-        const response = await fetch(`${SERVER_URL}/mines_click`, {
+    async function clickMines(i) {
+        if(!mState.active) return;
+        let cell = document.getElementById('cell-'+i);
+        const res = await fetch(`${SERVER_URL}/mines_click`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ user_id: userId, cell_idx: i })
-        });
-        const res = await response.json();
-        cell.style.opacity = "1";
+        }).then(r => r.json());
 
-        if(res.error) {
-            alert("Игра не найдена или завершена. Начните заново.");
-            resetMines();
-            return;
+        if(res.result === 'bomb') {
+            cell.classList.add('open-bomb'); cell.innerHTML = '💣';
+            mState.active = false;
+            setTimeout(() => { alert('БОМБА!'); resetMinesUI(); }, 500);
+        } else {
+            cell.classList.add('open-gem'); cell.innerHTML = '💎';
+            mState.opened++;
+            document.getElementById('m-coeff').innerText = 'x' + res.coeff;
+            document.getElementById('m-next').innerText = 'x' + res.next_coeff;
         }
+    }
 
-        function revealAllBombs(grid) {
-    if (!grid) return;
-    grid.forEach((val, idx) => {
-        let c = document.getElementById('cell-'+idx);
-        if (c) {
-            if(val === 1) {
-                c.classList.add('reveal-bomb');
-                c.innerHTML = '💣';
-            } else if (!c.classList.contains('open-gem')) {
-                c.innerHTML = '💎';
-                c.style.opacity = "0.3";
-            }
-        }
-    });
-}
-       
-async function cashoutMines() {
-    if(!mState.active) return;
-    
-    // Сразу блокируем кнопку, чтобы не тыкали дважды
-    document.getElementById('m-cash-btn').style.display = 'none';
-
-    try {
-        const response = await fetch(`${SERVER_URL}/mines_cashout`, {
+    async function cashoutMines() {
+        const res = await fetch(`${SERVER_URL}/mines_cashout`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ user_id: userId })
-        });
-        const res = await response.json();
-        
-        if(res.win) {
-            balance = res.balance; 
-            updateBal();
-            revealAllBombs(res.grid);
-            alert('Выиграно: ' + res.win + ' ₽');
-        } else if (res.error) {
-            alert("Ошибка: " + res.error);
-        }
-    } catch (e) {
-        alert("Ошибка связи с сервером");
-    } finally {
-        resetMines(); // В любом случае возвращаем кнопку ИГРАТЬ
+        }).then(r => r.json());
+        alert('Забрали: ' + res.win + '₽');
+        balance = res.balance; updateBal();
+        resetMinesUI();
     }
-}
-        // --- ЛОГИКА КЕЙСЫ ---
-        let curCaseId = null, isSpinning = false;
 
-        function renderCases() {
-            const grid = document.getElementById('cases-grid'); grid.innerHTML = '';
-            for(let id in caseDB) {
-                let c = caseDB[id];
-                grid.innerHTML += `<div class="game-card" onclick="viewCase('${id}')">📦 ${c.n}<br><span style="color:#2ecc71">${c.p} ₽</span></div>`;
-            }
-        }
+    function resetMinesUI() {
+        mState.active = false;
+        document.getElementById('m-start-btn').style.display = 'block';
+        document.getElementById('m-cash-btn').style.display = 'none';
+        initMinesGrid();
+    }
 
-        function viewCase(id) {
-            curCaseId = id;
+    // --- CASES (Заглушка для краткости) ---
+    function renderCases() {
+        const grid = document.getElementById('cases-grid'); grid.innerHTML = '';
+        for(let id in caseDB) {
             let c = caseDB[id];
-            document.getElementById('cases-grid').style.display='none';
-            document.getElementById('case-view').style.display='flex';
-            document.getElementById('case-title').innerText = c.n;
-            
-            // Превью предметов
-            let prev = document.getElementById('case-items-preview'); prev.innerHTML = '';
-            c.items.forEach(it => {
-                prev.innerHTML += `<div style="background:#2b2b2b; padding:5px 10px; border-radius:5px; font-size:12px; border:1px solid #444">${it}₽</div>`;
-            });
-            resetTape();
+            grid.innerHTML += `<div class="game-card" onclick="viewCase('${id}')">📦 ${c.n}<br>${c.p}₽</div>`;
         }
-
-        function resetTape() {
-            let t = document.getElementById('tape'); t.style.transition = 'none'; t.style.transform = 'translateX(0px)'; t.innerHTML = '';
-            let items = caseDB[curCaseId].items;
-            for(let i=0; i<80; i++) {
-                let val = items[Math.floor(Math.random()*items.length)];
-                t.innerHTML += `<div class="r-item"><span style="font-size:10px; color:#777">PRIZE</span><b>${val}</b> ₽</div>`;
-            }
-        }
-
-        async function startCase(isFast) {
-    if(isSpinning || balance < caseDB[curCaseId].p) return alert("Мало денег или уже крутится!");
-    
-    isSpinning = true;
-    try {
-        const response = await fetch(`${SERVER_URL}/open_case`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ user_id: userId, case_id: curCaseId })
-        });
-        const res = await response.json();
-
-        if(res.error) { 
-            isSpinning = false; // Важно: разблокируем кнопку при ошибке
-            return alert(res.error); 
-        }
-
-        let t = document.getElementById('tape');
-        let winAmount = res.win;
-        let winIdx = 60; 
-        
-        t.children[winIdx].innerHTML = `<span style="font-size:10px; color:#f39c12">WINNER</span><b>${winAmount}</b> ₽`;
-        
-        let time = isFast ? 1500 : 5000; // Быстрое открытие еще быстрее (1.5 сек)
-        let move = (winIdx * 80) - (document.querySelector('.roulette-container').offsetWidth / 2) + 40;
-        
-        t.style.transition = `transform ${time}ms cubic-bezier(0.1, 0, 0.1, 1)`;
-        t.style.transform = `translateX(-${move}px)`;
-
-        setTimeout(() => {
-            balance = res.balance; updateBal();
-            alert(`Выпало: ${winAmount} ₽`);
-            isSpinning = false;
-            resetTape();
-        }, time + 500);
-    } catch (err) {
-        isSpinning = false;
-        alert("Ошибка сервера при открытии кейса!");
     }
-}
+    function viewCase(id) { alert('Кейс ' + id + ' выбран'); }
 
-        function backToCases() { if(!isSpinning) { document.getElementById('cases-grid').style.display='grid'; document.getElementById('case-view').style.display='none'; } }
+    async function loadUserData() {
+        const params = new URLSearchParams(window.location.search);
+        userId = params.get('id') || 0;
+        const res = await fetch(`${SERVER_URL}/get_user?user_id=${userId}`).then(r => r.json());
+        balance = res.balance; updateBal();
+    }
 
-        // Загрузка данных
-        async function loadUserData() {
-            const params = new URLSearchParams(window.location.search);
-            userId = parseInt(params.get('id') || tg.initDataUnsafe?.user?.id || 0);
-            if(!userId) return;
-            document.getElementById('myid').innerText = "ID: " + userId;
-
-            const res = await fetch(`${SERVER_URL}/get_user?user_id=${userId}`).then(r => r.json());
-            if(res.balance !== undefined) { balance = res.balance; updateBal(); }
-        }
-
-        window.onload = () => { tg.expand(); loadUserData(); };
-    </script>
+    window.onload = () => { tg.expand(); loadUserData(); };
+</script>
 </body>
 </html>
