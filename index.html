@@ -259,26 +259,32 @@
             }
         }
 
-        async function startMines() {
-            let b = parseFloat(document.getElementById('m-bet').value);
-            let n = parseInt(document.getElementById('m-bombs').value);
-            if(n < 1 || n > 24) return alert("Бомб должно быть от 1 до 24");
+        let isStarting = false; // Защита кнопки играть
 
-            const res = await fetch(`${SERVER_URL}/mines_start`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ user_id: userId, bet: b, bombs: n })
-            }).then(r => r.json());
+async function startMines() {
+    if (isStarting) return;
+    
+    let b = parseFloat(document.getElementById('m-bet').value);
+    let n = parseInt(document.getElementById('m-bombs').value);
+    if(n < 1 || n > 24) return alert("Бомб должно быть от 1 до 24");
+    if(b > balance) return alert("Мало денег!");
 
-            if(res.error) return alert(res.error);
-            balance = res.balance; updateBal();
-            mState = { active: true, opened: 0 };
-            document.getElementById('m-start-btn').style.display = 'none';
-            document.getElementById('m-cash-btn').style.display = 'none'; // Скрыто, пока не нажмет 1 клетку
-            document.getElementById('m-coeff').innerText = 'x0.00';
-            initMinesGrid();
+    isStarting = true;
+    document.getElementById('m-start-btn').innerText = "ЗАГРУЗКА...";
+
+    try {
+        const res = await fetch(`${SERVER_URL}/mines_start`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: userId, bet: b, bombs: n })
+        }).then(r => r.json());
+
+        if(res.error) {
+            alert(res.error);
+            isStarting = false;
+            document.getElementById('m-start-btn').innerText = "ИГРАТЬ";
+            return;
         }
-
         let isClicking = false; // Блокировка от двойных быстрых кликов
 
 // Функция сброса интерфейса (возвращаем кнопку ИГРАТЬ)
@@ -312,29 +318,22 @@ async function clickMines(i) {
             return;
         }
 
-        if(res.result === 'bomb') {
-            cell.classList.add('open-bomb'); 
-            cell.innerHTML = '💣';
-            revealAllBombs(res.grid);
-            alert('БОМБА!');
-            resetMines(); // СРАЗУ возвращаем кнопку ИГРАТЬ
-        } else {
-            cell.classList.add('open-gem'); 
-            cell.innerHTML = '💎';
-            mState.opened++;
-            document.getElementById('m-coeff').innerText = 'x' + res.coeff;
-            document.getElementById('m-next').innerText = 'x' + res.next_coeff;
-            document.getElementById('m-cash-btn').style.display = 'block';
-            document.getElementById('m-start-btn').style.display = 'none';
+        function revealAllBombs(grid) {
+    if (!grid) return;
+    grid.forEach((val, idx) => {
+        let c = document.getElementById('cell-'+idx);
+        if (c) {
+            if(val === 1) {
+                c.classList.add('reveal-bomb');
+                c.innerHTML = '💣';
+            } else if (!c.classList.contains('open-gem')) {
+                c.innerHTML = '💎';
+                c.style.opacity = "0.3";
+            }
         }
-    } catch (e) { 
-        console.error(e);
-        cell.style.opacity = "1";
-    } finally { 
-        isClicking = false; 
-    }
+    });
 }
-
+       
 async function cashoutMines() {
     if(!mState.active) return;
     
